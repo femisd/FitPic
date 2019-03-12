@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">FitPic</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_friends_ui">Friends</string>
+    <string name="home">Home</string>
+    <string name="map">Map</string>
+    <string name="friends">Friends</string>
+
+</resources>
