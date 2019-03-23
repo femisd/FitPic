@@ -31,7 +31,8 @@ import java.util.List;
 public class FriendsUI extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
-    boolean doubleBackToExitPressedOnce = false;
+    private boolean doubleBackToExitPressedOnce = false;
+    private static boolean calledAlready;
 
     //Firebase fields
     private FirebaseAuth firebaseAuth;
@@ -54,7 +55,11 @@ public class FriendsUI extends AppCompatActivity {
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        if (!calledAlready) {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            calledAlready = true;
+        }
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         //Allow user to sign in if not already.
