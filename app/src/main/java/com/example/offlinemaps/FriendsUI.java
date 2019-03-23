@@ -2,6 +2,7 @@ package com.example.offlinemaps;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -27,7 +28,8 @@ import java.util.List;
 
 public class FriendsUI extends AppCompatActivity {
 
-    private DrawerLayout friendsDrawerLayout;
+    private DrawerLayout drawerLayout;
+    boolean doubleBackToExitPressedOnce = false;
 
     //Firebase fields
     private FirebaseAuth firebaseAuth;
@@ -50,16 +52,8 @@ public class FriendsUI extends AppCompatActivity {
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
+        //Allow user to sign in if not already.
         signIn();
-
-//        FloatingActionButton fab = findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
 
         ListView friends = (ListView) findViewById(R.id.lv_friends_list);
         ArrayList<User> userList = new ArrayList<>();
@@ -75,7 +69,7 @@ public class FriendsUI extends AppCompatActivity {
         FriendAdapterClass friendsAdapter = new FriendAdapterClass(this, userList);
         friends.setAdapter(friendsAdapter);
 
-        friendsDrawerLayout = findViewById(R.id.drawer_layout);
+        drawerLayout = findViewById(R.id.drawer_layout);
 
         NavigationView navigationView = findViewById(R.id.nv_friends_list);
         navigationView.setNavigationItemSelectedListener(
@@ -85,15 +79,25 @@ public class FriendsUI extends AppCompatActivity {
                         // set item as selected to persist highlight
                         menuItem.setChecked(true);
                         // close drawer when item is tapped
-                        friendsDrawerLayout.closeDrawers();
+                        drawerLayout.closeDrawers();
 
-                        // Add code here to update the UI based on the item selected
-                        // For example, swap UI fragments here
-                        if (menuItem.getItemId() == R.id.nav_map) {
-                            Intent i = new Intent(FriendsUI.this, MapsActivity.class);
-                            startActivity(i);
+                        //Update the UI based on the item selected
+                        switch(menuItem.getItemId()) {
+                            case R.id.nav_map:
+                                //Go to map activity.
+                                Intent map = new Intent(FriendsUI.this, MapsActivity.class);
+                                startActivity(map);
+                                break;
+                            case R.id.nav_leaderboard:
+                                //Go to leader board activity.
+                                Intent leaderboard = new Intent(FriendsUI.this, Leaderboard.class);
+                                startActivity(leaderboard);
+                                finish();
+                                break;
+                            case R.id.nav_home:
+                                //Go to main activity.
+                                break;
                         }
-
                         return true;
                     }
                 });
@@ -165,10 +169,28 @@ public class FriendsUI extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                friendsDrawerLayout.openDrawer(GravityCompat.START);
+                drawerLayout.openDrawer(GravityCompat.START);
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce=false;
+            }
+        }, 2000);
+    }
 }

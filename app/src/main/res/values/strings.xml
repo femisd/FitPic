@@ -5,5 +5,7 @@
     <string name="home">Home</string>
     <string name="map">Map</string>
     <string name="friends">Friends</string>
+    <string name="title_activity_leaderboard">Leaderboard</string>
+    <string name="leaderboard">Leaderboard</string>
 
 </resources>

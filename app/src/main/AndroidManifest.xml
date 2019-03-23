@@ -16,6 +16,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".Leaderboard"
+            android:label="@string/title_activity_leaderboard"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
             android:name=".FriendsUI"
             android:label="@string/title_activity_friends_ui"
             android:theme="@style/AppTheme.NoActionBar">
@@ -40,7 +44,8 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps">
-<!-- -->
+
+            <!--  -->
         </activity>
     </application>
 
