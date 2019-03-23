@@ -2,6 +2,7 @@ package com.example.offlinemaps;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -13,14 +14,30 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class FriendsUI extends AppCompatActivity {
 
-    private ListView listView;
-    private  FriendAdapterClass adapterClass;
     private DrawerLayout friendsDrawerLayout;
+
+    //Firebase fields
+    private FirebaseAuth firebaseAuth;
+    private FirebaseAuth.AuthStateListener authStateListener;
+    private static final int RC_SIGN_IN = 1;
+    private List<AuthUI.IdpConfig> providers = Arrays.asList(
+            new AuthUI.IdpConfig.EmailBuilder().build(),
+            new AuthUI.IdpConfig.PhoneBuilder().build(),
+            new AuthUI.IdpConfig.GoogleBuilder().build()
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +50,7 @@ public class FriendsUI extends AppCompatActivity {
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
+        signIn();
 
 //        FloatingActionButton fab = findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -43,19 +61,19 @@ public class FriendsUI extends AppCompatActivity {
 //            }
 //        });
 
-        listView = (ListView) findViewById(R.id.lv_friends_list);
+        ListView friends = (ListView) findViewById(R.id.lv_friends_list);
         ArrayList<User> userList = new ArrayList<>();
-        //common_google_signin_btn_icon_dark
-        userList.add(new User(R.drawable.joy, "Mike" , "Bournemouth, UK"));
-        userList.add(new User(R.drawable.common_google_signin_btn_text_dark_normal_background, "Ross" , "London, UK"));
-        userList.add(new User(R.drawable.fui_ic_check_circle_black_128dp, "Femi" , "Guildford, UK"));
-        userList.add(new User(R.drawable.googleg_standard_color_18, "Kai" , "London, UK"));
-        userList.add(new User(R.drawable.common_google_signin_btn_icon_dark, "Vytenis" , "Guildford, UK"));
-        userList.add(new User(R.drawable.common_google_signin_btn_icon_light, "Rayan" , "Guildford, UK"));
+        //Test data for list view
+        userList.add(new User(R.drawable.joy, "Mike", "Bournemouth, UK"));
+        userList.add(new User(R.drawable.common_google_signin_btn_text_dark_normal_background, "Ross", "London, UK"));
+        userList.add(new User(R.drawable.fui_ic_check_circle_black_128dp, "Femi", "Guildford, UK"));
+        userList.add(new User(R.drawable.googleg_standard_color_18, "Kai", "London, UK"));
+        userList.add(new User(R.drawable.common_google_signin_btn_icon_dark, "Vytenis", "Guildford, UK"));
+        userList.add(new User(R.drawable.common_google_signin_btn_icon_light, "Rayan", "Guildford, UK"));
 
 
-        adapterClass = new FriendAdapterClass(this, userList);
-        listView.setAdapter(adapterClass);
+        FriendAdapterClass friendsAdapter = new FriendAdapterClass(this, userList);
+        friends.setAdapter(friendsAdapter);
 
         friendsDrawerLayout = findViewById(R.id.drawer_layout);
 
@@ -80,6 +98,67 @@ public class FriendsUI extends AppCompatActivity {
                     }
                 });
 
+    }
+
+    /**
+    Method used to create a sign in page for the user and allow for them to sign themselves in
+     using either their google account or email address.
+     */
+    private void signIn() {
+        //Authentication for user to begin using app
+        firebaseAuth = FirebaseAuth.getInstance();
+        authStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    //user signed in.
+                    Toast.makeText(FriendsUI.this, "Signed in!", Toast.LENGTH_SHORT).show();
+                } else {
+                    //user is signed out.
+                    startActivityForResult(
+                            AuthUI.getInstance()
+                                    .createSignInIntentBuilder()
+                                    .setIsSmartLockEnabled(false)
+                                    .setAvailableProviders(Arrays.asList(
+                                            new AuthUI.IdpConfig.EmailBuilder().build(),
+                                            new AuthUI.IdpConfig.GoogleBuilder().build()))
+                                    .build(),
+                            RC_SIGN_IN);
+                }
+            }
+        };
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        firebaseAuth.addAuthStateListener(authStateListener);
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        firebaseAuth.removeAuthStateListener(authStateListener);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == RC_SIGN_IN) {
+            if (resultCode == RESULT_OK) {
+                Toast.makeText(this, "Signed in!", Toast.LENGTH_SHORT).show(); //Successful sign in.
+                return;
+
+            } else {
+                //permission granted
+            }
+        } else if (resultCode == RESULT_CANCELED) {
+            finish();
+            Toast.makeText(this, "Sign in cancelled", Toast.LENGTH_SHORT).show(); //Users exits mid sign in.
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
