@@ -33,7 +33,7 @@ public class FriendAdapterClass extends ArrayAdapter {
         User currentUser = userList.get(position);
 
         ImageView image = (ImageView) listItem.findViewById(R.id.iv_profile_pic);
-        image.setImageResource(currentUser.getmProfilePicture());
+        image.setImageResource((int) currentUser.getmProfilePicture());
 
         TextView name = (TextView) listItem.findViewById(R.id.tv_username);
         name.setText(currentUser.getmUsername());

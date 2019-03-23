@@ -19,6 +19,13 @@
             android:background="?attr/colorPrimary"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Upload"
+            android:id="@+id/bt_upload_user"/>
+
     </FrameLayout>
 
 

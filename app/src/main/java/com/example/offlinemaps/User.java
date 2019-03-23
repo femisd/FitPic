@@ -3,8 +3,10 @@ package com.example.offlinemaps;
 public class User {
 
     private String mUsername;
-    private int mProfilePicture;
+    private long mProfilePicture;
     private String mLocation;
+
+    public User() {}
 
     public User(int profilePicture, String username, String location) {
         mProfilePicture = profilePicture;
@@ -16,7 +18,7 @@ public class User {
         return mUsername;
     }
 
-    public int getmProfilePicture() {
+    public long getmProfilePicture() {
         return mProfilePicture;
     }
 
@@ -28,11 +30,20 @@ public class User {
         this.mUsername = mUsername;
     }
 
-    public void setmProfilePicture(int mProfilePicture) {
+    public void setmProfilePicture(long mProfilePicture) {
         this.mProfilePicture = mProfilePicture;
     }
 
     public void setmLocation(String mLocation) {
         this.mLocation = mLocation;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "mUsername='" + mUsername + '\'' +
+                ", mProfilePicture=" + mProfilePicture +
+                ", mLocation='" + mLocation + '\'' +
+                '}';
     }
 }

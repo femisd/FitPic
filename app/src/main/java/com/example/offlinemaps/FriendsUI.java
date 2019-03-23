@@ -4,23 +4,25 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,9 +39,9 @@ public class FriendsUI extends AppCompatActivity {
     private static final int RC_SIGN_IN = 1;
     private List<AuthUI.IdpConfig> providers = Arrays.asList(
             new AuthUI.IdpConfig.EmailBuilder().build(),
-            new AuthUI.IdpConfig.PhoneBuilder().build(),
             new AuthUI.IdpConfig.GoogleBuilder().build()
     );
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,21 +54,42 @@ public class FriendsUI extends AppCompatActivity {
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
         //Allow user to sign in if not already.
         signIn();
 
         ListView friends = (ListView) findViewById(R.id.lv_friends_list);
         ArrayList<User> userList = new ArrayList<>();
+        final FriendAdapterClass friendsAdapter = new FriendAdapterClass(this, userList);
+
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    for (DataSnapshot userSnapshot : postSnapshot.getChildren()) {
+                        User user = userSnapshot.getValue(User.class);
+                        friendsAdapter.add(user);
+                        Log.d("USER", user.toString());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         //Test data for list view
-        userList.add(new User(R.drawable.joy, "Mike", "Bournemouth, UK"));
-        userList.add(new User(R.drawable.common_google_signin_btn_text_dark_normal_background, "Ross", "London, UK"));
-        userList.add(new User(R.drawable.fui_ic_check_circle_black_128dp, "Femi", "Guildford, UK"));
-        userList.add(new User(R.drawable.googleg_standard_color_18, "Kai", "London, UK"));
-        userList.add(new User(R.drawable.common_google_signin_btn_icon_dark, "Vytenis", "Guildford, UK"));
-        userList.add(new User(R.drawable.common_google_signin_btn_icon_light, "Rayan", "Guildford, UK"));
+//        userList.add(new User(R.drawable.joy, "Mike", "Bournemouth, UK"));
+//        userList.add(new User(R.drawable.common_google_signin_btn_text_dark_normal_background, "Ross", "London, UK"));
+//        userList.add(new User(R.drawable.fui_ic_check_circle_black_128dp, "Femi", "Guildford, UK"));
+//        userList.add(new User(R.drawable.googleg_standard_color_18, "Kai", "London, UK"));
+//        userList.add(new User(R.drawable.common_google_signin_btn_icon_dark, "Vytenis", "Guildford, UK"));
+//        userList.add(new User(R.drawable.common_google_signin_btn_icon_light, "Rayan", "Guildford, UK"));
 
-
-        FriendAdapterClass friendsAdapter = new FriendAdapterClass(this, userList);
         friends.setAdapter(friendsAdapter);
 
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -82,7 +105,7 @@ public class FriendsUI extends AppCompatActivity {
                         drawerLayout.closeDrawers();
 
                         //Update the UI based on the item selected
-                        switch(menuItem.getItemId()) {
+                        switch (menuItem.getItemId()) {
                             case R.id.nav_map:
                                 //Go to map activity.
                                 Intent map = new Intent(FriendsUI.this, MapsActivity.class);
@@ -105,8 +128,8 @@ public class FriendsUI extends AppCompatActivity {
     }
 
     /**
-    Method used to create a sign in page for the user and allow for them to sign themselves in
-     using either their google account or email address.
+     * Method used to create a sign in page for the user and allow for them to sign themselves in
+     * using either their google account or email address.
      */
     private void signIn() {
         //Authentication for user to begin using app
@@ -189,7 +212,7 @@ public class FriendsUI extends AppCompatActivity {
 
             @Override
             public void run() {
-                doubleBackToExitPressedOnce=false;
+                doubleBackToExitPressedOnce = false;
             }
         }, 2000);
     }

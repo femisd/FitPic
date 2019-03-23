@@ -2,20 +2,27 @@ package com.example.offlinemaps;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class Leaderboard extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
+    private Button upload; //*
+
+    //Firebase fields
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +33,22 @@ public class Leaderboard extends AppCompatActivity {
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        upload = (Button) findViewById(R.id.bt_upload_user);
+
+        //Test
+        final User user = new User(R.drawable.common_google_signin_btn_icon_light, "Femi", "Guilford, UK");
+
+        upload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDatabase.child("users").push().setValue(user);
+                Log.d("Leaderboard","Clicked");
+            }
+        });
+        //Test
+
 
         drawerLayout = findViewById(R.id.drawer_layout);
 
@@ -40,7 +63,7 @@ public class Leaderboard extends AppCompatActivity {
                         drawerLayout.closeDrawers();
 
                         //Update the UI based on the item selected
-                        switch(menuItem.getItemId()) {
+                        switch (menuItem.getItemId()) {
                             case R.id.nav_map:
                                 //Go to map activity.
                                 Intent map = new Intent(Leaderboard.this, MapsActivity.class);
@@ -60,6 +83,7 @@ public class Leaderboard extends AppCompatActivity {
                         return true;
                     }
                 });
+
 
     }
 
