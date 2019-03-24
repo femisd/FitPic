@@ -35,14 +35,16 @@ public class FriendsUI extends AppCompatActivity {
     private static boolean calledAlready;
 
     //Firebase fields
+    private static final int RC_SIGN_IN = 1;
+
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
-    private static final int RC_SIGN_IN = 1;
+    private DatabaseReference mDatabase;
+
     private List<AuthUI.IdpConfig> providers = Arrays.asList(
             new AuthUI.IdpConfig.EmailBuilder().build(),
             new AuthUI.IdpConfig.GoogleBuilder().build()
     );
-    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,8 +78,9 @@ public class FriendsUI extends AppCompatActivity {
                     for (DataSnapshot userSnapshot : postSnapshot.getChildren()) {
                         User user = userSnapshot.getValue(User.class);
                         friendsAdapter.add(user);
-                        Log.d("USER", user.toString());
+                        friendsAdapter.notifyDataSetChanged();
                     }
+                    Log.d("JOY", "" + R.drawable.joy);
                 }
             }
 
@@ -152,9 +155,7 @@ public class FriendsUI extends AppCompatActivity {
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
                                     .setIsSmartLockEnabled(false)
-                                    .setAvailableProviders(Arrays.asList(
-                                            new AuthUI.IdpConfig.EmailBuilder().build(),
-                                            new AuthUI.IdpConfig.GoogleBuilder().build()))
+                                    .setAvailableProviders(providers)
                                     .build(),
                             RC_SIGN_IN);
                 }

@@ -19,12 +19,12 @@
             android:background="?attr/colorPrimary"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Upload"
-            android:id="@+id/bt_upload_user"/>
+        <ListView
+            android:layout_marginTop="55dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/lv_leaderboard_list">
+        </ListView>
 
     </FrameLayout>
 

@@ -28,7 +28,7 @@ public class FriendAdapterClass extends ArrayAdapter {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View listItem = convertView;
         if (listItem == null)
-            listItem = LayoutInflater.from(mContext).inflate(R.layout.friends_list_item, parent, false);
+            listItem = LayoutInflater.from(mContext).inflate(R.layout.friends_listview, parent, false);
 
         User currentUser = userList.get(position);
 

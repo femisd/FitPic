@@ -12,14 +12,16 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
+
 public class Leaderboard extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
-    private Button upload; //*
 
     //Firebase fields
     private DatabaseReference mDatabase;
@@ -35,20 +37,6 @@ public class Leaderboard extends AppCompatActivity {
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        upload = (Button) findViewById(R.id.bt_upload_user);
-
-        //Test
-        final User user = new User(R.drawable.common_google_signin_btn_icon_light, "Femi", "Guilford, UK");
-
-        upload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mDatabase.child("users").push().setValue(user);
-                Log.d("Leaderboard","Clicked");
-            }
-        });
-        //Test
-
 
         drawerLayout = findViewById(R.id.drawer_layout);
 
@@ -84,7 +72,14 @@ public class Leaderboard extends AppCompatActivity {
                     }
                 });
 
+        ListView leaderboard = findViewById(R.id.lv_leaderboard_list);
+        ArrayList<User> userList = new ArrayList<>();
+        final LeaderboardAdapterClass leaderboardAdapter = new LeaderboardAdapterClass(this, userList);
 
+        userList.add(new User(R.drawable.common_google_signin_btn_icon_dark, "Vytenis", "Guildford, UK"));
+        userList.add(new User(R.drawable.common_google_signin_btn_icon_light, "Rayan", "Guildford, UK"));
+
+        leaderboard.setAdapter(leaderboardAdapter);
     }
 
     @Override
@@ -97,4 +92,8 @@ public class Leaderboard extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
 }
