@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/iv_profile_pic"
         android:layout_width="75sp"
         android:layout_height="75sp"
@@ -37,40 +37,37 @@
         android:textSize="14sp" />
 
     <ImageView
+        android:id="@+id/iv_step_counter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/iv_step_counter"
-        android:src="@drawable/ic_step_counter"
-        android:layout_toEndOf="@id/iv_profile_pic"
-        android:layout_marginTop="15sp"
         android:layout_marginStart="160sp"
-        />
+        android:layout_marginTop="15sp"
+        android:layout_toEndOf="@id/iv_profile_pic"
+        android:src="@drawable/ic_step_counter" />
 
     <TextView
+        android:id="@+id/tv_step_counter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tv_step_counter"
-        android:layout_toEndOf="@+id/iv_step_counter"
         android:layout_marginTop="18sp"
-        android:text="20,000 steps"/>
+        android:layout_toEndOf="@+id/iv_step_counter" />
 
     <ImageView
+        android:id="@+id/iv_calorie"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/iv_calorie"
         android:layout_below="@id/iv_step_counter"
-        android:src="@drawable/ic_whatshot_black_24dp"
+        android:layout_marginTop="12sp"
         android:layout_toStartOf="@id/tv_calories_burnt"
-        android:layout_marginTop="12sp"/>
+        android:src="@drawable/ic_whatshot_black_24dp" />
 
     <TextView
+        android:id="@+id/tv_calories_burnt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tv_calories_burnt"
         android:layout_below="@+id/tv_step_counter"
-        android:layout_toEndOf="@id/iv_step_counter"
-        android:text="2,600 Calories Burnt"
-        android:layout_marginTop="18sp"/>
+        android:layout_marginTop="18sp"
+        android:layout_toEndOf="@id/iv_step_counter" />
 
 
 </RelativeLayout>

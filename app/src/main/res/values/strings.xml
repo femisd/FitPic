@@ -7,5 +7,13 @@
     <string name="friends">Friends</string>
     <string name="title_activity_leaderboard">Leaderboard</string>
     <string name="leaderboard">Leaderboard</string>
+    <string name="title_activity_profile_ui">ProfileUI</string>
+    <string name="profile">Profile</string>
+    <string name="Follow">Follow</string>
+    <string name="Followers">Followers</string>
+    <string name="Following">Following</string>
+    <string name="Calories_burnt">calories burnt</string>
+    <string name="steps">steps</string>
+    <string name="photos">Photos</string>
 
 </resources>

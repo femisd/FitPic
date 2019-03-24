@@ -42,6 +42,8 @@ public class LeaderboardAdapterClass extends ArrayAdapter {
 
         ImageView runningMan = (ImageView) listItem.findViewById(R.id.iv_step_counter);
 
+
+
         return listItem;
     }
 }

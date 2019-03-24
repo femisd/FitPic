@@ -2,17 +2,16 @@ package com.example.offlinemaps;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -22,6 +21,7 @@ import java.util.ArrayList;
 public class Leaderboard extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
+    private boolean doubleBackToExitPressedOnce;
 
     //Firebase fields
     private DatabaseReference mDatabase;
@@ -67,6 +67,10 @@ public class Leaderboard extends AppCompatActivity {
                             case R.id.nav_home:
                                 //Go to main activity.
                                 break;
+                            case R.id.nav_profile:
+                                Intent profile = new Intent(Leaderboard.this, ProfileUI.class);
+                                startActivity(profile);
+                                finish();
                         }
                         return true;
                     }
@@ -94,6 +98,20 @@ public class Leaderboard extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce = false;
+            }
+        }, 2000);
     }
 }

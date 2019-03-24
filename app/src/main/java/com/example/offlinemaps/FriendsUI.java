@@ -35,16 +35,7 @@ public class FriendsUI extends AppCompatActivity {
     private static boolean calledAlready;
 
     //Firebase fields
-    private static final int RC_SIGN_IN = 1;
-
-    private FirebaseAuth firebaseAuth;
-    private FirebaseAuth.AuthStateListener authStateListener;
     private DatabaseReference mDatabase;
-
-    private List<AuthUI.IdpConfig> providers = Arrays.asList(
-            new AuthUI.IdpConfig.EmailBuilder().build(),
-            new AuthUI.IdpConfig.GoogleBuilder().build()
-    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,14 +49,11 @@ public class FriendsUI extends AppCompatActivity {
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
         if (!calledAlready) {
-            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
             calledAlready = true;
         }
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-
-        //Allow user to sign in if not already.
-        signIn();
 
         ListView friends = (ListView) findViewById(R.id.lv_friends_list);
         ArrayList<User> userList = new ArrayList<>();
@@ -128,6 +116,10 @@ public class FriendsUI extends AppCompatActivity {
                             case R.id.nav_home:
                                 //Go to main activity.
                                 break;
+                            case R.id.nav_profile:
+                                Intent profile = new Intent(FriendsUI.this, ProfileUI.class);
+                                startActivity(profile);
+                                finish();
                         }
                         return true;
                     }
@@ -135,63 +127,14 @@ public class FriendsUI extends AppCompatActivity {
 
     }
 
-    /**
-     * Method used to create a sign in page for the user and allow for them to sign themselves in
-     * using either their google account or email address.
-     */
-    private void signIn() {
-        //Authentication for user to begin using app
-        firebaseAuth = FirebaseAuth.getInstance();
-        authStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    //user signed in.
-                    Toast.makeText(FriendsUI.this, "Signed in!", Toast.LENGTH_SHORT).show();
-                } else {
-                    //user is signed out.
-                    startActivityForResult(
-                            AuthUI.getInstance()
-                                    .createSignInIntentBuilder()
-                                    .setIsSmartLockEnabled(false)
-                                    .setAvailableProviders(providers)
-                                    .build(),
-                            RC_SIGN_IN);
-                }
-            }
-        };
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
-        firebaseAuth.addAuthStateListener(authStateListener);
-
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        firebaseAuth.removeAuthStateListener(authStateListener);
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == RC_SIGN_IN) {
-            if (resultCode == RESULT_OK) {
-                Toast.makeText(this, "Signed in!", Toast.LENGTH_SHORT).show(); //Successful sign in.
-                return;
-
-            } else {
-                //permission granted
-            }
-        } else if (resultCode == RESULT_CANCELED) {
-            finish();
-            Toast.makeText(this, "Sign in cancelled", Toast.LENGTH_SHORT).show(); //Users exits mid sign in.
-        }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
