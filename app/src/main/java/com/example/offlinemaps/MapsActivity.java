@@ -1,32 +1,16 @@
 package com.example.offlinemaps;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.widget.Toast;
 
-import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.maps.CameraUpdate;
+import androidx.fragment.app.FragmentActivity;
+import android.os.Bundle;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.TileOverlayOptions;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 

@@ -1,38 +1,66 @@
 package com.example.offlinemaps;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
+
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.util.Arrays;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class ProfileUI extends AppCompatActivity {
 
-    private DrawerLayout drawerLayout;
-    private boolean doubleBackToExitPressedOnce;
+    private DrawerLayout mDrawerLayout;
+    private boolean mDoubleBackToExitPressedOnce;
+    private CircleImageView mProfilePicture;
+    private String mCurrentUser;
 
-    //Firebase fields
+    //Final fields
+    private static final int GALLERY_PICK = 2;
     private static final int RC_SIGN_IN = 1;
 
+    //Firebase fields
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
+    private StorageReference userProfilePicturesRef;
+    private DatabaseReference userRef;
 
-    private List<AuthUI.IdpConfig> providers = Arrays.asList(
+    private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
             new AuthUI.IdpConfig.EmailBuilder().build(),
             new AuthUI.IdpConfig.GoogleBuilder().build()
     );
@@ -50,9 +78,15 @@ public class ProfileUI extends AppCompatActivity {
         //Prompt user for login.
         signIn();
 
-        drawerLayout = findViewById(R.id.drawer_layout);
+        //Initialisation of fields.
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nv_profile);
+        mProfilePicture = (CircleImageView) findViewById(R.id.cv_profile_picture);
 
-        NavigationView navigationView = findViewById(R.id.nv_profile);
+        //Firebase initialisation fields.
+        userProfilePicturesRef = FirebaseStorage.getInstance().getReference().child("Profile Pictures");
+
+
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -60,7 +94,7 @@ public class ProfileUI extends AppCompatActivity {
                         // set item as selected to persist highlight
                         menuItem.setChecked(true);
                         // close drawer when item is tapped
-                        drawerLayout.closeDrawers();
+                        mDrawerLayout.closeDrawers();
 
                         //Update the UI based on the item selected
                         switch (menuItem.getItemId()) {
@@ -86,7 +120,25 @@ public class ProfileUI extends AppCompatActivity {
                         return true;
                     }
                 });
+
+        /*
+        Allows user to select profile picture from an image in their gallery.
+         */
+        mProfilePicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Intent gallery = new Intent();
+//                gallery.setAction(Intent.ACTION_GET_CONTENT);
+//                gallery.setType("image/*");
+//                startActivityForResult(gallery, GALLERY_PICK);
+
+                CropImage.activity().setGuidelines(CropImageView.Guidelines.ON)
+                        .setAspectRatio(1, 1)
+                        .start(ProfileUI.this);
+            }
+        });
     }
+
 
     /**
      * Method used to create a sign in page for the user and allow for them to sign themselves in
@@ -101,6 +153,24 @@ public class ProfileUI extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     //user signed in.
+                    mCurrentUser = FirebaseAuth.getInstance().getUid();
+                    userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser);
+
+                    userRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                String image = dataSnapshot.child("profilePicture").getValue().toString();
+                                Log.d("IMAGE", image);
+                                Picasso.get().load(image).placeholder(R.drawable.ic_person_blue).into(mProfilePicture);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                     //Toast.makeText(FriendsUI.this, "Signed in!", Toast.LENGTH_SHORT).show();
                 } else {
                     //user is signed out.
@@ -108,7 +178,7 @@ public class ProfileUI extends AppCompatActivity {
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
                                     .setIsSmartLockEnabled(false)
-                                    .setAvailableProviders(providers)
+                                    .setAvailableProviders(mProviders)
                                     .build(),
                             RC_SIGN_IN);
                 }
@@ -134,7 +204,7 @@ public class ProfileUI extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                drawerLayout.openDrawer(GravityCompat.START);
+                mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -142,19 +212,19 @@ public class ProfileUI extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (doubleBackToExitPressedOnce) {
+        if (mDoubleBackToExitPressedOnce) {
             super.onBackPressed();
             return;
         }
 
-        this.doubleBackToExitPressedOnce = true;
+        this.mDoubleBackToExitPressedOnce = true;
         Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show();
 
         new Handler().postDelayed(new Runnable() {
 
             @Override
             public void run() {
-                doubleBackToExitPressedOnce = false;
+                mDoubleBackToExitPressedOnce = false;
             }
         }, 2000);
     }
@@ -172,6 +242,50 @@ public class ProfileUI extends AppCompatActivity {
         } else if (resultCode == RESULT_CANCELED) {
             finish();
             Toast.makeText(this, "Sign in cancelled", Toast.LENGTH_SHORT).show(); //Users exits mid sign in.
+        }
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri cropped = result.getUri();
+
+                final StorageReference filePath = userProfilePicturesRef.child(mCurrentUser + ".jpg");
+//                filePath.putFile(cropped).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            Toast.makeText(ProfileUI.this, "Profile pictured uploaded successfully!", Toast.LENGTH_SHORT).show();
+//
+//                            final String downloadURL = filePath.getDownloadUrl().toString();
+//                            userRef.child("profilePicture").setValue(downloadURL);
+//                        }
+//                    }
+//                });
+
+                filePath.putFile(cropped).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                    @Override
+                    public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                        if (!task.isSuccessful()) {
+                            throw task.getException();
+                        }
+
+                        // Continue with the task to get the download URL
+                        return filePath.getDownloadUrl();
+                    }
+                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if (task.isSuccessful()) {
+                            Uri downloadUri = task.getResult();
+                            Log.d("IMAGE", downloadUri + "");
+                            userRef.child("profilePicture").setValue(downloadUri.toString());
+                        } else {
+                            // Handle failures
+                            // ...
+                        }
+                    }
+                });
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
