@@ -12,9 +12,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,9 +31,11 @@ public class FriendsUI extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private boolean doubleBackToExitPressedOnce = false;
     private static boolean calledAlready;
+    private String mCurrentUser;
 
     //Firebase fields
     private DatabaseReference mDatabase;
+    private DatabaseReference userRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +54,8 @@ public class FriendsUI extends AppCompatActivity {
 //            calledAlready = true;
 //        }
 
+        mCurrentUser = FirebaseAuth.getInstance().getUid();
+        userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser);
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         ListView friends = (ListView) findViewById(R.id.lv_friends_list);
@@ -64,7 +71,6 @@ public class FriendsUI extends AppCompatActivity {
                         friendsAdapter.add(user);
                         friendsAdapter.notifyDataSetChanged();
                     }
-                    //Log.d("JOY", "" + R.drawable.joy);
                 }
             }
 
@@ -74,16 +80,10 @@ public class FriendsUI extends AppCompatActivity {
             }
         });
 
-        //Test data for list view
-//        userList.add(new User(R.drawable.joy, "Mike", "Bournemouth, UK"));
-//        userList.add(new User(R.drawable.common_google_signin_btn_text_dark_normal_background, "Ross", "London, UK"));
-//        userList.add(new User(R.drawable.fui_ic_check_circle_black_128dp, "Femi", "Guildford, UK"));
-//        userList.add(new User(R.drawable.googleg_standard_color_18, "Kai", "London, UK"));
-//        userList.add(new User(R.drawable.common_google_signin_btn_icon_dark, "Vytenis", "Guildford, UK"));
-//        userList.add(new User(R.drawable.common_google_signin_btn_icon_light, "Rayan", "Guildford, UK"));
-
+        //Set the friends list adapter.
         friends.setAdapter(friendsAdapter);
 
+        //Inflate the navigation drawer.
         drawerLayout = findViewById(R.id.drawer_layout);
 
         NavigationView navigationView = findViewById(R.id.nv_friends_list);
@@ -93,6 +93,7 @@ public class FriendsUI extends AppCompatActivity {
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         // set item as selected to persist highlight
                         menuItem.setChecked(true);
+
                         // close drawer when item is tapped
                         drawerLayout.closeDrawers();
 
@@ -112,6 +113,7 @@ public class FriendsUI extends AppCompatActivity {
                             case R.id.nav_home:
                                 //Go to main activity.
                                 break;
+                                //Got to profile activity.
                             case R.id.nav_profile:
                                 Intent profile = new Intent(FriendsUI.this, ProfileUI.class);
                                 startActivity(profile);
@@ -121,6 +123,18 @@ public class FriendsUI extends AppCompatActivity {
                     }
                 });
 
+
+        /**
+        Test feature
+         */
+//        Button friend = (Button) findViewById(R.id.add_friend);
+//        friend.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                User user = new User("", "Dan", "Bournemouth, UK", 0, 0, 0, 0,0);
+//                userRef.setValue(user);
+//            }
+//        });
     }
 
     @Override
@@ -142,6 +156,11 @@ public class FriendsUI extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    /*
+     * Method used to invoke the user whether they would
+     * like to quit the app with a confirmation before doing so.
+     */
 
     @Override
     public void onBackPressed() {

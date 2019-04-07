@@ -41,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="160sp"
-        android:layout_marginTop="15sp"
+        android:layout_marginTop="16sp"
         android:layout_toEndOf="@id/iv_profile_pic"
         android:src="@drawable/ic_step_counter" />
 
@@ -50,14 +50,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="18sp"
-        android:layout_toEndOf="@+id/iv_step_counter" />
+        android:layout_toEndOf="@+id/iv_step_counter"
+        android:textSize="17sp"
+        android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/iv_calorie"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/iv_step_counter"
-        android:layout_marginTop="12sp"
+        android:layout_marginTop="16sp"
         android:layout_toStartOf="@id/tv_calories_burnt"
         android:src="@drawable/ic_whatshot_black_24dp" />
 
@@ -67,7 +69,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tv_step_counter"
         android:layout_marginTop="18sp"
-        android:layout_toEndOf="@id/iv_step_counter" />
+        android:layout_toEndOf="@id/iv_step_counter"
+        android:textSize="17sp"
+        android:textStyle="bold" />
 
 
 </RelativeLayout>

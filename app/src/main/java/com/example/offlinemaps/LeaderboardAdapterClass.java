@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,16 +35,22 @@ public class LeaderboardAdapterClass extends ArrayAdapter {
         User currentUser = userList.get(position);
 
         ImageView image = (ImageView) listItem.findViewById(R.id.iv_profile_pic);
-        image.setImageResource((int) currentUser.getmProfilePicture());
+        //image.setImageResource((String) currentUser.getmProfilePicture());
+        if (!currentUser.getmProfilePicture().isEmpty()) {
+            Picasso.get().load(currentUser.getmProfilePicture()).placeholder(R.drawable.ic_person_blue).into(image);
+        }
 
         TextView name = (TextView) listItem.findViewById(R.id.tv_username);
         name.setText(currentUser.getmUsername());
 
-        TextView release = (TextView) listItem.findViewById(R.id.tv_location);
-        release.setText(currentUser.getmLocation());
+        TextView location = (TextView) listItem.findViewById(R.id.tv_location);
+        location.setText(currentUser.getmLocation());
 
-        ImageView runningMan = (ImageView) listItem.findViewById(R.id.iv_step_counter);
+        TextView steps = (TextView) listItem.findViewById(R.id.tv_step_counter);
+        steps.setText("" + currentUser.getmSteps());
 
+        TextView calories = (TextView) listItem.findViewById(R.id.tv_calories_burnt);
+        calories.setText(currentUser.getmCaloriesBurned() + "");
 
 
         return listItem;

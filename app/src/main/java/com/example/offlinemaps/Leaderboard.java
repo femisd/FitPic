@@ -80,8 +80,8 @@ public class Leaderboard extends AppCompatActivity {
         ArrayList<User> userList = new ArrayList<>();
         final LeaderboardAdapterClass leaderboardAdapter = new LeaderboardAdapterClass(this, userList);
 
-        userList.add(new User(R.drawable.common_google_signin_btn_icon_dark, "Vytenis", "Guildford, UK"));
-        userList.add(new User(R.drawable.common_google_signin_btn_icon_light, "Rayan", "Guildford, UK"));
+       userList.add(new User("https://firebasestorage.googleapis.com/v0/b/fitpic-2f0fd.appspot.com/o/Profile%20Pictures%2FlryFgJBnDAhlEECsXwGuF5zMUqO2.jpg?alt=media&token=3b1172ad-27bf-41a9-b8e8-faf10c27f946", "Mike", "Bournemouth, UK",5476,296.7,0,0,0));
+       userList.add(new User("https://firebasestorage.googleapis.com/v0/b/fitpic-2f0fd.appspot.com/o/Profile%20Pictures%2FPGeWAHVVV7U9yrEa4MrFc4y7cQQ2.jpg?alt=media&token=b6312e7b-80e3-466c-b099-809ebcdb20d5", "Vytenis", "Guildford, UK",894,40.8,0,0,0));
 
         leaderboard.setAdapter(leaderboardAdapter);
     }

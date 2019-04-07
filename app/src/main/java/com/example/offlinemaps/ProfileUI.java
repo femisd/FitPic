@@ -21,6 +21,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -51,7 +52,6 @@ public class ProfileUI extends AppCompatActivity {
     private String mCurrentUser;
 
     //Final fields
-    private static final int GALLERY_PICK = 2;
     private static final int RC_SIGN_IN = 1;
 
     //Firebase fields
@@ -111,6 +111,8 @@ public class ProfileUI extends AppCompatActivity {
                                 break;
                             case R.id.nav_home:
                                 //Go to main activity.
+                                firebaseAuth = FirebaseAuth.getInstance();
+                                firebaseAuth.signOut();
                                 break;
                             case R.id.nav_friends:
                                 Intent profile = new Intent(ProfileUI.this, FriendsUI.class);
@@ -127,11 +129,6 @@ public class ProfileUI extends AppCompatActivity {
         mProfilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent gallery = new Intent();
-//                gallery.setAction(Intent.ACTION_GET_CONTENT);
-//                gallery.setType("image/*");
-//                startActivityForResult(gallery, GALLERY_PICK);
-
                 CropImage.activity().setGuidelines(CropImageView.Guidelines.ON)
                         .setAspectRatio(1, 1)
                         .start(ProfileUI.this);
@@ -155,19 +152,55 @@ public class ProfileUI extends AppCompatActivity {
                     //user signed in.
                     mCurrentUser = FirebaseAuth.getInstance().getUid();
                     userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser);
+                    Log.d("TAG", userRef.toString());
 
                     userRef.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if (dataSnapshot.exists()) {
-                                String image = dataSnapshot.child("profilePicture").getValue().toString();
+                                String image = dataSnapshot.child("mProfilePicture").getValue().toString();
                                 Log.d("IMAGE", image);
-                                Picasso.get().load(image).placeholder(R.drawable.ic_person_blue).into(mProfilePicture);
+                                if (!image.isEmpty()) {
+                                    Picasso.get().load(image).placeholder(R.drawable.ic_person_white_24dp).into(mProfilePicture);
+                                }
+
+                                //User
+                                TextView user = (TextView) findViewById(R.id.tv_profile_id);
+                                user.setText(dataSnapshot.child("mUsername").getValue().toString());
+
+                                //Username
+                                TextView id = (TextView) findViewById(R.id.tv_profile_user);
+                                id.setText(dataSnapshot.child("mUsername").getValue().toString());
+
+                                //Steps
+                                TextView steps = (TextView) findViewById(R.id.tv_profile_steps);
+                                steps.setText(dataSnapshot.child("mSteps").getValue().toString());
+
+                                //Calories
+                                TextView calories = (TextView) findViewById(R.id.tv_profile_calories);
+                                calories.setText(dataSnapshot.child("mCaloriesBurned").getValue().toString());
+
+                                //Photos
+                                TextView photos = (TextView) findViewById(R.id.tv_profile_photos);
+                                photos.setText(dataSnapshot.child("mPhotos").getValue().toString());
+
+                                //Followers
+                                TextView followers = (TextView) findViewById(R.id.tv_profile_followers);
+                                followers.setText(dataSnapshot.child("mFollowers").getValue().toString());
+
+                                //Following
+                                TextView following = (TextView) findViewById(R.id.tv_profile_following);
+                                following.setText(dataSnapshot.child("mFollowing").getValue().toString());
+
+
+                            } else {
+                                User signedIn = new User("", "", "", 0, 0, 0, 0, 0);
+                                userRef.setValue(signedIn);
                             }
                         }
 
                         @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                        public void onCancelled(@NonNull DatabaseError dataaseError) {
 
                         }
                     });
@@ -250,17 +283,6 @@ public class ProfileUI extends AppCompatActivity {
                 Uri cropped = result.getUri();
 
                 final StorageReference filePath = userProfilePicturesRef.child(mCurrentUser + ".jpg");
-//                filePath.putFile(cropped).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-//                        if (task.isSuccessful()) {
-//                            Toast.makeText(ProfileUI.this, "Profile pictured uploaded successfully!", Toast.LENGTH_SHORT).show();
-//
-//                            final String downloadURL = filePath.getDownloadUrl().toString();
-//                            userRef.child("profilePicture").setValue(downloadURL);
-//                        }
-//                    }
-//                });
 
                 filePath.putFile(cropped).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                     @Override
@@ -278,10 +300,9 @@ public class ProfileUI extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Uri downloadUri = task.getResult();
                             Log.d("IMAGE", downloadUri + "");
-                            userRef.child("profilePicture").setValue(downloadUri.toString());
+                            userRef.child("mProfilePicture").setValue(downloadUri.toString());
                         } else {
                             // Handle failures
-                            // ...
                         }
                     }
                 });

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!-- Use DrawerLayout as root container for activity -->
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -49,7 +50,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="10dp"
-                        android:text="Mike Stainer"
+                        android:id="@+id/tv_profile_id"
                         android:textColor="#fff"
                         android:textSize="21sp"
                         android:textStyle="bold" />
@@ -84,7 +85,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingTop="10dp"
-                                android:text="125"
+                                android:id="@+id/tv_profile_photos"
                                 android:textColor="@color/startblue"
                                 android:textSize="20sp"
                                 android:textStyle="bold" />
@@ -108,7 +109,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingTop="10dp"
-                                android:text="1205"
+                                android:id="@+id/tv_profile_followers"
                                 android:textColor="@color/startblue"
                                 android:textSize="20sp"
                                 android:textStyle="bold" />
@@ -132,7 +133,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingTop="10dp"
-                                android:text="360"
+                                android:id="@+id/tv_profile_following"
                                 android:textColor="@color/startblue"
                                 android:textSize="20sp"
                                 android:textStyle="bold" />
@@ -168,8 +169,9 @@
                         android:layout_gravity="center_vertical"
                         android:paddingStart="20dp"
                         android:paddingEnd="20dp"
-                        android:text="ms01640"
-                        android:textStyle="bold" />
+                        android:id="@+id/tv_profile_user"
+                        android:textStyle="bold"
+                        android:textSize="20sp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -187,13 +189,20 @@
 
                     <TextView
                         android:layout_width="wrap_content"
-
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:paddingStart="20dp"
-                        android:paddingEnd="20dp"
-                        android:text="@string/steps"
-                        android:textStyle="bold" />
+                        android:paddingEnd="3dp"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:id="@+id/tv_profile_steps"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/Steps"
+                        android:textStyle="bold"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -211,13 +220,20 @@
 
                     <TextView
                         android:layout_width="wrap_content"
-
+                        android:id="@+id/tv_profile_calories"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:paddingStart="20dp"
-                        android:paddingEnd="20dp"
+                        android:paddingEnd="3dp"
+                        android:textStyle="bold"
+                        android:textSize="18sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:text="@string/Calories_burnt"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"/>
                 </LinearLayout>
             </LinearLayout>
 

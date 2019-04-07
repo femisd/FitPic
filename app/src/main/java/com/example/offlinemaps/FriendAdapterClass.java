@@ -10,6 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +35,10 @@ public class FriendAdapterClass extends ArrayAdapter {
         User currentUser = userList.get(position);
 
         ImageView image = (ImageView) listItem.findViewById(R.id.iv_profile_pic);
-        image.setImageResource((int) currentUser.getmProfilePicture());
+        //image.setImageResource((int) currentUser.getmProfilePicture());
+        if (!currentUser.getmProfilePicture().isEmpty()) {
+            Picasso.get().load(currentUser.getmProfilePicture()).placeholder(R.drawable.ic_person_blue).into(image);
+        }
 
         TextView name = (TextView) listItem.findViewById(R.id.tv_username);
         name.setText(currentUser.getmUsername());
