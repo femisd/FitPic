@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">FitPic</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_friends_ui">Friends</string>
+    <string name="home">Logout</string>
+    <string name="map">Map</string>
+    <string name="friends">Friends</string>
+    <string name="title_activity_leaderboard">Leaderboard</string>
+    <string name="leaderboard">Leaderboard</string>
+    <string name="title_activity_profile_ui">ProfileUI</string>
+    <string name="profile">Profile</string>
+    <string name="Follow">Follow</string>
+    <string name="Followers">Followers</string>
+    <string name="Following">Following</string>
+    <string name="Calories_burnt">cal</string>
+    <string name="photos">Photos</string>
+    <string name="Steps">steps</string>
+
+</resources>
