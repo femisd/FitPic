@@ -33,6 +33,15 @@
             android:label="@string/title_activity_leaderboard"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".StepCounterActivity"
+            android:label="Start Walking"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".GoalsActivity"
+            android:label="Daily Challenges"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".FriendsUI"
             android:label="@string/title_activity_friends_ui"
             android:theme="@style/AppTheme.NoActionBar"></activity>
