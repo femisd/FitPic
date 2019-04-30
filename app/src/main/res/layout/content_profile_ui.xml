@@ -246,6 +246,16 @@
                 android:text="@string/Follow"
                 android:textColor="@color/white" />
 
+            <Button
+                android:id="@+id/btn_startWalking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="35dp"
+                android:background="@drawable/buttonstyle"
+                android:text="Start Walking"
+                android:textColor="@color/white" />
+
         </LinearLayout>
     </FrameLayout>
 
