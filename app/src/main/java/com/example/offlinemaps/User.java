@@ -108,4 +108,7 @@ public class User {
     public void setmCaloriesBurned(double mCaloriesBurned) {
         this.mCaloriesBurned = mCaloriesBurned;
     }
+
+
+
 }

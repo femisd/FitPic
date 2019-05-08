@@ -15,7 +15,7 @@ public class GoalsActivity extends AppCompatActivity {
 
     private int currentStep;
     private RecyclerView goalsRecyclerView;
-    private RecyclerView.Adapter adapter;
+    private ChallengesAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
 
     @Override
@@ -28,7 +28,7 @@ public class GoalsActivity extends AppCompatActivity {
         currentStep = bundle.getInt("currentSteps");
 
 
-        ArrayList<Challenges> challengesList = new ArrayList<>();
+        final ArrayList<Challenges> challengesList = new ArrayList<>();
 
         challengesList.add(new Challenges(getCurrentStep(),"Walk 20 Steps!", 20, "Steps",20));
         challengesList.add(new Challenges(getCurrentStep(),"Walk 50 Steps!", 50, "Steps",50));
