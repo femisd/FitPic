@@ -21,6 +21,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class Leaderboard extends AppCompatActivity {
 
     //Firebase fields
     private DatabaseReference mDatabase;
-    private DatabaseReference pointsRef;
+    private Query pointsRef;
     private String currentUser;
 
     @Override
@@ -49,7 +50,7 @@ public class Leaderboard extends AppCompatActivity {
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         currentUser = FirebaseAuth.getInstance().getUid();
-        pointsRef = mDatabase.child(currentUser).child("mPoints");
+        pointsRef = mDatabase.child(currentUser).orderByChild("mPoints");
 
         final ListView leaderboard = findViewById(R.id.lv_leaderboard_list);
         final ArrayList<User> userList = new ArrayList<>();
@@ -62,6 +63,7 @@ public class Leaderboard extends AppCompatActivity {
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                leaderboardAdapter.clear();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     for (DataSnapshot userSnapshot : postSnapshot.getChildren()) {
                         User user = userSnapshot.getValue(User.class);
