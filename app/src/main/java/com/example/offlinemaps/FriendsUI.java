@@ -29,7 +29,6 @@ public class FriendsUI extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private boolean doubleBackToExitPressedOnce = false;
-    private static boolean calledAlready;
     private String mCurrentUser;
 
     //Firebase fields
@@ -46,12 +45,6 @@ public class FriendsUI extends AppCompatActivity {
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
-
-        //LOOK BACK AT THIS!
-//        if (!calledAlready) {
-//            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-//            calledAlready = true;
-//        }
 
         mCurrentUser = FirebaseAuth.getInstance().getUid();
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser);

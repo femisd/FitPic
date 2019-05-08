@@ -3,10 +3,12 @@ package com.example.offlinemaps;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -14,10 +16,16 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class Leaderboard extends AppCompatActivity {
 
@@ -26,6 +34,8 @@ public class Leaderboard extends AppCompatActivity {
 
     //Firebase fields
     private DatabaseReference mDatabase;
+    private DatabaseReference pointsRef;
+    private String currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +48,50 @@ public class Leaderboard extends AppCompatActivity {
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        currentUser = FirebaseAuth.getInstance().getUid();
+        pointsRef = mDatabase.child(currentUser).child("mPoints");
+
+        final ListView leaderboard = findViewById(R.id.lv_leaderboard_list);
+        final ArrayList<User> userList = new ArrayList<>();
+        final LeaderboardAdapterClass leaderboardAdapter = new LeaderboardAdapterClass(this, userList);
+
+        leaderboard.setAdapter(leaderboardAdapter);
 
         drawerLayout = findViewById(R.id.drawer_layout);
+
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    for (DataSnapshot userSnapshot : postSnapshot.getChildren()) {
+                        User user = userSnapshot.getValue(User.class);
+                        //Don't include users with no username.
+                        if (!userSnapshot.child("mUsername").getValue().toString().isEmpty() && !userList.contains(user)) {
+                            Log.d("USERNAME:", userSnapshot.child("mPoints").getValue().toString());
+                            userList.add(user);
+                            Log.d("LIST", "" + userList.toString());
+                        }
+                    }
+                }
+
+                //Sort by most points
+                Collections.sort(userList, new Comparator<User>() {
+                    @Override
+                    public int compare(User o1, User o2) {
+                        int comparePoints = o1.getmPoints();
+                        return o2.getmPoints() - comparePoints;
+                    }
+                });
+
+                //leaderboardAdapter.addAll(userList);
+                leaderboardAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         NavigationView navigationView = findViewById(R.id.nv_leaderboard);
         navigationView.setNavigationItemSelectedListener(
@@ -76,15 +128,6 @@ public class Leaderboard extends AppCompatActivity {
                         return true;
                     }
                 });
-
-        ListView leaderboard = findViewById(R.id.lv_leaderboard_list);
-        ArrayList<User> userList = new ArrayList<>();
-        final LeaderboardAdapterClass leaderboardAdapter = new LeaderboardAdapterClass(this, userList);
-
-       //userList.add(new User("https://firebasestorage.googleapis.com/v0/b/fitpic-2f0fd.appspot.com/o/Profile%20Pictures%2FlryFgJBnDAhlEECsXwGuF5zMUqO2.jpg?alt=media&token=3b1172ad-27bf-41a9-b8e8-faf10c27f946", "Mike", "Bournemouth, UK",5476,296.7,0,0,0));
-       //userList.add(new User("https://firebasestorage.googleapis.com/v0/b/fitpic-2f0fd.appspot.com/o/Profile%20Pictures%2FPGeWAHVVV7U9yrEa4MrFc4y7cQQ2.jpg?alt=media&token=b6312e7b-80e3-466c-b099-809ebcdb20d5", "Vytenis", "Guildford, UK",894,40.8,0,0,0));
-
-        leaderboard.setAdapter(leaderboardAdapter);
     }
 
     @Override

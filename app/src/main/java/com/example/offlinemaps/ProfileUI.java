@@ -50,6 +50,7 @@ public class ProfileUI extends AppCompatActivity {
     private boolean mDoubleBackToExitPressedOnce;
     private CircleImageView mProfilePicture;
     private String mCurrentUser;
+    private static boolean calledAlready;
 
     //Final fields
     private static final int RC_SIGN_IN = 1;
@@ -60,6 +61,7 @@ public class ProfileUI extends AppCompatActivity {
     private StorageReference userProfilePicturesRef;
     private DatabaseReference userRef;
 
+    //List of login methods.
     private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
             new AuthUI.IdpConfig.EmailBuilder().build(),
             new AuthUI.IdpConfig.GoogleBuilder().build()
@@ -80,6 +82,11 @@ public class ProfileUI extends AppCompatActivity {
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
+        if (!calledAlready) {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            calledAlready = true;
+        }
+
         //Prompt user for login.
         signIn();
 
@@ -91,7 +98,6 @@ public class ProfileUI extends AppCompatActivity {
 
         //Firebase initialisation fields.
         userProfilePicturesRef = FirebaseStorage.getInstance().getReference().child("Profile Pictures");
-
 
         //Test button for step counter
         startWalkingBtn = findViewById(R.id.btn_startWalking);

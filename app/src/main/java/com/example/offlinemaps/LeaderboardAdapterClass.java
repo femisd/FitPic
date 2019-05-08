@@ -1,14 +1,15 @@
 package com.example.offlinemaps;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.squareup.picasso.Picasso;
 
@@ -46,8 +47,8 @@ public class LeaderboardAdapterClass extends ArrayAdapter {
         TextView location = (TextView) listItem.findViewById(R.id.tv_location);
         location.setText(currentUser.getmLocation());
 
-        TextView steps = (TextView) listItem.findViewById(R.id.tv_step_counter);
-        steps.setText("" + currentUser.getmSteps());
+        TextView points = (TextView) listItem.findViewById(R.id.tv_point_counter);
+        points.setText("" + currentUser.getmPoints());
 
         TextView calories = (TextView) listItem.findViewById(R.id.tv_calories_burnt);
         calories.setText(currentUser.getmCaloriesBurned() + "");
