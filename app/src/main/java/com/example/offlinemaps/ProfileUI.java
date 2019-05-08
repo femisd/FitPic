@@ -11,6 +11,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -33,12 +40,6 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import java.util.Arrays;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileUI extends AppCompatActivity {
@@ -46,7 +47,6 @@ public class ProfileUI extends AppCompatActivity {
     //Test button for step counter!
     private Button startWalkingBtn;
 
-    private DrawerLayout mDrawerLayout;
     private boolean mDoubleBackToExitPressedOnce;
     private CircleImageView mProfilePicture;
     private String mCurrentUser;
@@ -65,11 +65,16 @@ public class ProfileUI extends AppCompatActivity {
             new AuthUI.IdpConfig.GoogleBuilder().build()
     );
 
+    //fields for nav view.
+    private DrawerLayout mDrawer;
+    private Toolbar toolbar;
+    private NavigationView mNavView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_ui);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
@@ -79,8 +84,9 @@ public class ProfileUI extends AppCompatActivity {
         signIn();
 
         //Initialisation of fields.
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nv_profile);
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mNavView = (NavigationView) findViewById(R.id.nv_profile);
+        setupDrawerContent(mNavView);
         mProfilePicture = (CircleImageView) findViewById(R.id.cv_profile_picture);
 
         //Firebase initialisation fields.
@@ -97,42 +103,6 @@ public class ProfileUI extends AppCompatActivity {
             }
         });
 
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        // set item as selected to persist highlight
-                        menuItem.setChecked(true);
-                        // close drawer when item is tapped
-                        mDrawerLayout.closeDrawers();
-
-                        //Update the UI based on the item selected
-                        switch (menuItem.getItemId()) {
-                            case R.id.nav_map:
-                                //Go to map activity.
-                                Intent map = new Intent(ProfileUI.this, MapsActivity.class);
-                                startActivity(map);
-                                break;
-                            case R.id.nav_leaderboard:
-                                //Go to leader board activity.
-                                Intent leaderboard = new Intent(ProfileUI.this, Leaderboard.class);
-                                startActivity(leaderboard);
-                                finish();
-                                break;
-                            case R.id.nav_home:
-                                //Go to main activity.
-                                firebaseAuth = FirebaseAuth.getInstance();
-                                firebaseAuth.signOut();
-                                break;
-                            case R.id.nav_friends:
-                                Intent profile = new Intent(ProfileUI.this, FriendsUI.class);
-                                startActivity(profile);
-                                finish();
-                        }
-                        return true;
-                    }
-                });
-
         /*
         Allows user to select profile picture from an image in their gallery.
          */
@@ -144,6 +114,54 @@ public class ProfileUI extends AppCompatActivity {
                         .start(ProfileUI.this);
             }
         });
+    }
+
+    /**
+     * Setup the navigation drawer.
+     *
+     * @param navigationView
+     */
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                selectDrawerItem(menuItem);
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Select an item from menu and perform an action.
+     *
+     * @param menuItem
+     */
+    public void selectDrawerItem(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.nav_map:
+                //Go to map activity.
+                Intent map = new Intent(ProfileUI.this, MapsActivity.class);
+                startActivity(map);
+                break;
+            case R.id.nav_leaderboard:
+                //Go to leader board activity.
+                Intent leaderboard = new Intent(ProfileUI.this, Leaderboard.class);
+                startActivity(leaderboard);
+                finish();
+                break;
+            case R.id.nav_home:
+                //Go to main activity.
+                firebaseAuth = FirebaseAuth.getInstance();
+                firebaseAuth.signOut();
+                break;
+            case R.id.nav_friends:
+                Intent friends = new Intent(ProfileUI.this, FriendsUI.class);
+                startActivity(friends);
+                finish();
+        }
+        menuItem.setChecked(true);
+        setTitle(menuItem.getTitle());
+        mDrawer.closeDrawers();
     }
 
 
@@ -163,6 +181,7 @@ public class ProfileUI extends AppCompatActivity {
                     mCurrentUser = FirebaseAuth.getInstance().getUid();
                     userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser);
                     Log.d("TAG", userRef.toString());
+                    userRef.child("mVIP").setValue(true);
 
                     userRef.addValueEventListener(new ValueEventListener() {
                         @Override
@@ -202,9 +221,12 @@ public class ProfileUI extends AppCompatActivity {
                                 TextView following = (TextView) findViewById(R.id.tv_profile_following);
                                 following.setText(dataSnapshot.child("mFollowing").getValue().toString());
 
+                                //Points
+                                TextView points = (TextView) findViewById(R.id.tv_profile_points);
+                                points.setText(dataSnapshot.child("mPoints").getValue().toString());
 
                             } else {
-                                User signedIn = new User("", "", "", 0, 0, 0, 0, 0);
+                                User signedIn = new User("", "", "", 0, 0, 0, 0, 0, 0, false);
                                 userRef.setValue(signedIn);
                             }
                         }
@@ -247,7 +269,7 @@ public class ProfileUI extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                mDrawerLayout.openDrawer(GravityCompat.START);
+                mDrawer.openDrawer(GravityCompat.START);
                 return true;
         }
         return super.onOptionsItemSelected(item);

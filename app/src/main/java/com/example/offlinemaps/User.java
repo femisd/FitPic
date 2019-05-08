@@ -10,7 +10,9 @@ public class User {
     private int mPhotos;
     private int mFollowing;
     private int mSteps;
+    private int mPoints;
     private double mCaloriesBurned;
+    private boolean mVIP;
 
     //Default constructor
     public User() {
@@ -18,7 +20,7 @@ public class User {
 
     //Constructor used for creating a User.
     public User(String profilePicture, String username, String location, int steps, double caloriesBurned,
-                int photos, int followers, int following) {
+                int photos, int followers, int following, int points, boolean vip) {
         mProfilePicture = profilePicture;
         mUsername = username;
         mLocation = location;
@@ -27,6 +29,8 @@ public class User {
         mPhotos = photos;
         mFollowers = followers;
         mFollowing = following;
+        mPoints = points;
+        mVIP = vip;
     }
 
     //Get the users username.
@@ -69,6 +73,12 @@ public class User {
         return mCaloriesBurned;
     }
 
+    //Get the users points.
+    public int getmPoints() { return mPoints; }
+
+    //Get the users VIP Status.
+    public boolean getVIPstatus() { return mVIP; }
+
     //Set the username for the user.
     public void setmUsername(String mUsername) {
         this.mUsername = mUsername;
@@ -107,5 +117,15 @@ public class User {
     //Set the calories burned for the user.
     public void setmCaloriesBurned(double mCaloriesBurned) {
         this.mCaloriesBurned = mCaloriesBurned;
+    }
+
+    //Set the points for the user.
+    public void setmPoints(int points) {
+        this.mPoints = points;
+    }
+
+    //Set the VIP status of the user.
+    public void setVIPstatus(boolean vip) {
+        this.mVIP = vip;
     }
 }

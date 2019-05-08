@@ -15,5 +15,6 @@
     <string name="Calories_burnt">cal</string>
     <string name="photos">Photos</string>
     <string name="Steps">steps</string>
+    <string name="points">points</string>
 
 </resources>

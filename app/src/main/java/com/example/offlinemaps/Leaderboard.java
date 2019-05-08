@@ -3,16 +3,17 @@ package com.example.offlinemaps;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import com.google.android.material.navigation.NavigationView;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -80,8 +81,8 @@ public class Leaderboard extends AppCompatActivity {
         ArrayList<User> userList = new ArrayList<>();
         final LeaderboardAdapterClass leaderboardAdapter = new LeaderboardAdapterClass(this, userList);
 
-       userList.add(new User("https://firebasestorage.googleapis.com/v0/b/fitpic-2f0fd.appspot.com/o/Profile%20Pictures%2FlryFgJBnDAhlEECsXwGuF5zMUqO2.jpg?alt=media&token=3b1172ad-27bf-41a9-b8e8-faf10c27f946", "Mike", "Bournemouth, UK",5476,296.7,0,0,0));
-       userList.add(new User("https://firebasestorage.googleapis.com/v0/b/fitpic-2f0fd.appspot.com/o/Profile%20Pictures%2FPGeWAHVVV7U9yrEa4MrFc4y7cQQ2.jpg?alt=media&token=b6312e7b-80e3-466c-b099-809ebcdb20d5", "Vytenis", "Guildford, UK",894,40.8,0,0,0));
+       //userList.add(new User("https://firebasestorage.googleapis.com/v0/b/fitpic-2f0fd.appspot.com/o/Profile%20Pictures%2FlryFgJBnDAhlEECsXwGuF5zMUqO2.jpg?alt=media&token=3b1172ad-27bf-41a9-b8e8-faf10c27f946", "Mike", "Bournemouth, UK",5476,296.7,0,0,0));
+       //userList.add(new User("https://firebasestorage.googleapis.com/v0/b/fitpic-2f0fd.appspot.com/o/Profile%20Pictures%2FPGeWAHVVV7U9yrEa4MrFc4y7cQQ2.jpg?alt=media&token=b6312e7b-80e3-466c-b099-809ebcdb20d5", "Vytenis", "Guildford, UK",894,40.8,0,0,0));
 
         leaderboard.setAdapter(leaderboardAdapter);
     }
