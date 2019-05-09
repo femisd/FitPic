@@ -77,7 +77,7 @@ public class User {
     public int getmPoints() { return mPoints; }
 
     //Get the users VIP Status.
-    public boolean getVIPstatus() { return mVIP; }
+    public boolean getmVIP() { return mVIP; }
 
     //Set the username for the user.
     public void setmUsername(String mUsername) {
@@ -125,7 +125,23 @@ public class User {
     }
 
     //Set the VIP status of the user.
-    public void setVIPstatus(boolean vip) {
+    public void setmVIP(boolean vip) {
         this.mVIP = vip;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "mUsername='" + mUsername + '\'' +
+                ", mProfilePicture='" + mProfilePicture + '\'' +
+                ", mLocation='" + mLocation + '\'' +
+                ", mFollowers=" + mFollowers +
+                ", mPhotos=" + mPhotos +
+                ", mFollowing=" + mFollowing +
+                ", mSteps=" + mSteps +
+                ", mPoints=" + mPoints +
+                ", mCaloriesBurned=" + mCaloriesBurned +
+                ", mVIP=" + mVIP +
+                '}';
     }
 }

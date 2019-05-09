@@ -72,7 +72,6 @@ public class ProfileUI extends AppCompatActivity {
     private Toolbar toolbar;
     private NavigationView mNavView;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,9 +81,6 @@ public class ProfileUI extends AppCompatActivity {
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
-
-
-
 
         if (!calledAlready) {
             FirebaseDatabase.getInstance().setPersistenceEnabled(true);
@@ -159,7 +155,7 @@ public class ProfileUI extends AppCompatActivity {
                 startActivity(leaderboard);
                 finish();
                 break;
-            case R.id.nav_home:
+            case R.id.nav_logout:
                 //Go to main activity.
                 firebaseAuth = FirebaseAuth.getInstance();
                 firebaseAuth.signOut();
@@ -170,7 +166,6 @@ public class ProfileUI extends AppCompatActivity {
                 finish();
         }
         menuItem.setChecked(true);
-        setTitle(menuItem.getTitle());
         mDrawer.closeDrawers();
     }
 
@@ -191,7 +186,6 @@ public class ProfileUI extends AppCompatActivity {
                     mCurrentUser = FirebaseAuth.getInstance().getUid();
                     userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser);
                     Log.d("TAG", userRef.toString());
-                    userRef.child("mVIP").setValue(true);
 
                     userRef.addValueEventListener(new ValueEventListener() {
                         @Override
@@ -202,14 +196,17 @@ public class ProfileUI extends AppCompatActivity {
                                 if (!image.isEmpty()) {
                                     Picasso.get().load(image).placeholder(R.drawable.ic_person_white_24dp).into(mProfilePicture);
                                 }
-
-                                //User
-                                TextView user = (TextView) findViewById(R.id.tv_profile_id);
-                                user.setText(dataSnapshot.child("mUsername").getValue().toString());
-
                                 //Username
                                 TextView id = (TextView) findViewById(R.id.tv_profile_user);
                                 id.setText(dataSnapshot.child("mUsername").getValue().toString());
+
+                                id.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent update = new Intent(ProfileUI.this, UpdateUsername.class);
+                                        startActivity(update);
+                                    }
+                                });
 
                                 //Steps
                                 TextView steps = (TextView) findViewById(R.id.tv_profile_steps);

@@ -3,7 +3,6 @@ package com.example.offlinemaps;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -21,7 +20,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -33,10 +31,15 @@ public class Leaderboard extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private boolean doubleBackToExitPressedOnce;
 
+    //fields for nav view.
+    private DrawerLayout mDrawer;
+    private Toolbar toolbar;
+    private NavigationView mNavView;
+
     //Firebase fields
     private DatabaseReference mDatabase;
-    private Query pointsRef;
     private String currentUser;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,17 +51,21 @@ public class Leaderboard extends AppCompatActivity {
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
+        //Initialise fields.
         mDatabase = FirebaseDatabase.getInstance().getReference();
         currentUser = FirebaseAuth.getInstance().getUid();
-        pointsRef = mDatabase.child(currentUser).orderByChild("mPoints");
 
         final ListView leaderboard = findViewById(R.id.lv_leaderboard_list);
         final ArrayList<User> userList = new ArrayList<>();
         final LeaderboardAdapterClass leaderboardAdapter = new LeaderboardAdapterClass(this, userList);
 
+        //Set adapter.
         leaderboard.setAdapter(leaderboardAdapter);
 
-        drawerLayout = findViewById(R.id.drawer_layout);
+        mDrawer = findViewById(R.id.drawer_layout);
+        mNavView = findViewById(R.id.nv_leaderboard);
+
+        setupDrawerContent(mNavView);
 
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -69,14 +76,12 @@ public class Leaderboard extends AppCompatActivity {
                         User user = userSnapshot.getValue(User.class);
                         //Don't include users with no username.
                         if (!userSnapshot.child("mUsername").getValue().toString().isEmpty() && !userList.contains(user)) {
-                            Log.d("USERNAME:", userSnapshot.child("mPoints").getValue().toString());
-                            userList.add(user);
-                            Log.d("LIST", "" + userList.toString());
+                            leaderboardAdapter.add(user);
                         }
                     }
                 }
 
-                //Sort by most points
+                //Sort by most points.
                 Collections.sort(userList, new Comparator<User>() {
                     @Override
                     public int compare(User o1, User o2) {
@@ -94,54 +99,68 @@ public class Leaderboard extends AppCompatActivity {
 
             }
         });
+    }
 
-        NavigationView navigationView = findViewById(R.id.nv_leaderboard);
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        // set item as selected to persist highlight
-                        menuItem.setChecked(true);
-                        // close drawer when item is tapped
-                        drawerLayout.closeDrawers();
+    /**
+     * Setup the navigation drawer.
+     *
+     * @param navigationView
+     */
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                selectDrawerItem(menuItem);
+                return true;
+            }
+        });
+    }
 
-                        //Update the UI based on the item selected
-                        switch (menuItem.getItemId()) {
-                            case R.id.nav_map:
-                                //Go to map activity.
-                                Intent map = new Intent(Leaderboard.this, MapsActivity.class);
-                                startActivity(map);
-                                //finish();
-                                break;
-                            case R.id.nav_friends:
-                                //Go to leader board activity.
-                                Intent friends = new Intent(Leaderboard.this, FriendsUI.class);
-                                startActivity(friends);
-                                finish();
-                                break;
-                            case R.id.nav_home:
-                                //Go to main activity.
-                                break;
-                            case R.id.nav_profile:
-                                Intent profile = new Intent(Leaderboard.this, ProfileUI.class);
-                                startActivity(profile);
-                                finish();
-                        }
-                        return true;
-                    }
-                });
+    /**
+     * Select an item from menu and perform an action.
+     *
+     * @param menuItem
+     */
+    public void selectDrawerItem(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.nav_map:
+                //Go to map activity.
+                Intent map = new Intent(Leaderboard.this, MapsActivity.class);
+                startActivity(map);
+                break;
+            case R.id.nav_friends:
+                //Go to leader board activity.
+                Intent friends = new Intent(Leaderboard.this, FriendsUI.class);
+                startActivity(friends);
+                finish();
+                break;
+            case R.id.nav_logout:
+                //Go to main activity.
+                firebaseAuth = FirebaseAuth.getInstance();
+                firebaseAuth.signOut();
+                break;
+            case R.id.nav_profile:
+                Intent profile = new Intent(Leaderboard.this, ProfileUI.class);
+                startActivity(profile);
+                finish();
+        }
+        menuItem.setChecked(true);
+        mDrawer.closeDrawers();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                drawerLayout.openDrawer(GravityCompat.START);
+                mDrawer.openDrawer(GravityCompat.START);
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Prompt user for confirmation before closing the app.
+     */
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {

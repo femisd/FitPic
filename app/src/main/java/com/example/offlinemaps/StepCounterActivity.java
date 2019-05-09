@@ -110,7 +110,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 startActivity(leaderboard);
                 finish();
                 break;
-            case R.id.nav_home:
+            case R.id.nav_logout:
                 //Go to main activity.
                 firebaseAuth = FirebaseAuth.getInstance();
                 firebaseAuth.signOut();
@@ -127,7 +127,6 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 break;
         }
         menuItem.setChecked(true);
-        setTitle(menuItem.getTitle());
         mDrawer.closeDrawers();
     }
 

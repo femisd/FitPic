@@ -1,7 +1,6 @@
 package com.example.offlinemaps;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +27,8 @@ public class ChallengesAdapter extends RecyclerView.Adapter<ChallengesAdapter.Ch
     private Context context;
     private DatabaseReference userRef;
     private String mCurrentUser = FirebaseAuth.getInstance().getUid();
+    public int currentPoints;
+
     public static class ChallengesViewHolder extends RecyclerView.ViewHolder{
 
         public TextView challengeNameText;
@@ -94,6 +95,7 @@ public class ChallengesAdapter extends RecyclerView.Adapter<ChallengesAdapter.Ch
 
 
 
+
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser);
 
         if( Integer.valueOf(currentItem.getProgress()) > Integer.valueOf(currentItem.getChallengeLimit()) ){
@@ -104,12 +106,27 @@ public class ChallengesAdapter extends RecyclerView.Adapter<ChallengesAdapter.Ch
                 public void onClick(View v) {
                     Toast.makeText(context, " Congratulations!\n"+ currentItem.getPoints() + " added!", Toast.LENGTH_LONG).show();
 
+                     //   challengesViewHolder.challengeLayout.setVisibility(View.GONE);
                         challengesViewHolder.completionLayout.setVisibility(View.VISIBLE);
                         challengesViewHolder.claimButton.setBackgroundResource(R.drawable.buttonstlye_dead);
                         challengesViewHolder.claimButton.setEnabled(false);
 
-                        userRef.child("mPoints").setValue( currentItem.getPoints());
+                       userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                           @Override
+                           public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                               User user = dataSnapshot.getValue(User.class);
+                           //    currentPoints = user.get
+                           }
 
+                           @Override
+                           public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                           }
+                       });
+
+                        userRef.child("mPoints").setValue(currentItem.getPoints());
+                        
+                        
                 }
             });
         }else{
