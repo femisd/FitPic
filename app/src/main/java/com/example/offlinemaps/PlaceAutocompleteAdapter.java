@@ -1,4 +1,4 @@
-package com.example.actuallyworks;
+package com.example.offlinemaps;
 
 /*
  * Copyright (C) 2015 Google Inc. All Rights Reserved.
@@ -80,7 +80,7 @@ public class PlaceAutocompleteAdapter
     /**
      * Initializes with a resource for text rows and autocomplete query bounds.
      *
-     * @see android.widget.ArrayAdapter#ArrayAdapter(android.content.Context, int)
+     * @see ArrayAdapter#ArrayAdapter(Context, int)
      */
     public PlaceAutocompleteAdapter(Context context, GoogleApiClient googleApiClient,
                                     LatLngBounds bounds, AutocompleteFilter filter) {
