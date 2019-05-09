@@ -155,7 +155,7 @@ public class ProfileUI extends AppCompatActivity {
                 startActivity(leaderboard);
                 finish();
                 break;
-            case R.id.nav_home:
+            case R.id.nav_logout:
                 //Go to main activity.
                 firebaseAuth = FirebaseAuth.getInstance();
                 firebaseAuth.signOut();
@@ -166,7 +166,6 @@ public class ProfileUI extends AppCompatActivity {
                 finish();
         }
         menuItem.setChecked(true);
-        setTitle(menuItem.getTitle());
         mDrawer.closeDrawers();
     }
 
@@ -187,7 +186,6 @@ public class ProfileUI extends AppCompatActivity {
                     mCurrentUser = FirebaseAuth.getInstance().getUid();
                     userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser);
                     Log.d("TAG", userRef.toString());
-                    userRef.child("mVIP").setValue(true);
 
                     userRef.addValueEventListener(new ValueEventListener() {
                         @Override
