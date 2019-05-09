@@ -40,18 +40,8 @@
                         android:layout_width="150dp"
                         android:layout_height="150dp"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="65dp"
+                        android:layout_marginTop="85dp"
                         android:id="@+id/cv_profile_picture"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="10dp"
-                        android:id="@+id/tv_profile_id"
-                        android:textColor="#fff"
-                        android:textSize="21sp"
-                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <androidx.cardview.widget.CardView
@@ -245,7 +235,7 @@
                     <ImageView
                         android:layout_width="36dp"
                         android:layout_height="36dp"
-                        android:src="@drawable/ic_exposure_plus_1_red_24dp" />
+                        android:src="@drawable/ic_local_atm_green_24dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -280,7 +270,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="35dp"
                 android:background="@drawable/buttonstyle"
                 android:text="Start Walking"
                 android:textColor="@color/white" />

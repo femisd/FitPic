@@ -42,8 +42,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="160sp"
         android:layout_marginTop="16sp"
+        android:paddingEnd="5dp"
         android:layout_toEndOf="@id/iv_profile_pic"
-        android:src="@drawable/ic_exposure_plus_1_red_24dp" />
+        android:src="@drawable/ic_local_atm_green_24dp" />
 
     <TextView
         android:id="@+id/tv_point_counter"
@@ -58,6 +59,7 @@
         android:id="@+id/iv_calorie"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingEnd="5dp"
         android:layout_below="@id/iv_point_counter"
         android:layout_marginTop="16sp"
         android:layout_toStartOf="@id/tv_calories_burnt"

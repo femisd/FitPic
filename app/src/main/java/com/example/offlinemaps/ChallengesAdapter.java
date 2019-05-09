@@ -1,7 +1,6 @@
 package com.example.offlinemaps;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,17 +25,9 @@ import androidx.recyclerview.widget.RecyclerView;
 public class ChallengesAdapter extends RecyclerView.Adapter<ChallengesAdapter.ChallengesViewHolder> {
     private ArrayList<Challenges> mChallangesList;
     private Context context;
-
     private DatabaseReference userRef;
     private String mCurrentUser = FirebaseAuth.getInstance().getUid();
-    private  User currentUser;
     public int currentPoints;
-
-    public int totalPoints;
-
-
-
-
 
     public static class ChallengesViewHolder extends RecyclerView.ViewHolder{
 
@@ -102,9 +93,12 @@ public class ChallengesAdapter extends RecyclerView.Adapter<ChallengesAdapter.Ch
 
 
 
+
+
+
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser);
 
-        if( Integer.valueOf(currentItem.getProgress()) >= Integer.valueOf(currentItem.getChallengeLimit()) ){
+        if( Integer.valueOf(currentItem.getProgress()) > Integer.valueOf(currentItem.getChallengeLimit()) ){
             challengesViewHolder.claimButton.setBackgroundResource(R.drawable.buttonstyle);
 
             challengesViewHolder.claimButton.setOnClickListener(new View.OnClickListener() {
@@ -112,27 +106,27 @@ public class ChallengesAdapter extends RecyclerView.Adapter<ChallengesAdapter.Ch
                 public void onClick(View v) {
                     Toast.makeText(context, " Congratulations!\n"+ currentItem.getPoints() + " added!", Toast.LENGTH_LONG).show();
 
-
-                    userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            currentUser = dataSnapshot.getValue(User.class);
-                            currentPoints = currentUser.getmPoints();
-                            Toast.makeText(context, currentUser.getmUsername(), Toast.LENGTH_SHORT).show();
-                            totalPoints = currentPoints + currentItem.getPoints();
-                            userRef.child("mPoints").setValue(totalPoints);
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-
-
+                     //   challengesViewHolder.challengeLayout.setVisibility(View.GONE);
                         challengesViewHolder.completionLayout.setVisibility(View.VISIBLE);
                         challengesViewHolder.claimButton.setBackgroundResource(R.drawable.buttonstlye_dead);
                         challengesViewHolder.claimButton.setEnabled(false);
+
+                       userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                           @Override
+                           public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                               User user = dataSnapshot.getValue(User.class);
+                           //    currentPoints = user.get
+                           }
+
+                           @Override
+                           public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                           }
+                       });
+
+                        userRef.child("mPoints").setValue(currentItem.getPoints());
+                        
+                        
                 }
             });
         }else{
@@ -140,7 +134,7 @@ public class ChallengesAdapter extends RecyclerView.Adapter<ChallengesAdapter.Ch
             challengesViewHolder.claimButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-              Toast.makeText(context, "Challenge not yet complete\nKeep it up!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Challenge not yet complete\nKeep it up!", Toast.LENGTH_SHORT).show();
                 }
             });
 
