@@ -180,7 +180,7 @@ public class GoalsActivity extends AppCompatActivity {
         populateChallenges();
       adapter.notifyDataSetChanged();
         startActivity(getIntent());
-
+        finish();
 
     }
 
