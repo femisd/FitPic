@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/iv_profile_pic"
+        android:layout_width="75sp"
+        android:layout_height="75sp"
+        android:layout_margin="10sp" />
+
+    <TextView
+        android:id="@+id/tv_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4sp"
+        android:layout_marginTop="22sp"
+        android:layout_toEndOf="@id/iv_profile_pic"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/iv_location_pin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_username"
+        android:layout_marginTop="2sp"
+        android:layout_toEndOf="@id/iv_profile_pic"
+        android:src="@drawable/ic_person_pin_circle_black_24dp" />
+
+    <TextView
+        android:id="@+id/tv_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_username"
+        android:layout_toEndOf="@id/iv_location_pin"
+        android:textSize="14sp" />
+
+    <ImageView
+        android:id="@+id/iv_point_counter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="160sp"
+        android:layout_marginTop="16sp"
+        android:layout_toEndOf="@id/iv_profile_pic"
+        android:src="@drawable/ic_exposure_plus_1_red_24dp" />
+
+    <TextView
+        android:id="@+id/tv_point_counter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15sp"
+        android:layout_toEndOf="@+id/iv_point_counter"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/iv_calorie"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/iv_point_counter"
+        android:layout_marginTop="16sp"
+        android:layout_toStartOf="@id/tv_calories_burnt"
+        android:src="@drawable/ic_whatshot_black_24dp" />
+
+    <TextView
+        android:id="@+id/tv_calories_burnt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_point_counter"
+        android:layout_marginTop="18sp"
+        android:layout_toEndOf="@id/iv_point_counter"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+
+</RelativeLayout>
