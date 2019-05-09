@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ public class GoalsActivity extends AppCompatActivity {
     private RecyclerView goalsRecyclerView;
     private ChallengesAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
+    private Button refreshBtn;
 
     private TextView timerText;
     private CountDownTimer countDownTimer;
@@ -39,6 +42,8 @@ public class GoalsActivity extends AppCompatActivity {
     private  User currentUser;
 
     public int currentPoints;
+
+    private ArrayList<Challenges> challengesList;
 
 
     @Override
@@ -52,15 +57,17 @@ public class GoalsActivity extends AppCompatActivity {
 
         timerText = findViewById(R.id.timer_textView);
 
+        refreshBtn = findViewById(R.id.btn_refresh);
+
+        refreshBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refreshChallenges();
+            }
+        });
 
 
-        final ArrayList<Challenges> challengesList = new ArrayList<>();
-
-        challengesList.add(new Challenges(getCurrentStep(),"Walk 20 Steps!", 20, "Steps",20));
-        challengesList.add(new Challenges(getCurrentStep(),"Walk 50 Steps!", 50, "Steps",50));
-        challengesList.add(new Challenges(getCurrentStep(),"Walk 100 Steps!", 100, "Steps",100));
-        challengesList.add(new Challenges(0,"Walk 100 Meters!", 10, "Meters",20));
-        challengesList.add(new Challenges(getCurrentStep()/20,"Burn 10 calories!", 10, "Calories",20));
+        challengesList = new ArrayList<>();
 
         goalsRecyclerView = findViewById(R.id.goalsRecyclerView);
         goalsRecyclerView.setHasFixedSize(true);
@@ -69,6 +76,9 @@ public class GoalsActivity extends AppCompatActivity {
 
         goalsRecyclerView.setLayoutManager(layoutManager);
         goalsRecyclerView.setAdapter(adapter);
+
+
+        populateChallenges();
 
 
 
@@ -147,6 +157,34 @@ public class GoalsActivity extends AppCompatActivity {
     public int getCurrentPoints() {
         return currentPoints;
     }
+
+
+    public void populateChallenges(){
+
+
+        challengesList.add(new Challenges(getCurrentStep(),"Walk 20 Steps!", 20, "Steps",20));
+        challengesList.add(new Challenges(getCurrentStep(),"Walk 50 Steps!", 50, "Steps",50));
+        challengesList.add(new Challenges(getCurrentStep(),"Walk 100 Steps!", 100, "Steps",100));
+        challengesList.add(new Challenges(0,"Walk 100 Meters!", 10, "Meters",20));
+        challengesList.add(new Challenges(getCurrentStep()/20,"Burn 10 calories!", 10, "Calories",20));
+
+
+    }
+
+
+    public void refreshChallenges(){
+        challengesList.clear();
+        adapter.notifyDataSetChanged();
+
+
+        populateChallenges();
+      adapter.notifyDataSetChanged();
+        startActivity(getIntent());
+
+
+    }
+
+
 }
 
 
