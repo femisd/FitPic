@@ -196,14 +196,17 @@ public class ProfileUI extends AppCompatActivity {
                                 if (!image.isEmpty()) {
                                     Picasso.get().load(image).placeholder(R.drawable.ic_person_white_24dp).into(mProfilePicture);
                                 }
-
-                                //User
-                                TextView user = (TextView) findViewById(R.id.tv_profile_id);
-                                user.setText(dataSnapshot.child("mUsername").getValue().toString());
-
                                 //Username
                                 TextView id = (TextView) findViewById(R.id.tv_profile_user);
                                 id.setText(dataSnapshot.child("mUsername").getValue().toString());
+
+                                id.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent update = new Intent(ProfileUI.this, UpdateUsername.class);
+                                        startActivity(update);
+                                    }
+                                });
 
                                 //Steps
                                 TextView steps = (TextView) findViewById(R.id.tv_profile_steps);
