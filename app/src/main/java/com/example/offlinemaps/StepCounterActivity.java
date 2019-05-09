@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -29,8 +30,11 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     private Button goalsBtn;
     private SensorManager sensorManager;
     private Sensor stepSensor;
+    private Button trackerBtn;
 
     private FirebaseAuth firebaseAuth;
+
+    private boolean tracking;
 
     //fields for nav view.
     private DrawerLayout mDrawer;
@@ -48,6 +52,10 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
+        trackerBtn = findViewById(R.id.trackerBtn);
+        tracking = false;
+
+        updateButton();
         counterView = findViewById(R.id.counterText);
         goalsBtn = findViewById(R.id.goalsBtn);
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -69,16 +77,88 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavView = (NavigationView) findViewById(R.id.nv_nav);
         setupDrawerContent(mNavView);
+
+
+
+        trackerBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(!tracking){
+                    tracking = true;
+                    Toast.makeText(StepCounterActivity.this, "CLick", Toast.LENGTH_SHORT).show();
+
+
+                }
+
+                else if(tracking){
+                    tracking = false;
+
+                    Toast.makeText(StepCounterActivity.this, "clock", Toast.LENGTH_SHORT).show();
+
+                }
+                updateButton();
+            }
+        });
+
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        outState.putBoolean("Tracker", tracking);
+        outState.putInt("Steps", steps);
+        Toast.makeText(this, "OOO" + steps, Toast.LENGTH_SHORT).show();
+        super.onSaveInstanceState(outState);
+
+
+    }
+
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        //super.onRestoreInstanceState(savedInstanceState);
+
+        tracking = savedInstanceState.getBoolean("Tracker");
+        steps = savedInstanceState.getInt("Steps");
+        Toast.makeText(this, "REE" + steps, Toast.LENGTH_SHORT).show();
+        updateButton();
+        updateSteps();
+    }
+
+    public void updateButton(){
+
+        if(tracking){
+          //  tracking = true;
+            trackerBtn.setText("Stop Tracking");
+            trackerBtn.setBackgroundResource(R.drawable.buttonstlye_dead);
+        }
+
+        else if(!tracking){
+          //  tracking = false;
+            trackerBtn.setText("Start Tracking");
+            trackerBtn.setBackgroundResource(R.drawable.buttonstyle);
+        }
+
+    }
+
+    public void updateSteps(){
+        counterView.setText(Integer.toString(steps));
+
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-       if(event.values[0] == 1.0f) {
-           steps++;
-       }
-        counterView.setText(Integer.toString(steps));
+      if(tracking) {
 
+          if (event.values[0] == 1.0f) {
+              steps++;
+          }
+
+      }
+        updateSteps();
 
     }
 
