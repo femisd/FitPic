@@ -97,6 +97,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:focusableInTouchMode="false"
+            android:fontFamily="@font/black_ops_one"
             android:text="COMPLETE"
             android:textColor="@color/colorPrimary"
             android:textSize="60dp" />
