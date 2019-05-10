@@ -8,6 +8,8 @@ public class Challenges {
     private String challengeFormat;
     private int points;
 
+    public Challenges() {
+    }
 
     public Challenges(int progress, String challengeName, int challengeLimit, String challengeFormat, int points) {
         this.progress = progress;
