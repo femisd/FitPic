@@ -24,7 +24,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -61,7 +60,7 @@ import java.util.List;
 
 
 public class StepCounterActivity extends AppCompatActivity implements SensorEventListener, OnMapReadyCallback,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerClickListener {
 
     private TextView counterView;
     private int steps = 0;
@@ -111,6 +110,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     private Location currentLocation;
     private LatLng currentLatLng;
 
+    private  TextView locationText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,6 +124,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
         trackerBtn = findViewById(R.id.trackerBtn);
         tracking = false;
+
+        locationText = findViewById(R.id.locationText);
 
         updateButton();
         counterView = findViewById(R.id.counterText);
@@ -155,7 +158,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
                 if(!tracking){
                     tracking = true;
-                    Toast.makeText(StepCounterActivity.this, "CLick", Toast.LENGTH_SHORT).show();
+                //    Toast.makeText(StepCounterActivity.this, "CLick", Toast.LENGTH_SHORT).show();
 
 
                 }
@@ -163,7 +166,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 else if(tracking){
                     tracking = false;
 
-                    Toast.makeText(StepCounterActivity.this, "clock", Toast.LENGTH_SHORT).show();
+                 //   Toast.makeText(StepCounterActivity.this, "clock", Toast.LENGTH_SHORT).show();
 
                 }
                 updateButton();
@@ -190,7 +193,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
         outState.putBoolean("Tracker", tracking);
         outState.putInt("Steps", steps);
-        Toast.makeText(this, "OOO" + steps, Toast.LENGTH_SHORT).show();
+       // Toast.makeText(this, "OOO" + steps, Toast.LENGTH_SHORT).show();
         super.onSaveInstanceState(outState);
 
 
@@ -203,7 +206,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
         tracking = savedInstanceState.getBoolean("Tracker");
         steps = savedInstanceState.getInt("Steps");
-        Toast.makeText(this, "REE" + steps, Toast.LENGTH_SHORT).show();
+     //   Toast.makeText(this, "REE" + steps, Toast.LENGTH_SHORT).show();
         updateButton();
         updateSteps();
     }
@@ -305,19 +308,10 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 
 
-        List<LatLng> location=new ArrayList<>();
-        List<String> locationName=new ArrayList<>();
-
-        location.add(new LatLng(51.5074,0.1278));
-        location.add(new LatLng(50,-.05));
 
 
-        locationName.add("London");
-        locationName.add("ocean");
-        for(int i=0;i<location.size();i++){
-            mMap.addMarker(new MarkerOptions().position(location.get(i)).title(locationName.get(i)));
 
-        }
+        setUpMap();
 
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1200); // two minute interval
@@ -339,6 +333,116 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
             mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
             mMap.setMyLocationEnabled(true);
         }
+    }
+
+    private Marker myMarker;
+    private Marker myMarker1;
+    private Marker myMarker2;
+    private Marker myMarker3;
+
+
+
+    private void setUpMap()
+    {
+
+        List<LatLng> location=new ArrayList<>();
+        List<String> locationName=new ArrayList<>();
+
+        location.add(new LatLng(51.5074,0.1278));
+        location.add(new LatLng(51.243271, -0.591590));
+        location.add(new LatLng(51.242373, -0.581312));
+        location.add(new LatLng(51.242007, -0.586198));
+        location.add(new LatLng(51.243012, -0.595327));
+
+        mMap.setOnMarkerClickListener(this);
+
+        locationName.add("London");
+        locationName.add("Pats field");
+        locationName.add("Friary Centre");
+        locationName.add("Student Union");
+        //locationName.add();
+
+
+
+
+
+        myMarker = mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(51.243271, -0.591590))
+                    .title("Pats field")
+                    .snippet("112m")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+
+
+        myMarker1 = mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(51.242373, -0.581312))
+                .title("Friary Centre")
+                .snippet("743m")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+
+        myMarker2 = mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(51.242007, -0.586198))
+                .title("Student Union")
+                .snippet("123m")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+
+        myMarker3 = mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(51.243012, -0.595327))
+                .title("School Of Arts")
+                .snippet("846m")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+
+
+
+
+
+
+
+    }
+
+
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+
+
+        if (marker.equals(myMarker))
+        {
+            //handle click here
+
+          //  Toast.makeText(StepCounterActivity.this, "YOIIIIIIIIIIIIIIIIIIIIIIIIIIINKS", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(StepCounterActivity.this, ""+myMarker.getPosition()+" " , Toast.LENGTH_SHORT).show();
+
+            locationText.setText("Pats field");
+        }
+        if (marker.equals(myMarker1))
+        {
+            //handle click here
+
+           // Toast.makeText(StepCounterActivity.this, "afjaknfask", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(StepCounterActivity.this, ""+myMarker1.getPosition()+" " , Toast.LENGTH_SHORT).show();
+            locationText.setText("Friary Centre");
+
+        }
+
+        if (marker.equals(myMarker2))
+        {
+            //handle click here
+
+           // Toast.makeText(StepCounterActivity.this, "afjaknfask", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(StepCounterActivity.this, ""+myMarker2.getPosition()+" " , Toast.LENGTH_SHORT).show();
+            locationText.setText("Student Union");
+
+        }
+        if (marker.equals(myMarker3))
+        {
+            //handle click here
+
+          //  Toast.makeText(StepCounterActivity.this, "afjaknfask", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(StepCounterActivity.this, ""+myMarker3.getPosition()+" " , Toast.LENGTH_SHORT).show();
+            locationText.setText("School Of Arts");
+
+        }
+        return false;
     }
 
     @Override
@@ -485,7 +589,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 currentLocation = locationList.get(locationList.size() - 1);
                 currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
                 Log.i("MapsActivity", "Current Location: " + currentLocation.getLatitude() + " " + currentLocation.getLongitude());
-                Toast.makeText(StepCounterActivity.this, ""+currentLocation.getLatitude()+" " + currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+               // Toast.makeText(StepCounterActivity.this, ""+currentLocation.getLatitude()+" " + currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
                 mLastLocation = currentLocation;
                 if (mCurrLocationMarker != null) {
                     mCurrLocationMarker.remove();
@@ -574,27 +678,6 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
             // permissions this app might request
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
