@@ -75,8 +75,8 @@ public class Leaderboard extends AppCompatActivity {
                     for (DataSnapshot userSnapshot : postSnapshot.getChildren()) {
                         User user = userSnapshot.getValue(User.class);
                         //Don't include users with no username.
-                        if (!userSnapshot.child("mUsername").getValue().toString().isEmpty()) {
-                            userList.add(user);
+                        if (!userSnapshot.child("mUsername").getValue().toString().isEmpty() && !userList.contains(user)) {
+                            leaderboardAdapter.add(user);
                         }
                     }
                 }

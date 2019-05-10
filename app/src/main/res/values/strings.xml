@@ -16,5 +16,6 @@
     <string name="photos">Photos</string>
     <string name="Steps">steps</string>
     <string name="points">points</string>
+    <string name="title_activity_update_username">UpdateUsername</string>
 
 </resources>

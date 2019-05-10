@@ -40,18 +40,8 @@
                         android:layout_width="150dp"
                         android:layout_height="150dp"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="65dp"
+                        android:layout_marginTop="85dp"
                         android:id="@+id/cv_profile_picture"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="10dp"
-                        android:id="@+id/tv_profile_id"
-                        android:textColor="#fff"
-                        android:textSize="21sp"
-                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <androidx.cardview.widget.CardView
