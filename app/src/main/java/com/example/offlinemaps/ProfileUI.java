@@ -176,6 +176,7 @@ public class ProfileUI extends AppCompatActivity {
      */
     private void signIn() {
         //Authentication for user to begin using app
+
         firebaseAuth = FirebaseAuth.getInstance();
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -197,10 +198,11 @@ public class ProfileUI extends AppCompatActivity {
                                     Picasso.get().load(image).placeholder(R.drawable.ic_person_white_24dp).into(mProfilePicture);
                                 }
                                 //Username
-                                TextView id = (TextView) findViewById(R.id.tv_profile_user);
-                                id.setText(dataSnapshot.child("mUsername").getValue().toString());
+                                TextView username = (TextView) findViewById(R.id.tv_profile_user);
+                                username.setText(dataSnapshot.child("mUsername").getValue().toString());
 
-                                id.setOnClickListener(new View.OnClickListener() {
+                                //Launch update username activity.
+                                username.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
                                         Intent update = new Intent(ProfileUI.this, UpdateUsername.class);
