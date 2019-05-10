@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 public class FriendsUI extends AppCompatActivity {
 
+    //Fields.
     private boolean doubleBackToExitPressedOnce = false;
     private String mCurrentUser;
 
@@ -51,6 +52,7 @@ public class FriendsUI extends AppCompatActivity {
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
+        //Firebase initialisation.
         mCurrentUser = FirebaseAuth.getInstance().getUid();
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser);
         mDatabase = FirebaseDatabase.getInstance().getReference();
