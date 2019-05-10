@@ -1,23 +1,44 @@
+//Imports.
 const functions = require('firebase-functions');
+const admin = require("firebase-admin");
+const fs=require('fs'); 
+const nodemailer = require('nodemailer');
 
-// The Firebase Admin SDK to access the Firebase Realtime Database.
-const admin = require('firebase-admin');
 admin.initializeApp();
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-exports.helloWorld = functions.https.onRequest((request, response) => {
-	response.send("Hello from Firebase!");
+//Define email variables.
+const gmailEmail = "team17.uos@gmail.com";
+const gmailPassword = "Team17inches-";
+const mailTransport = nodemailer.createTransport({
+  service: 'gmail', //use Gmail as the service.
+  auth: {
+    user: gmailEmail,
+    pass: gmailPassword,
+  },
 });
 
-// Take the text parameter passed to this HTTP endpoint and insert it into the
-// Realtime Database under the path /messages/:pushId/original
-exports.addUser = functions.https.onRequest(async (req, res) => {
-  // Grab the text parameter.
-  const original = req.query.text;
-  // Push the new message into the Realtime Database using the Firebase Admin SDK.
-  const snapshot = await admin.database().ref('/users').push({original: original});
-  // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
-  res.redirect(303, snapshot.ref.toString());
+//Locate HTML file.
+var htmlmail=fs.readFileSync("welcome.html","utf-8").toString();
+
+//Structure email.
+exports.sendWelcomeEmail = functions.auth.user().onCreate((user) => {
+    const recipent_email = user.email; 
+   
+    const mailOptions = {
+        from: '"FitPic" <admin@fitpic.com>',
+        to: recipent_email,
+        subject: 'Welcome to FitPic!',
+         html: htmlmail
+    };
+    
+  //Try to send the email.  
+  try {
+    mailTransport.sendMail(mailOptions);
+    console.log('mail send');
+    
+  } catch(error) {
+ 	//Display error if email fails.
+    console.error('There was an error while sending the email:', error);
+  }
+return null; 
 });
