@@ -24,6 +24,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -81,11 +82,11 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
 
     private GoogleMap mMap;
-    SupportMapFragment mapFrag;
-    LocationRequest mLocationRequest;
-    Location mLastLocation;
-    Marker mCurrLocationMarker;
-    FusedLocationProviderClient mFusedLocationClient;
+    private SupportMapFragment mapFrag;
+    private LocationRequest mLocationRequest;
+    private Location mLastLocation;
+    private Marker mCurrLocationMarker;
+    private FusedLocationProviderClient mFusedLocationClient;
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
     // private LocationCallback;
@@ -393,55 +394,16 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
 
 
-
-
-
-
     }
 
 
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        locationText.setText(marker.getTitle());
+        Toast.makeText(StepCounterActivity.this, ""+marker.getPosition()+" " , Toast.LENGTH_SHORT).show();
 
 
-        if (marker.equals(myMarker))
-        {
-            //handle click here
-
-          //  Toast.makeText(StepCounterActivity.this, "YOIIIIIIIIIIIIIIIIIIIIIIIIIIINKS", Toast.LENGTH_SHORT).show();
-           // Toast.makeText(StepCounterActivity.this, ""+myMarker.getPosition()+" " , Toast.LENGTH_SHORT).show();
-
-            locationText.setText("Pats field");
-        }
-        if (marker.equals(myMarker1))
-        {
-            //handle click here
-
-           // Toast.makeText(StepCounterActivity.this, "afjaknfask", Toast.LENGTH_SHORT).show();
-           // Toast.makeText(StepCounterActivity.this, ""+myMarker1.getPosition()+" " , Toast.LENGTH_SHORT).show();
-            locationText.setText("Friary Centre");
-
-        }
-
-        if (marker.equals(myMarker2))
-        {
-            //handle click here
-
-           // Toast.makeText(StepCounterActivity.this, "afjaknfask", Toast.LENGTH_SHORT).show();
-           // Toast.makeText(StepCounterActivity.this, ""+myMarker2.getPosition()+" " , Toast.LENGTH_SHORT).show();
-            locationText.setText("Student Union");
-
-        }
-        if (marker.equals(myMarker3))
-        {
-            //handle click here
-
-          //  Toast.makeText(StepCounterActivity.this, "afjaknfask", Toast.LENGTH_SHORT).show();
-           // Toast.makeText(StepCounterActivity.this, ""+myMarker3.getPosition()+" " , Toast.LENGTH_SHORT).show();
-            locationText.setText("School Of Arts");
-
-        }
         return false;
     }
 
