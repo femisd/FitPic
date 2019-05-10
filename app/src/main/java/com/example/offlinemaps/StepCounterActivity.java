@@ -54,6 +54,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,7 +83,6 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
     private NavigationView mNavView;
-
 
 
     private GoogleMap mMap;
@@ -111,7 +115,11 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     private Location currentLocation;
     private LatLng currentLatLng;
 
-    private  TextView locationText;
+    private TextView locationText;
+
+    //Firebase fields
+    private DatabaseReference userRef;
+    private String mCurrentUser = FirebaseAuth.getInstance().getUid();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,49 +144,60 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
         counterView.setText(String.valueOf(steps));
 
-        sensorManager.registerListener(this,stepSensor, SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_FASTEST);
 
-       goalsBtn.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-               Intent intent = new Intent(getApplicationContext(), GoalsActivity.class);
-               intent.putExtra("currentSteps",steps);
-               startActivity(intent);
-           }
-       });
+        userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser);
+
+        goalsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), GoalsActivity.class);
+                intent.putExtra("currentSteps", steps);
+                startActivity(intent);
+            }
+        });
 
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavView = (NavigationView) findViewById(R.id.nv_nav);
         setupDrawerContent(mNavView);
 
 
-
         trackerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if(!tracking){
+                if (!tracking) {
                     tracking = true;
-                //    Toast.makeText(StepCounterActivity.this, "CLick", Toast.LENGTH_SHORT).show();
+                    //    Toast.makeText(StepCounterActivity.this, "CLick", Toast.LENGTH_SHORT).show();
 
 
-                }
-
-                else if(tracking){
+                } else if (tracking) {
                     tracking = false;
+                    userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            User currentUser = dataSnapshot.getValue(User.class); //Get current user object.
+                            int totalSteps = currentUser.getmSteps() + steps; //Calculate total steps.
+                            userRef.child("mSteps").setValue(totalSteps);
 
-                 //   Toast.makeText(StepCounterActivity.this, "clock", Toast.LENGTH_SHORT).show();
+                            double currentCalories = currentUser.getmCaloriesBurned();
+                            //Assume 0.04 calories to 1 step.
+                            double caloriesBurned = (steps * 0.04) + currentCalories;
+                            userRef.child("mCaloriesBurned").setValue(caloriesBurned);
+                            steps = 0;
+                            counterView.setText("0"); //Reset counter.
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
 
                 }
                 updateButton();
             }
         });
-
-
-
-
-
-
 
         mSearchText = (AutoCompleteTextView) findViewById(R.id.input_search);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -194,7 +213,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
         outState.putBoolean("Tracker", tracking);
         outState.putInt("Steps", steps);
-       // Toast.makeText(this, "OOO" + steps, Toast.LENGTH_SHORT).show();
+        // Toast.makeText(this, "OOO" + steps, Toast.LENGTH_SHORT).show();
         super.onSaveInstanceState(outState);
 
 
@@ -207,42 +226,39 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
         tracking = savedInstanceState.getBoolean("Tracker");
         steps = savedInstanceState.getInt("Steps");
-     //   Toast.makeText(this, "REE" + steps, Toast.LENGTH_SHORT).show();
+        //   Toast.makeText(this, "REE" + steps, Toast.LENGTH_SHORT).show();
         updateButton();
         updateSteps();
     }
 
-    public void updateButton(){
+    public void updateButton() {
 
-        if(tracking){
-          //  tracking = true;
+        if (tracking) {
+            //  tracking = true;
             trackerBtn.setText("Stop Tracking");
             trackerBtn.setBackgroundResource(R.drawable.buttonstlye_dead);
-        }
-
-        else if(!tracking){
-          //  tracking = false;
+        } else if (!tracking) {
+            //  tracking = false;
             trackerBtn.setText("Start Tracking");
             trackerBtn.setBackgroundResource(R.drawable.buttonstyle);
         }
 
     }
 
-    public void updateSteps(){
+    public void updateSteps() {
         counterView.setText(Integer.toString(steps));
-
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-      if(tracking) {
+        if (tracking) {
 
-          if (event.values[0] == 1.0f) {
-              steps++;
-          }
+            if (event.values[0] == 1.0f) {
+                steps++;
+            }
 
-      }
+        }
         updateSteps();
 
     }
@@ -301,15 +317,10 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     }
 
 
-
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-
-
-
 
 
         setUpMap();
@@ -342,14 +353,12 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     private Marker myMarker3;
 
 
+    private void setUpMap() {
 
-    private void setUpMap()
-    {
+        List<LatLng> location = new ArrayList<>();
+        List<String> locationName = new ArrayList<>();
 
-        List<LatLng> location=new ArrayList<>();
-        List<String> locationName=new ArrayList<>();
-
-        location.add(new LatLng(51.5074,0.1278));
+        location.add(new LatLng(51.5074, 0.1278));
         location.add(new LatLng(51.243271, -0.591590));
         location.add(new LatLng(51.242373, -0.581312));
         location.add(new LatLng(51.242007, -0.586198));
@@ -364,14 +373,11 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         //locationName.add();
 
 
-
-
-
         myMarker = mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(51.243271, -0.591590))
-                    .title("Pats field")
-                    .snippet("112m")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                .position(new LatLng(51.243271, -0.591590))
+                .title("Pats field")
+                .snippet("112m")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
 
         myMarker1 = mMap.addMarker(new MarkerOptions()
@@ -393,15 +399,13 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
 
-
     }
-
 
 
     @Override
     public boolean onMarkerClick(Marker marker) {
         locationText.setText(marker.getTitle());
-        Toast.makeText(StepCounterActivity.this, ""+marker.getPosition()+" " , Toast.LENGTH_SHORT).show();
+        Toast.makeText(StepCounterActivity.this, "" + marker.getPosition() + " ", Toast.LENGTH_SHORT).show();
 
 
         return false;
@@ -444,27 +448,27 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
     }
 
-    private void init(){
+    private void init() {
         Log.d(TAG, "init: initializing");
 
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
-                .enableAutoManage(this,this)
+                .enableAutoManage(this, this)
                 .build();
 
-        mPlaceAutocompleteAdapater = new PlaceAutocompleteAdapter(this,mGoogleApiClient,LAT_LNG_BOUNDS,null);
+        mPlaceAutocompleteAdapater = new PlaceAutocompleteAdapter(this, mGoogleApiClient, LAT_LNG_BOUNDS, null);
 
         mSearchText.setAdapter(mPlaceAutocompleteAdapater);
 
         mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if(actionId == EditorInfo.IME_ACTION_SEARCH
+                if (actionId == EditorInfo.IME_ACTION_SEARCH
                         || actionId == EditorInfo.IME_ACTION_DONE
                         || keyEvent.getAction() == KeyEvent.ACTION_DOWN
-                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER){
+                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
 
                     //execute our method for searching
                     geoLocate();
@@ -477,7 +481,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
 
     public double toRadians(double deg) {
-        return deg*Math.PI/180;
+        return deg * Math.PI / 180;
     }
 
     public double calcDist(LatLng latLng1, LatLng latLng2) {
@@ -492,30 +496,30 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         double lat2R = toRadians(lat2);
         double lon2R = toRadians(lon2);
 
-        double a = Math.pow( Math.sin((lat2R-lat1R)/2),2) + Math.cos(lat1R) * Math.cos(lat2R)*Math.pow(Math.sin((lon2R-lon1R)/2),2);
-        double c = 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+        double a = Math.pow(Math.sin((lat2R - lat1R) / 2), 2) + Math.cos(lat1R) * Math.cos(lat2R) * Math.pow(Math.sin((lon2R - lon1R) / 2), 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double R = 6371.0;
-        dist = R*c;
+        dist = R * c;
         return dist;
     }
 
-    private void geoLocate(){
+    private void geoLocate() {
         Log.d(TAG, "geoLocate: geolocating");
 
         String searchString = mSearchText.getText().toString();
 
         Geocoder geocoder = new Geocoder(StepCounterActivity.this);
         List<Address> list = new ArrayList<>();
-        try{
+        try {
             list = geocoder.getFromLocationName(searchString, 1);
-        }catch (IOException e){
-            Log.e(TAG, "geoLocate: IOException: " + e.getMessage() );
+        } catch (IOException e) {
+            Log.e(TAG, "geoLocate: IOException: " + e.getMessage());
         }
 
-        if(list.size() > 0){
+        if (list.size() > 0) {
             Address address = list.get(0);
-            LatLng addressLatLng = new LatLng(address.getLatitude(),address.getLongitude());
-            moveCamera(addressLatLng,DEFAULT_ZOOM,address.getAddressLine(0));
+            LatLng addressLatLng = new LatLng(address.getLatitude(), address.getLongitude());
+            moveCamera(addressLatLng, DEFAULT_ZOOM, address.getAddressLine(0));
             Log.d(TAG, "geoLocate: found a location: " + address.toString());
             //Toast.makeText(this, "Dist to " + address.toString() + " is " + calcDist(addressLatLng, currentLatLng), Toast.LENGTH_SHORT).show();
 
@@ -523,8 +527,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
     }
 
-    private void moveCamera(LatLng latLng, float zoom, String title){
-        Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
+    private void moveCamera(LatLng latLng, float zoom, String title) {
+        Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
         MarkerOptions options = new MarkerOptions()
@@ -534,11 +538,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     }
 
     /**
-     *
      * CalcDist between two pars of lat-lon
-     *
      */
-
 
 
     LocationCallback mLocationCallback = new LocationCallback() {
@@ -551,7 +552,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 currentLocation = locationList.get(locationList.size() - 1);
                 currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
                 Log.i("MapsActivity", "Current Location: " + currentLocation.getLatitude() + " " + currentLocation.getLongitude());
-               // Toast.makeText(StepCounterActivity.this, ""+currentLocation.getLatitude()+" " + currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                // Toast.makeText(StepCounterActivity.this, ""+currentLocation.getLatitude()+" " + currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
                 mLastLocation = currentLocation;
                 if (mCurrLocationMarker != null) {
                     mCurrLocationMarker.remove();
@@ -592,7 +593,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                                 //Prompt the user once explanation has been shown
                                 ActivityCompat.requestPermissions(StepCounterActivity.this,
                                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                        MY_PERMISSIONS_REQUEST_LOCATION );
+                                        MY_PERMISSIONS_REQUEST_LOCATION);
                             }
                         })
                         .create()
@@ -603,7 +604,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_LOCATION );
+                        MY_PERMISSIONS_REQUEST_LOCATION);
             }
         }
     }
@@ -640,7 +641,6 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
             // permissions this app might request
         }
     }
-
 
 
 }

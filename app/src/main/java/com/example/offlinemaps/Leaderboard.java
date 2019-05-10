@@ -123,11 +123,6 @@ public class Leaderboard extends AppCompatActivity {
      */
     public void selectDrawerItem(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
-            case R.id.nav_map:
-                //Go to map activity.
-                Intent map = new Intent(Leaderboard.this, MapsActivity.class);
-                startActivity(map);
-                break;
             case R.id.nav_friends:
                 //Go to leader board activity.
                 Intent friends = new Intent(Leaderboard.this, FriendsUI.class);

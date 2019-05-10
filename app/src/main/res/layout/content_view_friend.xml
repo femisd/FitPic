@@ -41,7 +41,7 @@
                         android:layout_height="150dp"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="85dp"
-                        android:id="@+id/cv_profile_picture"/>
+                        android:id="@+id/cv_view_friends_picture"/>
                 </LinearLayout>
 
                 <androidx.cardview.widget.CardView
@@ -73,7 +73,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingTop="10dp"
-                                android:id="@+id/tv_profile_photos"
+                                android:id="@+id/tv_view_friends_photos"
                                 android:textColor="@color/startblue"
                                 android:textSize="20sp"
                                 android:textStyle="bold" />
@@ -97,7 +97,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingTop="10dp"
-                                android:id="@+id/tv_profile_followers"
+                                android:id="@+id/tv_view_friends_followers"
                                 android:textColor="@color/startblue"
                                 android:textSize="20sp"
                                 android:textStyle="bold" />
@@ -121,7 +121,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingTop="10dp"
-                                android:id="@+id/tv_profile_following"
+                                android:id="@+id/tv_view_friends_following"
                                 android:textColor="@color/startblue"
                                 android:textSize="20sp"
                                 android:textStyle="bold" />
@@ -157,7 +157,7 @@
                         android:layout_gravity="center_vertical"
                         android:paddingStart="20dp"
                         android:paddingEnd="20dp"
-                        android:id="@+id/tv_profile_user"
+                        android:id="@+id/tv_view_friends_user"
                         android:textStyle="bold"
                         android:textSize="20sp"/>
                 </LinearLayout>
@@ -183,7 +183,7 @@
                         android:paddingEnd="3dp"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:id="@+id/tv_profile_steps"/>
+                        android:id="@+id/tv_view_friends_steps"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -208,7 +208,7 @@
 
                     <TextView
                         android:layout_width="wrap_content"
-                        android:id="@+id/tv_profile_calories"
+                        android:id="@+id/tv_view_friends_calories"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:paddingStart="20dp"
@@ -239,7 +239,7 @@
 
                     <TextView
                         android:layout_width="wrap_content"
-                        android:id="@+id/tv_profile_points"
+                        android:id="@+id/tv_view_friends_points"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:paddingStart="20dp"
@@ -255,33 +255,13 @@
                         android:textStyle="bold"/>
                 </LinearLayout>
             </LinearLayout>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="35dp"
-                android:background="@drawable/buttonstyle"
-                android:text="@string/Follow"
-                android:textColor="@color/white" />
-
-            <Button
-                android:id="@+id/btn_startWalking"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="35dp"
-                android:background="@drawable/buttonstyle"
-                android:text="@string/start_walking"
-                android:textColor="@color/white" />
-
         </LinearLayout>
     </FrameLayout>
 
 
     <!-- Container for contents of drawer - use NavigationView to make configuration easier -->
     <com.google.android.material.navigation.NavigationView
-        android:id="@+id/nv_profile"
+        android:id="@+id/nv_view_friend"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"

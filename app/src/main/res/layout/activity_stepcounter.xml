@@ -9,9 +9,6 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="false">
 
-
-
-
     <FrameLayout
         android:id="@+id/fl_content_frame"
         android:layout_width="match_parent"
@@ -76,22 +73,6 @@
                 android:layout_height="500dp"
                 tools:context=".MapsActivity"
                 />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             <TextView
                 android:id="@+id/counterText"
                 android:layout_width="wrap_content"
