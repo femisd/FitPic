@@ -4,19 +4,12 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -41,10 +34,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
@@ -63,7 +53,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button locationstart;
 
     //widgets
-    private AutoCompleteTextView mSearchText;
 
     private static final String TAG = "MapActivity";
 
@@ -87,7 +76,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         //locationstart = new Button(this);
 
-        mSearchText = (AutoCompleteTextView) findViewById(R.id.input_search);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         mapFrag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -169,40 +157,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private void init(){
+    private void init() {
         Log.d(TAG, "init: initializing");
 
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
-                .enableAutoManage(this,this)
+                .enableAutoManage(this, this)
                 .build();
 
-        mPlaceAutocompleteAdapater = new PlaceAutocompleteAdapter(this,mGoogleApiClient,LAT_LNG_BOUNDS,null);
 
-        mSearchText.setAdapter(mPlaceAutocompleteAdapater);
-
-        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if(actionId == EditorInfo.IME_ACTION_SEARCH
-                        || actionId == EditorInfo.IME_ACTION_DONE
-                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
-                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER){
-
-                    //execute our method for searching
-                    geoLocate();
-                }
-
-                return false;
-            }
-        });
     }
 
 
     public double toRadians(double deg) {
-        return deg*Math.PI/180;
+        return deg * Math.PI / 180;
     }
 
     public double calcDist(LatLng latLng1, LatLng latLng2) {
@@ -217,39 +187,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         double lat2R = toRadians(lat2);
         double lon2R = toRadians(lon2);
 
-        double a = Math.pow( Math.sin((lat2R-lat1R)/2),2) + Math.cos(lat1R) * Math.cos(lat2R)*Math.pow(Math.sin((lon2R-lon1R)/2),2);
-        double c = 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+        double a = Math.pow(Math.sin((lat2R - lat1R) / 2), 2) + Math.cos(lat1R) * Math.cos(lat2R) * Math.pow(Math.sin((lon2R - lon1R) / 2), 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double R = 6371.0;
-        dist = R*c;
+        dist = R * c;
         return dist;
     }
 
-    private void geoLocate(){
-        Log.d(TAG, "geoLocate: geolocating");
 
-        String searchString = mSearchText.getText().toString();
-
-        Geocoder geocoder = new Geocoder(MapsActivity.this);
-        List<Address> list = new ArrayList<>();
-        try{
-            list = geocoder.getFromLocationName(searchString, 1);
-        }catch (IOException e){
-            Log.e(TAG, "geoLocate: IOException: " + e.getMessage() );
-        }
-
-        if(list.size() > 0){
-            Address address = list.get(0);
-            LatLng addressLatLng = new LatLng(address.getLatitude(),address.getLongitude());
-            moveCamera(addressLatLng,DEFAULT_ZOOM,address.getAddressLine(0));
-            Log.d(TAG, "geoLocate: found a location: " + address.toString());
-            //Toast.makeText(this, "Dist to " + address.toString() + " is " + calcDist(addressLatLng, currentLatLng), Toast.LENGTH_SHORT).show();
-
-        }
-
-    }
-
-    private void moveCamera(LatLng latLng, float zoom, String title){
-        Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
+    private void moveCamera(LatLng latLng, float zoom, String title) {
+        Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
         MarkerOptions options = new MarkerOptions()
@@ -259,11 +206,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     /**
-     *
      * CalcDist between two pars of lat-lon
-     *
      */
-
 
 
     LocationCallback mLocationCallback = new LocationCallback() {
@@ -317,7 +261,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 //Prompt the user once explanation has been shown
                                 ActivityCompat.requestPermissions(MapsActivity.this,
                                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                        MY_PERMISSIONS_REQUEST_LOCATION );
+                                        MY_PERMISSIONS_REQUEST_LOCATION);
                             }
                         })
                         .create()
@@ -328,7 +272,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_LOCATION );
+                        MY_PERMISSIONS_REQUEST_LOCATION);
             }
         }
     }
@@ -365,7 +309,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // permissions this app might request
         }
     }
-
 
 
 }

@@ -46,3 +46,15 @@ return null;
 exports.doubleVIPpoints = functions.database.ref("/users/{userID}").onCreate((snap, context) => {
 	console.log(snap.val(), "written by", context.auth.uid);
 });
+
+
+// Send notifications 
+exports.sendNotification = functions.firestore.document("Users/{user_id}/Notification/{notification_id}").onWrite(event =>{
+
+  const user_id = event.params.user_id;
+  const notification_id = event.params.notification_id; 
+
+  console.log("User ID: " + user_id + " | Notification ID :" + notification_id);
+  
+
+});
