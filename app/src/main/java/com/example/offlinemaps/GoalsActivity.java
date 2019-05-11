@@ -3,24 +3,25 @@ package com.example.offlinemaps;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 
 public class GoalsActivity extends AppCompatActivity {
@@ -36,23 +37,33 @@ public class GoalsActivity extends AppCompatActivity {
     private CountDownTimer countDownTimer;
     private long timeLeftinMs = 36000000;
 
-
+    //Firebase fields.
     private DatabaseReference userRef;
     private String mCurrentUser = FirebaseAuth.getInstance().getUid();
-    private  User currentUser;
+    private User currentUser;
 
     public int currentPoints;
 
     private ArrayList<Challenges> challengesList;
 
+    //fields for nav view.
+    private DrawerLayout mDrawer;
+    private Toolbar toolbar;
+    private NavigationView mNavView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_goals);
+        setContentView(R.layout.content_goals);
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
-       Intent intent = getIntent();
-       Bundle bundle = intent.getExtras();
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
         currentStep = bundle.getInt("currentSteps");
 
         timerText = findViewById(R.id.timer_textView);
@@ -66,6 +77,9 @@ public class GoalsActivity extends AppCompatActivity {
             }
         });
 
+        mDrawer = findViewById(R.id.drawer_layout);
+        mNavView = findViewById(R.id.nav_goals);
+        setupDrawerContent(mNavView);
 
         challengesList = new ArrayList<>();
 
@@ -81,38 +95,55 @@ public class GoalsActivity extends AppCompatActivity {
         populateChallenges();
 
 
-
         startTimer();
         updateTimer();
+    }
 
-
-        userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser);
-
-
-
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+    /**
+     * Setup the navigation drawer.
+     *
+     * @param navigationView
+     */
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                currentUser = dataSnapshot.getValue(User.class);
-                currentPoints = currentUser.getmPoints();
-                Log.d("Point", ""+currentPoints);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                selectDrawerItem(menuItem);
+                return true;
             }
         });
+    }
 
-
-
-
+    /**
+     * Select an item from menu and perform an action.
+     *
+     * @param menuItem
+     */
+    public void selectDrawerItem(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.nav_leaderboard:
+                //Go to leader board activity.
+                Intent leaderboard = new Intent(GoalsActivity.this, Leaderboard.class);
+                startActivity(leaderboard);
+                finish();
+                break;
+            case R.id.nav_logout:
+                //Go to main activity.
+                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+                firebaseAuth.signOut();
+                break;
+            case R.id.nav_profile:
+                Intent profile = new Intent(GoalsActivity.this, ProfileUI.class);
+                startActivity(profile);
+                finish();
+        }
+        menuItem.setChecked(true);
+        mDrawer.closeDrawers();
     }
 
     public int getCurrentStep() {
         return currentStep;
     }
-
 
 
     public void startTimer() {
@@ -131,60 +162,69 @@ public class GoalsActivity extends AppCompatActivity {
         }.start();
 
     }
-        public void  updateTimer(){
 
-            int seconds = (int) (timeLeftinMs / 1000);
-            int minutes = (seconds / 60);
-            int hours = (minutes / 60);
+    public void updateTimer() {
 
-            minutes = minutes - hours * 60;
+        int seconds = (int) (timeLeftinMs / 1000);
+        int minutes = (seconds / 60);
+        int hours = (minutes / 60);
 
-            seconds = seconds - (minutes * 60) - (hours * 60 * 60);
+        minutes = minutes - hours * 60;
 
-            String timeLeftText;
-            timeLeftText = "Next Automatic Refresh is in " + hours;
-            timeLeftText += ":";
-            if(minutes < 10 ) timeLeftText += "0";
-            timeLeftText += minutes;
-            timeLeftText += ":";
-            if(seconds < 10) timeLeftText += "0";
-            timeLeftText += seconds;
+        seconds = seconds - (minutes * 60) - (hours * 60 * 60);
 
-            timerText.setText(timeLeftText);
+        String timeLeftText;
+        timeLeftText = "Next Automatic Refresh is in " + hours;
+        timeLeftText += ":";
+        if (minutes < 10) timeLeftText += "0";
+        timeLeftText += minutes;
+        timeLeftText += ":";
+        if (seconds < 10) timeLeftText += "0";
+        timeLeftText += seconds;
 
-        }
+        timerText.setText(timeLeftText);
+
+    }
 
     public int getCurrentPoints() {
         return currentPoints;
     }
 
 
-    public void populateChallenges(){
+    public void populateChallenges() {
 
 
-        challengesList.add(new Challenges(getCurrentStep(),"Walk 20 Steps!", 20, "Steps",20));
-        challengesList.add(new Challenges(getCurrentStep(),"Walk 50 Steps!", 50, "Steps",50));
-        challengesList.add(new Challenges(getCurrentStep(),"Walk 100 Steps!", 100, "Steps",100));
-        challengesList.add(new Challenges(0,"Walk 100 Meters!", 10, "Meters",20));
-        challengesList.add(new Challenges(getCurrentStep()/20,"Burn 10 calories!", 10, "Calories",20));
+        challengesList.add(new Challenges(getCurrentStep(), "Walk 20 Steps!", 20, "Steps", 20));
+        challengesList.add(new Challenges(getCurrentStep(), "Walk 50 Steps!", 50, "Steps", 50));
+        challengesList.add(new Challenges(getCurrentStep(), "Walk 100 Steps!", 100, "Steps", 100));
+        challengesList.add(new Challenges(0, "Walk 100 Meters!", 10, "Meters", 20));
+        challengesList.add(new Challenges(getCurrentStep() / 20, "Burn 10 calories!", 10, "Calories", 20));
 
 
     }
 
 
-    public void refreshChallenges(){
+    public void refreshChallenges() {
         challengesList.clear();
         adapter.notifyDataSetChanged();
 
 
         populateChallenges();
-      adapter.notifyDataSetChanged();
+        adapter.notifyDataSetChanged();
         startActivity(getIntent());
         finish();
 
     }
 
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                mDrawer.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
 
 

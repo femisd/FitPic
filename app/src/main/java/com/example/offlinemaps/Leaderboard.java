@@ -3,7 +3,10 @@ package com.example.offlinemaps;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -99,6 +102,17 @@ public class Leaderboard extends AppCompatActivity {
 
             }
         });
+
+        leaderboard.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                User user = userList.get(position);
+                Log.d("YOOO", user.toString());
+                Intent i = new Intent(Leaderboard.this, ViewFriend.class);
+                i.putExtra("user", user);
+                startActivity(i);
+            }
+        });
     }
 
     /**
@@ -123,11 +137,6 @@ public class Leaderboard extends AppCompatActivity {
      */
     public void selectDrawerItem(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
-            case R.id.nav_map:
-                //Go to map activity.
-                Intent map = new Intent(Leaderboard.this, MapsActivity.class);
-                startActivity(map);
-                break;
             case R.id.nav_friends:
                 //Go to leader board activity.
                 Intent friends = new Intent(Leaderboard.this, FriendsUI.class);

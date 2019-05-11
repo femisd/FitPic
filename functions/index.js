@@ -42,3 +42,7 @@ exports.sendWelcomeEmail = functions.auth.user().onCreate((user) => {
   }
 return null; 
 });
+
+exports.doubleVIPpoints = functions.database.ref("/users/{userID}").onCreate((snap, context) => {
+	console.log(snap.val(), "written by", context.auth.uid);
+});

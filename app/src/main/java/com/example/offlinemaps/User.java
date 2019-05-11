@@ -1,8 +1,12 @@
 package com.example.offlinemaps;
 
-public class User {
+import java.io.Serializable;
+import java.util.HashMap;
+
+public class User implements Serializable {
 
     //Fields
+    private String mUid;
     private String mUsername;
     private String mProfilePicture;
     private String mLocation;
@@ -13,14 +17,15 @@ public class User {
     private int mPoints;
     private double mCaloriesBurned;
     private boolean mVIP;
+    private HashMap<String, User> mFollowedUsers;
 
     //Default constructor
     public User() {
     }
 
     //Constructor used for creating a User.
-    public User(String profilePicture, String username, String location, int steps, double caloriesBurned,
-                int photos, int followers, int following, int points, boolean vip) {
+    public User(String profilePicture, String uid, String username, String location, int steps, double caloriesBurned,
+                int photos, int followers, int following, int points, boolean vip, HashMap<String, User> followedUsers) {
         mProfilePicture = profilePicture;
         mUsername = username;
         mLocation = location;
@@ -31,6 +36,8 @@ public class User {
         mFollowing = following;
         mPoints = points;
         mVIP = vip;
+        mUid = uid;
+        mFollowedUsers = followedUsers;
     }
 
     //Get the users username.
@@ -78,6 +85,15 @@ public class User {
 
     //Get the users VIP Status.
     public boolean getmVIP() { return mVIP; }
+
+    //Get the users UID.
+    public String getmUid() {
+        return mUid;
+    }
+
+    public HashMap<String, User> getmFollowedUsers() {
+        return mFollowedUsers;
+    }
 
     //Set the username for the user.
     public void setmUsername(String mUsername) {
