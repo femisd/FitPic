@@ -18,9 +18,14 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -92,6 +97,25 @@ public class ViewFriend extends AppCompatActivity {
         points.setText(user.getmPoints() + "");
 
         final Button follow = (Button) findViewById(R.id.bt_follow);
+
+        final ArrayList<String> userUIDs = new ArrayList<>();
+        followersRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    userUIDs.add(snapshot.getValue(User.class).getmUid());
+
+                    if (snapshot.getValue(User.class).getmUid().equals(user.getmUid())) {
+                        follow.setText("Unfollow");
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
         follow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,6 +126,7 @@ public class ViewFriend extends AppCompatActivity {
                     userRef.child("mFollowedUsers").child(user.getmUid()).setValue(user);
                 } else {
                     follow.setText("Follow");
+                    userRef.child("mFollowedUsers").child(user.getmUid()).removeValue();
                     Toast.makeText(ViewFriend.this, "Unfollowed " + user.getmUsername(), Toast.LENGTH_SHORT).show();
                 }
 

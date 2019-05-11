@@ -25,5 +25,8 @@
     <string name="start_tracking">Start Tracking</string>
     <string name="_0">0</string>
     <string name="enter_address_city_or_zip_code">Enter Address, City or Zip Code</string>
+    <string name="search_hint">Type a friends username</string>
+    <string name="title_activity_friend_search">FriendSearch</string>
+    <string name="search">search</string>
 
 </resources>
