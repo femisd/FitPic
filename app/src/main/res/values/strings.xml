@@ -21,5 +21,9 @@
     <string name="title_activity_goals2">GoalsActivity2</string>
     <string name="update">Update!</string>
     <string name="title_activity_view_friend">ViewFriend</string>
+    <string name="goals">Goals</string>
+    <string name="start_tracking">Start Tracking</string>
+    <string name="_0">0</string>
+    <string name="enter_address_city_or_zip_code">Enter Address, City or Zip Code</string>
 
 </resources>

@@ -33,10 +33,6 @@ public class FriendsUI extends AppCompatActivity {
     private boolean doubleBackToExitPressedOnce = false;
     private String mCurrentUser;
 
-    //Final fields.
-    private static final int VIEW_FRIEND_REQUEST = 2;
-
-
     //fields for nav view.
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
@@ -60,35 +56,52 @@ public class FriendsUI extends AppCompatActivity {
 
         //Firebase initialisation.
         mCurrentUser = FirebaseAuth.getInstance().getUid();
-        userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser);
+        userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser).child("mFollowedUsers");
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         ListView friends = (ListView) findViewById(R.id.lv_friends_list);
         final ArrayList<User> userList = new ArrayList<>();
         final FriendAdapterClass friendsAdapter = new FriendAdapterClass(this, userList);
 
-        mDatabase.addValueEventListener(new ValueEventListener() {
+//        mDatabase.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                friendsAdapter.clear();
+//                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+//                    for (DataSnapshot userSnapshot : postSnapshot.getChildren()) {
+//                        User user = userSnapshot.getValue(User.class);
+//                        //Don't include users with no username.
+//                        if (!userSnapshot.child("mUsername").getValue().toString().isEmpty()) {
+//                            Log.d("USERNAME:", user.toString() + "");
+//                            friendsAdapter.add(user);
+//                        }
+//                        friendsAdapter.notifyDataSetChanged();
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+
+        userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                friendsAdapter.clear();
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    for (DataSnapshot userSnapshot : postSnapshot.getChildren()) {
-                        User user = userSnapshot.getValue(User.class);
-                        //Don't include users with no username.
-                        if (!userSnapshot.child("mUsername").getValue().toString().isEmpty()) {
-                            Log.d("USERNAME:", user.toString() + "");
-                            friendsAdapter.add(user);
-                        }
-                        friendsAdapter.notifyDataSetChanged();
-                    }
+                for (DataSnapshot user : dataSnapshot.getChildren()) {
+                    Log.d("USERS", user.toString());
+                    friendsAdapter.add(user.getValue(User.class));
                 }
             }
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
+
 
         //Set the friends list adapter.
         friends.setAdapter(friendsAdapter);

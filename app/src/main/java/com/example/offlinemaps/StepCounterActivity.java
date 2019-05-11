@@ -168,11 +168,9 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
                 if (!tracking) {
                     tracking = true;
-                    //    Toast.makeText(StepCounterActivity.this, "CLick", Toast.LENGTH_SHORT).show();
-
 
                 } else if (tracking) {
-                    tracking = false;
+                    goalsBtn.setEnabled(true);
                     userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

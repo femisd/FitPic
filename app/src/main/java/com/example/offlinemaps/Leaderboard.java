@@ -3,7 +3,10 @@ package com.example.offlinemaps;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -97,6 +100,17 @@ public class Leaderboard extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
+            }
+        });
+
+        leaderboard.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                User user = userList.get(position);
+                Log.d("YOOO", user.toString());
+                Intent i = new Intent(Leaderboard.this, ViewFriend.class);
+                i.putExtra("user", user);
+                startActivity(i);
             }
         });
     }
