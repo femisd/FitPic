@@ -10,19 +10,15 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -54,7 +50,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,6 +73,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     private Toolbar toolbar;
     private NavigationView mNavView;
 
+    private ImageButton selfieBtn;
+
 
 
     private GoogleMap mMap;
@@ -93,7 +90,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     private Button locationstart;
 
     //widgets
-    private AutoCompleteTextView mSearchText;
+
 
     private static final String TAG = "MapActivity";
 
@@ -127,6 +124,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
         locationText = findViewById(R.id.locationText);
 
+        selfieBtn = findViewById(R.id.selfieBtn);
+
         updateButton();
         counterView = findViewById(R.id.counterText);
         goalsBtn = findViewById(R.id.goalsBtn);
@@ -156,6 +155,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
             @Override
             public void onClick(View v) {
 
+                selfieBtn.setVisibility(View.VISIBLE);
+
                 if(!tracking){
                     tracking = true;
                 //    Toast.makeText(StepCounterActivity.this, "CLick", Toast.LENGTH_SHORT).show();
@@ -179,7 +180,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
 
 
-        mSearchText = (AutoCompleteTextView) findViewById(R.id.input_search);
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         mapFrag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -494,23 +495,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
         mPlaceAutocompleteAdapater = new PlaceAutocompleteAdapter(this,mGoogleApiClient,LAT_LNG_BOUNDS,null);
 
-        mSearchText.setAdapter(mPlaceAutocompleteAdapater);
 
-        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if(actionId == EditorInfo.IME_ACTION_SEARCH
-                        || actionId == EditorInfo.IME_ACTION_DONE
-                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
-                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER){
 
-                    //execute our method for searching
-                    geoLocate();
-                }
-
-                return false;
-            }
-        });
     }
 
 
@@ -537,29 +523,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         return dist;
     }
 
-    private void geoLocate(){
-        Log.d(TAG, "geoLocate: geolocating");
 
-        String searchString = mSearchText.getText().toString();
-
-        Geocoder geocoder = new Geocoder(StepCounterActivity.this);
-        List<Address> list = new ArrayList<>();
-        try{
-            list = geocoder.getFromLocationName(searchString, 1);
-        }catch (IOException e){
-            Log.e(TAG, "geoLocate: IOException: " + e.getMessage() );
-        }
-
-        if(list.size() > 0){
-            Address address = list.get(0);
-            LatLng addressLatLng = new LatLng(address.getLatitude(),address.getLongitude());
-            moveCamera(addressLatLng,DEFAULT_ZOOM,address.getAddressLine(0));
-            Log.d(TAG, "geoLocate: found a location: " + address.toString());
-            //Toast.makeText(this, "Dist to " + address.toString() + " is " + calcDist(addressLatLng, currentLatLng), Toast.LENGTH_SHORT).show();
-
-        }
-
-    }
 
     private void moveCamera(LatLng latLng, float zoom, String title){
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
