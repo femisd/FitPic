@@ -12,11 +12,8 @@
   <component name="ChangeListManager">
     <list default="true" id="eb49fe6c-e77f-440e-94c4-d24a3665ae00" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/caches/gradle_models.ser" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/gradle_models.ser" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/offlinemaps/MapsActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/offlinemaps/MapsActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/offlinemaps/StepCounterActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/offlinemaps/StepCounterActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_stepcounter.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_stepcounter.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -39,8 +36,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_goals.xml">
           <provider editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="14" column="15" selection-start-line="14" selection-start-column="15" selection-end-line="14" selection-end-column="15" />
+            <state relative-caret-position="150">
+              <caret line="10" column="15" selection-start-line="10" selection-start-column="15" selection-end-line="10" selection-end-column="15" />
             </state>
           </provider>
           <provider selected="true" editor-type-id="android-designer2" />
@@ -59,16 +56,22 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/offlinemaps/StepCounterActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="157" column="52" selection-start-line="157" selection-start-column="52" selection-end-line="157" selection-end-column="52" />
+            <state relative-caret-position="177">
+              <caret line="393" lean-forward="true" selection-start-line="393" selection-end-line="393" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#16054#16055#0" expanded="true" />
-                <element signature="e#16092#16093#0" expanded="true" />
-                <element signature="e#18246#19837#0" expanded="true" />
-                <element signature="e#19836#19837#0" expanded="true" />
-                <element signature="e#20745#21313#0" expanded="true" />
-                <element signature="e#21312#21313#0" expanded="true" />
+                <element signature="e#4684#4977#0" expanded="true" />
+                <element signature="e#4976#4977#0" expanded="true" />
+                <element signature="e#5190#5777#0" expanded="true" />
+                <element signature="e#5776#5777#0" expanded="true" />
+                <element signature="e#7637#7893#0" expanded="true" />
+                <element signature="e#7892#7893#0" expanded="true" />
+                <element signature="e#16002#16003#0" expanded="true" />
+                <element signature="e#16040#16041#0" expanded="true" />
+                <element signature="e#17260#18851#0" expanded="true" />
+                <element signature="e#18850#18851#0" expanded="true" />
+                <element signature="e#19759#20327#0" expanded="true" />
+                <element signature="e#20326#20327#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -316,7 +319,7 @@
       <window_info anchor="bottom" id="Debug" order="3" />
       <window_info anchor="bottom" id="Terminal" order="4" weight="0.32601535" />
       <window_info anchor="bottom" id="Event Log" order="5" side_tool="true" />
-      <window_info anchor="bottom" id="Version Control" order="6" weight="0.32840723" />
+      <window_info anchor="bottom" id="Version Control" order="6" weight="0.22167487" />
       <window_info anchor="bottom" id="Build" order="7" weight="0.32676518" />
       <window_info anchor="bottom" id="Android Profiler" order="8" weight="0.32930845" />
       <window_info anchor="right" id="Device File Explorer" order="0" side_tool="true" />
@@ -547,19 +550,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_goals.xml">
       <provider editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="15" selection-start-line="14" selection-start-column="15" selection-end-line="14" selection-end-column="15" />
+        <state relative-caret-position="150">
+          <caret line="10" column="15" selection-start-line="10" selection-start-column="15" selection-end-line="10" selection-end-column="15" />
         </state>
       </provider>
       <provider selected="true" editor-type-id="android-designer2" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/buttonstyle_pic.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" selection-start-line="8" selection-end-line="8" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/buttonstyle_pic.xml" />
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/offlinemaps/MapsActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-735">
@@ -580,16 +577,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/offlinemaps/StepCounterActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="157" column="52" selection-start-line="157" selection-start-column="52" selection-end-line="157" selection-end-column="52" />
+        <state relative-caret-position="177">
+          <caret line="393" lean-forward="true" selection-start-line="393" selection-end-line="393" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#16054#16055#0" expanded="true" />
-            <element signature="e#16092#16093#0" expanded="true" />
-            <element signature="e#18246#19837#0" expanded="true" />
-            <element signature="e#19836#19837#0" expanded="true" />
-            <element signature="e#20745#21313#0" expanded="true" />
-            <element signature="e#21312#21313#0" expanded="true" />
+            <element signature="e#4684#4977#0" expanded="true" />
+            <element signature="e#4976#4977#0" expanded="true" />
+            <element signature="e#5190#5777#0" expanded="true" />
+            <element signature="e#5776#5777#0" expanded="true" />
+            <element signature="e#7637#7893#0" expanded="true" />
+            <element signature="e#7892#7893#0" expanded="true" />
+            <element signature="e#16002#16003#0" expanded="true" />
+            <element signature="e#16040#16041#0" expanded="true" />
+            <element signature="e#17260#18851#0" expanded="true" />
+            <element signature="e#18850#18851#0" expanded="true" />
+            <element signature="e#19759#20327#0" expanded="true" />
+            <element signature="e#20326#20327#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -371,26 +371,26 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                     .position(new LatLng(51.243271, -0.591590))
                     .title("Pats field")
                     .snippet("112m")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.running_icon)));
 
 
         myMarker1 = mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(51.242373, -0.581312))
                 .title("Friary Centre")
                 .snippet("743m")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.running_icon)));
 
         myMarker2 = mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(51.242007, -0.586198))
                 .title("Student Union")
                 .snippet("123m")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.running_icon)));
 
         myMarker3 = mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(51.243012, -0.595327))
                 .title("School Of Arts")
                 .snippet("846m")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.running_icon)));
 
 
 
