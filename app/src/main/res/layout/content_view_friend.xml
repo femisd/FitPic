@@ -255,13 +255,23 @@
                         android:textStyle="bold"/>
                 </LinearLayout>
             </LinearLayout>
+
+            <Button
+                android:id="@+id/bt_follow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="35dp"
+                android:background="@drawable/buttonstyle"
+                android:text="@string/Follow"
+                android:textColor="@color/white" />
         </LinearLayout>
     </FrameLayout>
 
 
     <!-- Container for contents of drawer - use NavigationView to make configuration easier -->
     <com.google.android.material.navigation.NavigationView
-        android:id="@+id/nv_view_friend"
+        android:id="@+id/nav_view_friend"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"

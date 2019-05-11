@@ -20,6 +20,9 @@
             android:background="?attr/colorPrimary"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
 
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -257,15 +260,6 @@
             </LinearLayout>
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="35dp"
-                android:background="@drawable/buttonstyle"
-                android:text="@string/Follow"
-                android:textColor="@color/white" />
-
-            <Button
                 android:id="@+id/btn_startWalking"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -276,6 +270,7 @@
                 android:textColor="@color/white" />
 
         </LinearLayout>
+        </ScrollView>
     </FrameLayout>
 
 

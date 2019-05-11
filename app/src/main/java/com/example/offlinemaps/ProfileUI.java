@@ -54,7 +54,6 @@ public class ProfileUI extends AppCompatActivity {
 
     //Final fields
     private static final int RC_SIGN_IN = 1;
-    private static final int VIEW_FRIEND_REQUEST = 2;
 
     //Firebase fields
     private FirebaseAuth firebaseAuth;
@@ -190,7 +189,6 @@ public class ProfileUI extends AppCompatActivity {
                             if (dataSnapshot.exists()) {
                                 User user = dataSnapshot.getValue(User.class);
                                 String image = user.getmProfilePicture();
-                                Log.d("IMAGE", image);
                                 if (!image.isEmpty()) {
                                     Picasso.get().load(image).placeholder(R.drawable.ic_person_white_24dp).into(mProfilePicture);
                                 }
@@ -237,7 +235,7 @@ public class ProfileUI extends AppCompatActivity {
                                 points.setText(user.getmPoints() + "");
 
                             } else {
-                                User signedIn = new User("", "", "Guildford, UK", 0, 0, 0, 0, 0, 0, false);
+                                User signedIn = new User("", mCurrentUser, "", "Guildford, UK", 0, 0, 0, 0, 0, 0, false, null);
                                 userRef.setValue(signedIn);
                             }
                         }
@@ -352,46 +350,6 @@ public class ProfileUI extends AppCompatActivity {
                     }
                 });
             }
-        }
-
-        if (requestCode == 2) {
-            if (resultCode == RESULT_OK) {
-                User user = (User) getIntent().getSerializableExtra("user");
-                Log.d("VIEW_FRIEND_REQUEST", user.getmUsername());
-                String image = user.getmProfilePicture();
-                Log.d("IMAGE", image);
-                if (!image.isEmpty()) {
-                    Picasso.get().load(image).placeholder(R.drawable.ic_person_white_24dp).into(mProfilePicture);
-                }
-                //Username
-                TextView username = (TextView) findViewById(R.id.tv_profile_user);
-                username.setText(user.getmUsername());
-
-                //Steps
-                TextView steps = (TextView) findViewById(R.id.tv_profile_steps);
-                steps.setText(user.getmSteps() + "");
-
-                //Calories
-                TextView calories = (TextView) findViewById(R.id.tv_profile_calories);
-                calories.setText(user.getmCaloriesBurned() + "");
-
-                //Photos
-                TextView photos = (TextView) findViewById(R.id.tv_profile_photos);
-                photos.setText(user.getmPhotos() + "");
-
-                //Followers
-                TextView followers = (TextView) findViewById(R.id.tv_profile_followers);
-                followers.setText(user.getmFollowers() + "");
-
-                //Following
-                TextView following = (TextView) findViewById(R.id.tv_profile_following);
-                following.setText(user.getmFollowing() + "");
-
-                //Points
-                TextView points = (TextView) findViewById(R.id.tv_profile_points);
-                points.setText(user.getmPoints() + "");
-            }
-
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

@@ -1,12 +1,25 @@
 package com.example.offlinemaps;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -15,16 +28,35 @@ public class ViewFriend extends AppCompatActivity {
 
     private CircleImageView mProfilePicture;
 
+    //fields for nav view.
+    private DrawerLayout mDrawer;
+    private Toolbar toolbar;
+    private NavigationView mNavView;
+
+    private DatabaseReference userRef;
+    private DatabaseReference followersRef;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_friend);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mNavView = (NavigationView) findViewById(R.id.nav_view_friend);
+        setupDrawerContent(mNavView);
+
+        String currentUser = FirebaseAuth.getInstance().getUid();
+        userRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUser);
+        followersRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUser).child("mFollowedUsers");
 
         mProfilePicture = (CircleImageView) findViewById(R.id.cv_view_friends_picture);
 
-        User user = (User) getIntent().getSerializableExtra("user");
+        final User user = (User) getIntent().getSerializableExtra("user");
         Log.d("VIEW_FRIEND_REQUEST", user.toString());
         String image = user.getmProfilePicture();
         Log.d("IMAGE", image);
@@ -58,6 +90,79 @@ public class ViewFriend extends AppCompatActivity {
         //Points
         TextView points = (TextView) findViewById(R.id.tv_view_friends_points);
         points.setText(user.getmPoints() + "");
+
+        final Button follow = (Button) findViewById(R.id.bt_follow);
+        follow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (follow.getText().toString().equals("Follow")) {
+
+                    Toast.makeText(ViewFriend.this, "Following " + user.getmUsername(), Toast.LENGTH_SHORT).show();
+                    follow.setText("Unfollow");
+                    userRef.child("mFollowedUsers").child(user.getmUid()).setValue(user);
+                } else {
+                    follow.setText("Follow");
+                    Toast.makeText(ViewFriend.this, "Unfollowed " + user.getmUsername(), Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
     }
 
+    /**
+     * Setup the navigation drawer.
+     *
+     * @param navigationView
+     */
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                selectDrawerItem(menuItem);
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Select an item from menu and perform an action.
+     *
+     * @param menuItem
+     */
+    public void selectDrawerItem(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.nav_leaderboard:
+                //Go to leader board activity.
+                Intent leaderboard = new Intent(ViewFriend.this, Leaderboard.class);
+                startActivity(leaderboard);
+                finish();
+                break;
+            case R.id.nav_logout:
+                //Go to main activity.
+                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+                firebaseAuth.signOut();
+                break;
+            case R.id.nav_friends:
+                Intent friends = new Intent(ViewFriend.this, FriendsUI.class);
+                startActivity(friends);
+                finish();
+            case R.id.nav_profile:
+                Intent profile = new Intent(ViewFriend.this, ProfileUI.class);
+                startActivity(profile);
+                finish();
+        }
+        menuItem.setChecked(true);
+        mDrawer.closeDrawers();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                mDrawer.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
