@@ -83,7 +83,7 @@ public class User implements Serializable {
     //Get the users points.
     public int getmPoints() { return mPoints; }
 
-    //Get the users VIP Status.
+    //Get the users vip_ticket Status.
     public boolean getmVIP() { return mVIP; }
 
     //Get the users UID.
@@ -140,7 +140,7 @@ public class User implements Serializable {
         this.mPoints = points;
     }
 
-    //Set the VIP status of the user.
+    //Set the vip_ticket status of the user.
     public void setmVIP(boolean vip) {
         this.mVIP = vip;
     }

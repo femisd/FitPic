@@ -288,6 +288,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 //Go to main activity.
                 firebaseAuth = FirebaseAuth.getInstance();
                 firebaseAuth.signOut();
+                finish();
                 break;
             case R.id.nav_friends:
                 Intent friends = new Intent(StepCounterActivity.this, FriendsUI.class);
