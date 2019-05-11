@@ -10,7 +10,10 @@
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="eb49fe6c-e77f-440e-94c4-d24a3665ae00" name="Default Changelist" comment="" />
+    <list default="true" id="eb49fe6c-e77f-440e-94c4-d24a3665ae00" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/offlinemaps/MapsActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/offlinemaps/MapsActivity.java" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,7 +56,7 @@
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/offlinemaps/StepCounterActivity.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-1293">
-              <caret line="377" selection-start-line="377" selection-end-line="377" />
+              <caret line="378" selection-start-line="378" selection-end-line="378" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#4684#4977#0" expanded="true" />
@@ -76,8 +79,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/offlinemaps/MapsActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-735">
-              <caret line="199" selection-start-line="199" selection-end-line="199" />
+            <state relative-caret-position="270">
+              <caret line="265" column="26" selection-start-line="265" selection-start-column="26" selection-end-line="265" selection-end-column="26" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -130,9 +133,9 @@
         <option value="$PROJECT_DIR$/app/src/main/res/layout/reward_element.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/offlinemaps/GoalsActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/drawable/buttonstyle_pic.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/offlinemaps/MapsActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_stepcounter.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/offlinemaps/StepCounterActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/offlinemaps/MapsActivity.java" />
       </list>
     </option>
   </component>
@@ -565,7 +568,7 @@
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/offlinemaps/StepCounterActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1293">
-          <caret line="377" selection-start-line="377" selection-end-line="377" />
+          <caret line="378" selection-start-line="378" selection-end-line="378" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#4684#4977#0" expanded="true" />
@@ -586,8 +589,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/offlinemaps/MapsActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-735">
-          <caret line="199" selection-start-line="199" selection-end-line="199" />
+        <state relative-caret-position="270">
+          <caret line="265" column="26" selection-start-line="265" selection-start-column="26" selection-end-line="265" selection-end-column="26" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

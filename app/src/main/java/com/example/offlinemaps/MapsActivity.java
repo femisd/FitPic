@@ -37,7 +37,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.List;
 
 
-
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.OnConnectionFailedListener {
 
@@ -158,14 +157,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private void init(){
+    private void init() {
         Log.d(TAG, "init: initializing");
 
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
-                .enableAutoManage(this,this)
+                .enableAutoManage(this, this)
                 .build();
 
 
@@ -173,7 +172,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     public double toRadians(double deg) {
-        return deg*Math.PI/180;
+        return deg * Math.PI / 180;
     }
 
     public double calcDist(LatLng latLng1, LatLng latLng2) {
@@ -188,19 +187,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         double lat2R = toRadians(lat2);
         double lon2R = toRadians(lon2);
 
-        double a = Math.pow( Math.sin((lat2R-lat1R)/2),2) + Math.cos(lat1R) * Math.cos(lat2R)*Math.pow(Math.sin((lon2R-lon1R)/2),2);
-        double c = 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+        double a = Math.pow(Math.sin((lat2R - lat1R) / 2), 2) + Math.cos(lat1R) * Math.cos(lat2R) * Math.pow(Math.sin((lon2R - lon1R) / 2), 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double R = 6371.0;
-        dist = R*c;
+        dist = R * c;
         return dist;
     }
 
 
-
-
-
-    private void moveCamera(LatLng latLng, float zoom, String title){
-        Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
+    private void moveCamera(LatLng latLng, float zoom, String title) {
+        Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
         MarkerOptions options = new MarkerOptions()
@@ -210,11 +206,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     /**
-     *
      * CalcDist between two pars of lat-lon
-     *
      */
-
 
 
     LocationCallback mLocationCallback = new LocationCallback() {
@@ -268,7 +261,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 //Prompt the user once explanation has been shown
                                 ActivityCompat.requestPermissions(MapsActivity.this,
                                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                        MY_PERMISSIONS_REQUEST_LOCATION );
+                                        MY_PERMISSIONS_REQUEST_LOCATION);
                             }
                         })
                         .create()
@@ -279,7 +272,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_LOCATION );
+                        MY_PERMISSIONS_REQUEST_LOCATION);
             }
         }
     }
@@ -316,7 +309,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // permissions this app might request
         }
     }
-
 
 
 }
