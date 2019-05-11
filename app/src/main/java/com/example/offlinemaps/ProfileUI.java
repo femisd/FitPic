@@ -54,6 +54,7 @@ public class ProfileUI extends AppCompatActivity {
 
     //Final fields
     private static final int RC_SIGN_IN = 1;
+    private static final int VIEW_FRIEND_REQUEST = 2;
 
     //Firebase fields
     private FirebaseAuth firebaseAuth;
@@ -144,11 +145,6 @@ public class ProfileUI extends AppCompatActivity {
      */
     public void selectDrawerItem(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
-            case R.id.nav_map:
-                //Go to map activity.
-                Intent map = new Intent(ProfileUI.this, MapsActivity.class);
-                startActivity(map);
-                break;
             case R.id.nav_leaderboard:
                 //Go to leader board activity.
                 Intent leaderboard = new Intent(ProfileUI.this, Leaderboard.class);
@@ -181,7 +177,7 @@ public class ProfileUI extends AppCompatActivity {
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
+                final FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     //user signed in.
                     mCurrentUser = FirebaseAuth.getInstance().getUid();
@@ -192,14 +188,20 @@ public class ProfileUI extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if (dataSnapshot.exists()) {
-                                String image = dataSnapshot.child("mProfilePicture").getValue().toString();
+                                User user = dataSnapshot.getValue(User.class);
+                                String image = user.getmProfilePicture();
                                 Log.d("IMAGE", image);
                                 if (!image.isEmpty()) {
                                     Picasso.get().load(image).placeholder(R.drawable.ic_person_white_24dp).into(mProfilePicture);
                                 }
                                 //Username
                                 TextView username = (TextView) findViewById(R.id.tv_profile_user);
-                                username.setText(dataSnapshot.child("mUsername").getValue().toString());
+                                if (user.getmUsername().isEmpty()) {
+                                    Intent intent = new Intent(ProfileUI.this, UpdateUsername.class);
+                                    startActivity(intent);
+                                } else {
+                                    username.setText(user.getmUsername());
+                                }
 
                                 //Launch update username activity.
                                 username.setOnClickListener(new View.OnClickListener() {
@@ -212,36 +214,36 @@ public class ProfileUI extends AppCompatActivity {
 
                                 //Steps
                                 TextView steps = (TextView) findViewById(R.id.tv_profile_steps);
-                                steps.setText(dataSnapshot.child("mSteps").getValue().toString());
+                                steps.setText(user.getmSteps() + "");
 
                                 //Calories
                                 TextView calories = (TextView) findViewById(R.id.tv_profile_calories);
-                                calories.setText(dataSnapshot.child("mCaloriesBurned").getValue().toString());
+                                calories.setText(user.getmCaloriesBurned() + "");
 
                                 //Photos
                                 TextView photos = (TextView) findViewById(R.id.tv_profile_photos);
-                                photos.setText(dataSnapshot.child("mPhotos").getValue().toString());
+                                photos.setText(user.getmPhotos() + "");
 
                                 //Followers
                                 TextView followers = (TextView) findViewById(R.id.tv_profile_followers);
-                                followers.setText(dataSnapshot.child("mFollowers").getValue().toString());
+                                followers.setText(user.getmFollowers() + "");
 
                                 //Following
                                 TextView following = (TextView) findViewById(R.id.tv_profile_following);
-                                following.setText(dataSnapshot.child("mFollowing").getValue().toString());
+                                following.setText(user.getmFollowing() + "");
 
                                 //Points
                                 TextView points = (TextView) findViewById(R.id.tv_profile_points);
-                                points.setText(dataSnapshot.child("mPoints").getValue().toString());
+                                points.setText(user.getmPoints() + "");
 
                             } else {
-                                User signedIn = new User("", "", "", 0, 0, 0, 0, 0, 0, false);
+                                User signedIn = new User("", "", "Guildford, UK", 0, 0, 0, 0, 0, 0, false);
                                 userRef.setValue(signedIn);
                             }
                         }
 
                         @Override
-                        public void onCancelled(@NonNull DatabaseError dataaseError) {
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
                         }
                     });
@@ -307,6 +309,7 @@ public class ProfileUI extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
+                Log.d("SIGN_IN", "Success");
                 Toast.makeText(this, "Signed in!", Toast.LENGTH_SHORT).show(); //Successful sign in.
                 return;
 
@@ -314,8 +317,10 @@ public class ProfileUI extends AppCompatActivity {
                 //permission granted
             }
         } else if (resultCode == RESULT_CANCELED) {
+            //Put back to profile activity.
+            Intent profile = new Intent(ProfileUI.this, ProfileUI.class);
+            startActivity(profile);
             finish();
-            Toast.makeText(this, "Sign in cancelled", Toast.LENGTH_SHORT).show(); //Users exits mid sign in.
         }
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
@@ -340,7 +345,6 @@ public class ProfileUI extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Uri> task) {
                         if (task.isSuccessful()) {
                             Uri downloadUri = task.getResult();
-                            Log.d("IMAGE", downloadUri + "");
                             userRef.child("mProfilePicture").setValue(downloadUri.toString());
                         } else {
                             // Handle failures
@@ -348,6 +352,46 @@ public class ProfileUI extends AppCompatActivity {
                     }
                 });
             }
+        }
+
+        if (requestCode == 2) {
+            if (resultCode == RESULT_OK) {
+                User user = (User) getIntent().getSerializableExtra("user");
+                Log.d("VIEW_FRIEND_REQUEST", user.getmUsername());
+                String image = user.getmProfilePicture();
+                Log.d("IMAGE", image);
+                if (!image.isEmpty()) {
+                    Picasso.get().load(image).placeholder(R.drawable.ic_person_white_24dp).into(mProfilePicture);
+                }
+                //Username
+                TextView username = (TextView) findViewById(R.id.tv_profile_user);
+                username.setText(user.getmUsername());
+
+                //Steps
+                TextView steps = (TextView) findViewById(R.id.tv_profile_steps);
+                steps.setText(user.getmSteps() + "");
+
+                //Calories
+                TextView calories = (TextView) findViewById(R.id.tv_profile_calories);
+                calories.setText(user.getmCaloriesBurned() + "");
+
+                //Photos
+                TextView photos = (TextView) findViewById(R.id.tv_profile_photos);
+                photos.setText(user.getmPhotos() + "");
+
+                //Followers
+                TextView followers = (TextView) findViewById(R.id.tv_profile_followers);
+                followers.setText(user.getmFollowers() + "");
+
+                //Following
+                TextView following = (TextView) findViewById(R.id.tv_profile_following);
+                following.setText(user.getmFollowing() + "");
+
+                //Points
+                TextView points = (TextView) findViewById(R.id.tv_profile_points);
+                points.setText(user.getmPoints() + "");
+            }
+
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

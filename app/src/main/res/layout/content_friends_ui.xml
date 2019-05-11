@@ -26,13 +26,6 @@
             android:layout_height="match_parent"
             android:id="@+id/lv_friends_list">
         </ListView>
-
-        <!--<Button-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:id="@+id/add_friend"-->
-            <!--android:text="ADD"-->
-            <!--android:layout_gravity="center"/>-->
     </FrameLayout>
 
 

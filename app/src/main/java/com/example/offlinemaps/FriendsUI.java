@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -30,6 +32,10 @@ public class FriendsUI extends AppCompatActivity {
     //Fields.
     private boolean doubleBackToExitPressedOnce = false;
     private String mCurrentUser;
+
+    //Final fields.
+    private static final int VIEW_FRIEND_REQUEST = 2;
+
 
     //fields for nav view.
     private DrawerLayout mDrawer;
@@ -87,6 +93,16 @@ public class FriendsUI extends AppCompatActivity {
         //Set the friends list adapter.
         friends.setAdapter(friendsAdapter);
 
+        friends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                User user = userList.get(position);
+                Log.d("YOOO", user.toString());
+                Intent i = new Intent(FriendsUI.this, ViewFriend.class);
+                i.putExtra("user", user);
+                startActivity(i);
+            }
+        });
         //Inflate the navigation drawer.
         mDrawer = findViewById(R.id.drawer_layout);
 
@@ -116,11 +132,6 @@ public class FriendsUI extends AppCompatActivity {
      */
     public void selectDrawerItem(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
-            case R.id.nav_map:
-                //Go to map activity.
-                Intent map = new Intent(FriendsUI.this, MapsActivity.class);
-                startActivity(map);
-                break;
             case R.id.nav_leaderboard:
                 //Go to leader board activity.
                 Intent leaderboard = new Intent(FriendsUI.this, Leaderboard.class);

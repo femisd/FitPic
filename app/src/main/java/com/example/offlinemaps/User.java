@@ -1,6 +1,8 @@
 package com.example.offlinemaps;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
 
     //Fields
     private String mUsername;

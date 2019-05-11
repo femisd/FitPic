@@ -19,9 +19,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ViewFriend"
+            android:label="@string/title_activity_view_friend"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
             android:name=".UpdateUsername"
             android:label="@string/title_activity_update_username"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ProfileUI"
             android:label="@string/app_name"
