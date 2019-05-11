@@ -59,40 +59,19 @@ public class FriendsUI extends AppCompatActivity {
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser).child("mFollowedUsers");
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        ListView friends = (ListView) findViewById(R.id.lv_friends_list);
+        final ListView friends = (ListView) findViewById(R.id.lv_friends_list);
         final ArrayList<User> userList = new ArrayList<>();
         final FriendAdapterClass friendsAdapter = new FriendAdapterClass(this, userList);
-
-//        mDatabase.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                friendsAdapter.clear();
-//                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-//                    for (DataSnapshot userSnapshot : postSnapshot.getChildren()) {
-//                        User user = userSnapshot.getValue(User.class);
-//                        //Don't include users with no username.
-//                        if (!userSnapshot.child("mUsername").getValue().toString().isEmpty()) {
-//                            Log.d("USERNAME:", user.toString() + "");
-//                            friendsAdapter.add(user);
-//                        }
-//                        friendsAdapter.notifyDataSetChanged();
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
 
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                friendsAdapter.clear();
                 for (DataSnapshot user : dataSnapshot.getChildren()) {
                     Log.d("USERS", user.toString());
                     friendsAdapter.add(user.getValue(User.class));
                 }
+                friendsAdapter.notifyDataSetChanged();
             }
 
 
@@ -110,10 +89,9 @@ public class FriendsUI extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 User user = userList.get(position);
-                Log.d("YOOO", user.toString());
-                Intent i = new Intent(FriendsUI.this, ViewFriend.class);
-                i.putExtra("user", user);
-                startActivity(i);
+                Intent viewFriend = new Intent(FriendsUI.this, ViewFriend.class);
+                viewFriend.putExtra("user", user);
+                startActivity(viewFriend);
             }
         });
         //Inflate the navigation drawer.
