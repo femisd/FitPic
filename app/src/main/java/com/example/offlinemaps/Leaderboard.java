@@ -55,7 +55,7 @@ public class Leaderboard extends AppCompatActivity {
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
         //Initialise fields.
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase = FirebaseDatabase.getInstance().getReference().child("users");
         currentUser = FirebaseAuth.getInstance().getUid();
 
         final ListView leaderboard = findViewById(R.id.lv_leaderboard_list);
@@ -74,13 +74,10 @@ public class Leaderboard extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 leaderboardAdapter.clear();
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    for (DataSnapshot userSnapshot : postSnapshot.getChildren()) {
-                        User user = userSnapshot.getValue(User.class);
-                        //Don't include users with no username.
-                        if (!userSnapshot.child("mUsername").getValue().toString().isEmpty() && !userList.contains(user)) {
-                            leaderboardAdapter.add(user);
-                        }
+                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                    User user = userSnapshot.getValue(User.class);
+                    if (!user.getmUsername().isEmpty() && !userList.contains(user)) {
+                        leaderboardAdapter.add(user);
                     }
                 }
 
@@ -92,8 +89,6 @@ public class Leaderboard extends AppCompatActivity {
                         return o2.getmPoints() - comparePoints;
                     }
                 });
-
-                //leaderboardAdapter.addAll(userList);
                 leaderboardAdapter.notifyDataSetChanged();
             }
 
@@ -102,6 +97,39 @@ public class Leaderboard extends AppCompatActivity {
 
             }
         });
+
+//        mDatabase.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                leaderboardAdapter.clear();
+//                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+//                    for (DataSnapshot userSnapshot : postSnapshot.getChildren()) {
+//                        User user = userSnapshot.getValue(User.class);
+//                        //Don't include users with no username.
+//                        if (!userSnapshot.child("mUsername").getValue().toString().isEmpty() && !userList.contains(user)) {
+//                            leaderboardAdapter.add(user);
+//                        }
+//                    }
+//                }
+//
+//                //Sort by most points.
+//                Collections.sort(userList, new Comparator<User>() {
+//                    @Override
+//                    public int compare(User o1, User o2) {
+//                        int comparePoints = o1.getmPoints();
+//                        return o2.getmPoints() - comparePoints;
+//                    }
+//                });
+//
+//                //leaderboardAdapter.addAll(userList);
+//                leaderboardAdapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
 
         leaderboard.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -147,11 +175,13 @@ public class Leaderboard extends AppCompatActivity {
                 //Go to main activity.
                 firebaseAuth = FirebaseAuth.getInstance();
                 firebaseAuth.signOut();
+                finish();
                 break;
             case R.id.nav_profile:
                 Intent profile = new Intent(Leaderboard.this, ProfileUI.class);
                 startActivity(profile);
                 finish();
+                break;
         }
         menuItem.setChecked(true);
         mDrawer.closeDrawers();
