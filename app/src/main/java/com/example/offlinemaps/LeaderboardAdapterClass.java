@@ -41,6 +41,11 @@ public class LeaderboardAdapterClass extends ArrayAdapter {
             Picasso.get().load(currentUser.getmProfilePicture()).placeholder(R.drawable.ic_person_blue).into(image);
         }
 
+        if (currentUser.getmVIP()) {
+            ImageView vip = (ImageView) listItem.findViewById(R.id.iv_vip);
+            vip.setImageResource(R.drawable.vip_ticket);
+        }
+
         TextView name = (TextView) listItem.findViewById(R.id.tv_username);
         name.setText(currentUser.getmUsername());
 

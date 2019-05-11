@@ -38,15 +38,16 @@ public class FriendAdapterClass extends ArrayAdapter {
 
         if (currentUser != null) {
             if (currentUser.getmVIP()) {
-                Log.d("IMAGE", "MADE it");
                 ImageView vip = (ImageView) listItem.findViewById(R.id.iv_vip);
-                vip.setImageResource(R.drawable.ic_portrait_black_24dp);
+                vip.setImageResource(R.drawable.vip_ticket);
             }
 
             ImageView image = (ImageView) listItem.findViewById(R.id.iv_profile_pic);
-            //image.setImageResource((int) currentUser.getmProfilePicture());
             if (!currentUser.getmProfilePicture().isEmpty()) {
+                Log.d("FriendAdapter", currentUser.getmProfilePicture());
                 Picasso.get().load(currentUser.getmProfilePicture()).placeholder(R.drawable.ic_person_blue).into(image);
+            } else {
+                Picasso.get().load(R.drawable.ic_menu_black_24dp).into(image);
             }
 
             TextView name = (TextView) listItem.findViewById(R.id.tv_username);

@@ -154,11 +154,13 @@ public class ProfileUI extends AppCompatActivity {
                 //Go to main activity.
                 firebaseAuth = FirebaseAuth.getInstance();
                 firebaseAuth.signOut();
+                finish();
                 break;
             case R.id.nav_friends:
                 Intent friends = new Intent(ProfileUI.this, FriendsUI.class);
                 startActivity(friends);
                 finish();
+                break;
         }
         menuItem.setChecked(true);
         mDrawer.closeDrawers();

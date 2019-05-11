@@ -90,11 +90,13 @@ public class UpdateUsername extends AppCompatActivity {
                 //Go to main activity.
                 FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
                 firebaseAuth.signOut();
+                finish();
                 break;
             case R.id.nav_profile:
                 Intent profile = new Intent(UpdateUsername.this, ProfileUI.class);
                 startActivity(profile);
                 finish();
+                break;
         }
         menuItem.setChecked(true);
         mDrawer.closeDrawers();
