@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="20dp">
+
+   <RelativeLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_margin="10dp"
+       android:layout_marginBottom="10dp">
+
+       <TextView
+           android:id="@+id/usernameFeedText"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Username" />
+
+       <TextView
+           android:id="@+id/dateFeedText"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_alignEnd="@+id/usernameFeedText"
+           android:layout_marginEnd="-287dp"
+           android:text="12/05/2019" />
+
+       <TextView
+           android:id="@+id/locationFeedText"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_alignTop="@+id/usernameFeedText"
+           android:layout_marginTop="29dp"
+           android:text="Guildford" />
+
+   </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/feedImage"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="center"
+        android:src="@drawable/selfie_icon"/>
+
+
+
+</LinearLayout>
