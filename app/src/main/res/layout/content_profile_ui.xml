@@ -112,7 +112,8 @@
                             android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:id="@+id/ll_following_box">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -147,7 +148,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:paddingStart="25dp"
-                    android:paddingEnd="25dp">
+                    android:paddingEnd="25dp"
+                    android:id="@+id/ll_user_box">
 
                     <ImageView
                         android:layout_width="36dp"

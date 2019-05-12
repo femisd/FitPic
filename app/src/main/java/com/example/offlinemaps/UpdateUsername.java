@@ -15,10 +15,14 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class UpdateUsername extends AppCompatActivity {
 
@@ -28,6 +32,15 @@ public class UpdateUsername extends AppCompatActivity {
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
     private NavigationView mNavView;
+
+    //Final fields
+    private static final int RC_SIGN_IN = 1;
+
+    //List of login methods.
+    private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
+            new AuthUI.IdpConfig.EmailBuilder().build(),
+            new AuthUI.IdpConfig.GoogleBuilder().build()
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +106,13 @@ public class UpdateUsername extends AppCompatActivity {
                 FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
                 firebaseAuth.signOut();
                 finish();
+                startActivityForResult(
+                        AuthUI.getInstance()
+                                .createSignInIntentBuilder()
+                                .setIsSmartLockEnabled(false)
+                                .setAvailableProviders(mProviders)
+                                .build(),
+                        RC_SIGN_IN);
                 break;
             case R.id.nav_profile:
                 Intent profile = new Intent(UpdateUsername.this, ProfileUI.class);

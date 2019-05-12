@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,14 +55,15 @@ public class ProfileUI extends AppCompatActivity {
     private String mCurrentUser;
     private static boolean calledAlready;
 
-    //Final fields
-    private static final int RC_SIGN_IN = 1;
-
     //Firebase fields
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
     private StorageReference userProfilePicturesRef;
     private DatabaseReference userRef;
+
+
+    //Final fields
+    private static final int RC_SIGN_IN = 1;
 
     //List of login methods.
     private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
@@ -206,8 +208,9 @@ public class ProfileUI extends AppCompatActivity {
                                     username.setText(user.getmUsername());
                                 }
 
+                                LinearLayout usernameBox = findViewById(R.id.ll_user_box);
                                 //Launch update username activity.
-                                username.setOnClickListener(new View.OnClickListener() {
+                                usernameBox.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
                                         Intent update = new Intent(ProfileUI.this, UpdateUsername.class);
@@ -235,7 +238,8 @@ public class ProfileUI extends AppCompatActivity {
                                 TextView following = (TextView) findViewById(R.id.tv_profile_following);
                                 following.setText(user.getmFollowing() + "");
 
-                                following.setOnClickListener(new View.OnClickListener() {
+                                LinearLayout followingBox = findViewById(R.id.ll_following_box);
+                                followingBox.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
                                         Intent following = new Intent(ProfileUI.this, FriendsUI.class);

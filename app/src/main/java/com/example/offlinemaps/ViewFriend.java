@@ -16,6 +16,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -24,6 +25,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import java.util.Arrays;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -37,9 +41,19 @@ public class ViewFriend extends AppCompatActivity {
     private Toolbar toolbar;
     private NavigationView mNavView;
 
+    //Database references.
     private DatabaseReference userRef;
     private DatabaseReference followersRef;
     private DatabaseReference viewedUserRef;
+
+    //Final fields
+    private static final int RC_SIGN_IN = 1;
+
+    //List of login methods.
+    private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
+            new AuthUI.IdpConfig.EmailBuilder().build(),
+            new AuthUI.IdpConfig.GoogleBuilder().build()
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +90,7 @@ public class ViewFriend extends AppCompatActivity {
         //Username
         TextView username = (TextView) findViewById(R.id.tv_view_friends_user);
         username.setText(user.getmUsername());
+        setTitle(user.getmUsername());
 
         //Steps
         TextView steps = (TextView) findViewById(R.id.tv_view_friends_steps);
@@ -102,6 +117,10 @@ public class ViewFriend extends AppCompatActivity {
         points.setText(user.getmPoints() + "");
 
         final Button follow = (Button) findViewById(R.id.bt_follow);
+
+        if (user.getmUid().equals(currentUser)) {
+            follow.setVisibility(View.GONE);
+        }
 
         viewedUserRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -214,6 +233,13 @@ public class ViewFriend extends AppCompatActivity {
                 FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
                 firebaseAuth.signOut();
                 finish();
+                startActivityForResult(
+                        AuthUI.getInstance()
+                                .createSignInIntentBuilder()
+                                .setIsSmartLockEnabled(false)
+                                .setAvailableProviders(mProviders)
+                                .build(),
+                        RC_SIGN_IN);
                 break;
             case R.id.nav_friends:
                 Intent friends = new Intent(ViewFriend.this, FriendsUI.class);
