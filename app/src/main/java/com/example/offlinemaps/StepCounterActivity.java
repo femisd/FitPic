@@ -94,6 +94,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     //fields for nav view.
     private DrawerLayout mDrawer;
 
+    ArrayList<NameCoords> nearbyMarkers;
+
     // private LocationCallback;
     private Toolbar toolbar;
 
@@ -112,12 +114,52 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
      * CalcDist between two pars of lat-lon
      */
 
+    boolean isModified = false;
+
+
+    //method which move camera to our current location when the map is initially loaded or from returning from another activity
+    public void loc(LatLng ln){
+
+        if(!isModified) {
+            this.isModified = true;
+            moveCamera(ln,15f);
+
+
+
+        }
+
+
+
+
+    }
+
+    public void updateMarkers(ArrayList<NameCoords> locations){
+        for(int i = 0; i < locations.size(); i++){
+            LatLng coordinates = locations.get(i).getCoords();
+            double dist = calcDist(currentLatLng, coordinates);
+            mMap.addMarker(new MarkerOptions()
+                    .position(coordinates)
+                    .title(locations.get(i).getName())
+                    .snippet(dist*1000+"m")
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
+        }
+    }
 
     LocationCallback mLocationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
 
             List<Location> locationList = locationResult.getLocations();
+
+            currentLocation = locationList.get(locationList.size() - 1);
+            currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+
+            loc(currentLatLng);
+
+
+
+
+
             if (locationList.size() > 0) {
                 //The last location in the list is the newest
                 currentLocation = locationList.get(locationList.size() - 1);
@@ -129,6 +171,11 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                     mCurrLocationMarker.remove();
                 }
 
+
+
+
+
+
                 //Place current location marker
                 LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
                 MarkerOptions markerOptions = new MarkerOptions();
@@ -138,7 +185,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 mCurrLocationMarker = mMap.addMarker(markerOptions);
 
                 //move map camera
-                //  mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 20));
+                // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 20));
+                updateMarkers(nearbyMarkers);
             }
         }
     };
@@ -196,13 +244,17 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
             @Override
             public void onClick(View v) {
 
+                selfieBtn.setVisibility(View.VISIBLE);
+
+
                 if (!tracking) {
                     tracking = true;
+                    //    Toast.makeText(StepCounterActivity.this, "CLick", Toast.LENGTH_SHORT).show();
 
-                } else if (tracking) {
-                    /*
-                        Update users steps and calories after walking completed.
-                     */
+
+
+                }else if (tracking) {
+                    tracking = false;
                     goalsBtn.setEnabled(true);
                     userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -217,6 +269,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                             userRef.child("mCaloriesBurned").setValue(caloriesBurned);
                             steps = 0;
                             counterView.setText("0"); //Reset counter.
+
                         }
 
                         @Override
@@ -367,7 +420,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 
 
-        setUpMap();
+
+
 
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1200); // two minute interval
@@ -389,6 +443,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
             mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
             mMap.setMyLocationEnabled(true);
         }
+        setUpMap();
     }
 
     private void setUpMap() {
@@ -410,34 +465,17 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         locationName.add("Student Union");
         //locationName.add();
 
+        /**
+         * Temporary List
+         */
+        nearbyMarkers = new ArrayList<NameCoords>();
 
-        myMarker = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(51.243271, -0.591590))
-                .title("Pats field")
-                .snippet("112m")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
-
-
-        myMarker1 = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(51.242373, -0.581312))
-                .title("Friary Centre")
-                .snippet("743m")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
-
-        myMarker2 = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(51.242007, -0.586198))
-                .title("Student Union")
-                .snippet("123m")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
-
-        myMarker3 = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(51.243012, -0.595327))
-                .title("School Of Arts")
-                .snippet("846m")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
-
-
+        nearbyMarkers.add(new NameCoords("Pats Field", new LatLng(51.243271, -0.591590)));
+        nearbyMarkers.add(new NameCoords("Friary Centre", new LatLng(51.242373, -0.581312)));
+        nearbyMarkers.add(new NameCoords("Student Union", new LatLng(51.242007, -0.586198)));
+        nearbyMarkers.add(new NameCoords("School Of Arts", new LatLng(51.243012, -0.595327)));
     }
+
 
     @Override
     public boolean onMarkerClick(Marker marker) {
@@ -553,14 +591,11 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         return dist;
     }
 
-    private void moveCamera(LatLng latLng, float zoom, String title) {
+    private void moveCamera(LatLng latLng, float zoom) {
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
-        MarkerOptions options = new MarkerOptions()
-                .position(latLng)
-                .title(title);
-        mMap.addMarker(options);
+
     }
 
     private void checkLocationPermission() {
