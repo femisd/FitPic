@@ -93,6 +93,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     private boolean tracking;
     //fields for nav view.
     private DrawerLayout mDrawer;
+    private int poorManGeofence = 50;//meteres pls
+    private boolean inAGeofence;
 
     ArrayList<NameCoords> nearbyMarkers;
 
@@ -135,14 +137,32 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
     public void updateMarkers(ArrayList<NameCoords> locations){
         for(int i = 0; i < locations.size(); i++){
-            LatLng coordinates = locations.get(i).getCoords();
-            double dist = calcDist(currentLatLng, coordinates);
+            NameCoords locationToCheck = locations.get(i);
+            locationToCheck.updateDist(currentLatLng);
             mMap.addMarker(new MarkerOptions()
-                    .position(coordinates)
+                    .position(locationToCheck.getCoords())
                     .title(locations.get(i).getName())
-                    .snippet(dist*1000+"m")
+                    .snippet(locationToCheck.getDist()+"m")
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
+
+            if (locationToCheck.amIInIt()){
+                selfieBtn.setVisibility(View.VISIBLE);
+                //Toast.makeText(this, "NI-", Toast.LENGTH_SHORT).show();
+            }else if(!amIInAny(locations)){
+                selfieBtn.setVisibility(View.GONE);
+                //Toast.makeText(this, "Bye.", Toast.LENGTH_SHORT).show();
+            }
         }
+    }
+
+    private boolean amIInAny(ArrayList<NameCoords> locations){
+        boolean output = false;
+        for(int i = 0; i < locations.size(); i++){
+            if(locations.get(i).amIInIt()) {
+                output = true;
+            }
+        }
+        return output;
     }
 
     LocationCallback mLocationCallback = new LocationCallback() {
@@ -178,14 +198,15 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
                 //Place current location marker
                 LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+
+                //move map camera
+                // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 20));
+                mMap.clear();
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(latLng);
                 markerOptions.title("Current Position");
                 markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.running_pointer));
                 mCurrLocationMarker = mMap.addMarker(markerOptions);
-
-                //move map camera
-                // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 20));
                 updateMarkers(nearbyMarkers);
             }
         }
@@ -215,6 +236,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
         selfieBtn = findViewById(R.id.selfieBtn);
 
+        inAGeofence = false;
+
         updateButton();
         counterView = findViewById(R.id.counterText);
         goalsBtn = findViewById(R.id.goalsBtn);
@@ -243,8 +266,6 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         trackerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                selfieBtn.setVisibility(View.VISIBLE);
 
 
                 if (!tracking) {
@@ -568,11 +589,11 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
     }
 
-    public double toRadians(double deg) {
+    public static double toRadians(double deg) {
         return deg * Math.PI / 180;
     }
 
-    public double calcDist(LatLng latLng1, LatLng latLng2) {
+    public static double calcDist(LatLng latLng1, LatLng latLng2) {
 
         double lat1 = latLng1.latitude;
         double lon1 = latLng1.longitude;
