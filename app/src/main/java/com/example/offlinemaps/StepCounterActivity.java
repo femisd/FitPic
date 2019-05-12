@@ -94,6 +94,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     //fields for nav view.
     private DrawerLayout mDrawer;
 
+    ArrayList<NameCoords> nearbyMarkers;
+
     // private LocationCallback;
     private Toolbar toolbar;
 
@@ -129,6 +131,18 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
 
 
+    }
+
+    public void updateMarkers(ArrayList<NameCoords> locations){
+        for(int i = 0; i < locations.size(); i++){
+            LatLng coordinates = locations.get(i).getCoords();
+            double dist = calcDist(currentLatLng, coordinates);
+            mMap.addMarker(new MarkerOptions()
+                    .position(coordinates)
+                    .title(locations.get(i).getName())
+                    .snippet(dist*1000+"m")
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
+        }
     }
 
     LocationCallback mLocationCallback = new LocationCallback() {
@@ -172,6 +186,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
                 //move map camera
                 // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 20));
+                updateMarkers(nearbyMarkers);
             }
         }
     };
@@ -406,7 +421,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
 
 
-        setUpMap();
+
 
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1200); // two minute interval
@@ -428,6 +443,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
             mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
             mMap.setMyLocationEnabled(true);
         }
+        setUpMap();
     }
 
     private void setUpMap() {
@@ -449,34 +465,17 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         locationName.add("Student Union");
         //locationName.add();
 
+        /**
+         * Temporary List
+         */
+        nearbyMarkers = new ArrayList<NameCoords>();
 
-        myMarker = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(51.243271, -0.591590))
-                .title("Pats field")
-                .snippet("112m")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
-
-
-        myMarker1 = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(51.242373, -0.581312))
-                .title("Friary Centre")
-                .snippet("743m")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
-
-        myMarker2 = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(51.242007, -0.586198))
-                .title("Student Union")
-                .snippet("123m")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
-
-        myMarker3 = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(51.243012, -0.595327))
-                .title("School Of Arts")
-                .snippet("846m")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
-
-
+        nearbyMarkers.add(new NameCoords("Pats Field", new LatLng(51.243271, -0.591590)));
+        nearbyMarkers.add(new NameCoords("Friary Centre", new LatLng(51.242373, -0.581312)));
+        nearbyMarkers.add(new NameCoords("Student Union", new LatLng(51.242007, -0.586198)));
+        nearbyMarkers.add(new NameCoords("School Of Arts", new LatLng(51.243012, -0.595327)));
     }
+
 
     @Override
     public boolean onMarkerClick(Marker marker) {
