@@ -75,7 +75,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     private static final String TAG = "MapActivity";
-    private float DEFAULT_ZOOM = 922337203685807f;
+    private static final float DEFAULT_ZOOM = 15f;
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(-40, -168), new LatLng(71, 136));
     private static final int CAMERA_REQUEST_CODE = 1;
     SupportMapFragment mapFrag;
@@ -108,7 +108,6 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     //Current Location
     private Location currentLocation;
     private LatLng currentLatLng;
-
     /**
      * CalcDist between two pars of lat-lon
      */
@@ -152,6 +151,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 currentLocation = locationList.get(locationList.size() - 1);
                 currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
                 Log.i("MapsActivity", "Current Location: " + currentLocation.getLatitude() + " " + currentLocation.getLongitude());
+                // Toast.makeText(StepCounterActivity.this, ""+currentLocation.getLatitude()+" " + currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
                 mLastLocation = currentLocation;
                 if (mCurrLocationMarker != null) {
                     mCurrLocationMarker.remove();
@@ -316,9 +316,11 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     public void updateButton() {
 
         if (tracking) {
+            //  tracking = true;
             trackerBtn.setText("Stop Tracking");
             trackerBtn.setBackgroundResource(R.drawable.buttonstlye_dead);
         } else if (!tracking) {
+            //  tracking = false;
             trackerBtn.setText("Start Tracking");
             trackerBtn.setBackgroundResource(R.drawable.buttonstyle);
         }
@@ -593,6 +595,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     private void moveCamera(LatLng latLng, float zoom) {
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+
 
     }
 

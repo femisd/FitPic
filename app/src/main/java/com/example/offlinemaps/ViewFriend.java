@@ -30,6 +30,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ViewFriend extends AppCompatActivity {
 
     private CircleImageView mProfilePicture;
+    private User loggedIn;
 
     //fields for nav view.
     private DrawerLayout mDrawer;
@@ -38,6 +39,7 @@ public class ViewFriend extends AppCompatActivity {
 
     private DatabaseReference userRef;
     private DatabaseReference followersRef;
+    private DatabaseReference viewedUserRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,13 +58,15 @@ public class ViewFriend extends AppCompatActivity {
         setupDrawerContent(mNavView);
 
         //Setup references.
-        String currentUser = FirebaseAuth.getInstance().getUid();
+        final String currentUser = FirebaseAuth.getInstance().getUid();
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUser);
-        followersRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUser).child("mFollowedUsers");
 
         //Get user object from previous intent.
         final User user = (User) getIntent().getSerializableExtra("user");
         Log.d("VIEW_FRIEND_REQUEST", user.toString());
+
+        followersRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUser).child("mFollowedUsers");
+        viewedUserRef = FirebaseDatabase.getInstance().getReference().child("users").child(user.getmUid());
 
         String image = user.getmProfilePicture();
         Log.d("IMAGE", image);
@@ -86,11 +90,11 @@ public class ViewFriend extends AppCompatActivity {
         photos.setText(user.getmPhotos() + "");
 
         //Followers
-        TextView followers = (TextView) findViewById(R.id.tv_view_friends_followers);
+        final TextView followers = (TextView) findViewById(R.id.tv_view_friends_followers);
         followers.setText(user.getmFollowers() + "");
 
         //Following
-        TextView following = (TextView) findViewById(R.id.tv_view_friends_following);
+        final TextView following = (TextView) findViewById(R.id.tv_view_friends_following);
         following.setText(user.getmFollowing() + "");
 
         //Points
@@ -98,6 +102,21 @@ public class ViewFriend extends AppCompatActivity {
         points.setText(user.getmPoints() + "");
 
         final Button follow = (Button) findViewById(R.id.bt_follow);
+
+        viewedUserRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                final User snapshotValue = dataSnapshot.getValue(User.class);
+                    followers.setText(snapshotValue.getmFollowers() + "");
+                    following.setText(snapshotValue.getmFollowing() + "");
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         /*
             Query database to check if queried user exists in
@@ -108,9 +127,9 @@ public class ViewFriend extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     if (snapshot.exists()) {
-                        User user = snapshot.getValue(User.class);
+                        User follower = snapshot.getValue(User.class);
 
-                        if (user.getmUid().equals(user.getmUid())) {
+                        if (user.getmUid().equals(follower.getmUid())) {
                             follow.setText("Unfollow");
                         }
                     }
@@ -123,27 +142,44 @@ public class ViewFriend extends AppCompatActivity {
             }
         });
 
-        /*
-            Update button texts and add users to logged in users followers.
-         */
-        follow.setOnClickListener(new View.OnClickListener() {
+        userRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onClick(View v) {
-                if (follow.getText().toString().equals("Follow")) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                loggedIn = dataSnapshot.getValue(User.class);
+            }
 
-                    Toast.makeText(ViewFriend.this, "Following " + user.getmUsername(), Toast.LENGTH_SHORT).show();
-                    follow.setText("Unfollow");
-                    userRef.child("mFollowedUsers").child(user.getmUid()).setValue(user);
-                } else {
-                    follow.setText("Follow");
-                    userRef.child("mFollowedUsers").child(user.getmUid()).removeValue();
-                    Toast.makeText(ViewFriend.this, "Unfollowed " + user.getmUsername(), Toast.LENGTH_SHORT).show();
-                }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
 
+        /*
+            Update button texts and add users to current users' followers.
+            Increment counters.
+        */
+        follow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (follow.getText().toString().equals("Follow")) {
+                    Toast.makeText(ViewFriend.this, "Following " + user.getmUsername(), Toast.LENGTH_SHORT).show();
+                    follow.setText("Unfollow");
+                    userRef.child("mFollowedUsers").child(user.getmUid()).setValue(user);
+                    userRef.child("mFollowing").setValue(loggedIn.getmFollowing() + 1);
+                    viewedUserRef.child("mFollowers").setValue(user.getmFollowers() + 1);
+                } else {
+                    follow.setText("Follow");
+                    userRef.child("mFollowedUsers").child(user.getmUid()).removeValue();
+                    Toast.makeText(ViewFriend.this, "Unfollowed " + user.getmUsername(), Toast.LENGTH_SHORT).show();
+                    //loggedIn.setmFollowing(loggedIn.getmFollowing() - 1);
+                    userRef.child("mFollowing").setValue(loggedIn.getmFollowing() - 1);
+                    viewedUserRef.child("mFollowers").setValue(user.getmFollowers());
+                }
+
+            }
+        });
     }
+
 
     /**
      * Setup the navigation drawer.
