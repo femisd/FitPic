@@ -75,7 +75,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     private static final String TAG = "MapActivity";
-    private static final float DEFAULT_ZOOM = 15f;
+    private float DEFAULT_ZOOM = 922337203685807f;
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(-40, -168), new LatLng(71, 136));
     private static final int CAMERA_REQUEST_CODE = 1;
     SupportMapFragment mapFrag;
@@ -108,26 +108,59 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     //Current Location
     private Location currentLocation;
     private LatLng currentLatLng;
+
     /**
      * CalcDist between two pars of lat-lon
      */
 
+    boolean isModified = false;
+
+
+    //method which move camera to our current location when the map is initially loaded or from returning from another activity
+    public void loc(LatLng ln){
+
+        if(!isModified) {
+            this.isModified = true;
+            moveCamera(ln,15f);
+
+
+
+        }
+
+
+
+
+    }
 
     LocationCallback mLocationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
 
             List<Location> locationList = locationResult.getLocations();
+
+            currentLocation = locationList.get(locationList.size() - 1);
+            currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+
+            loc(currentLatLng);
+
+
+
+
+
             if (locationList.size() > 0) {
                 //The last location in the list is the newest
                 currentLocation = locationList.get(locationList.size() - 1);
                 currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
                 Log.i("MapsActivity", "Current Location: " + currentLocation.getLatitude() + " " + currentLocation.getLongitude());
-                // Toast.makeText(StepCounterActivity.this, ""+currentLocation.getLatitude()+" " + currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
                 mLastLocation = currentLocation;
                 if (mCurrLocationMarker != null) {
                     mCurrLocationMarker.remove();
                 }
+
+
+
+
+
 
                 //Place current location marker
                 LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
@@ -138,7 +171,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 mCurrLocationMarker = mMap.addMarker(markerOptions);
 
                 //move map camera
-                //  mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 20));
+                // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 20));
             }
         }
     };
@@ -196,10 +229,17 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
             @Override
             public void onClick(View v) {
 
+                selfieBtn.setVisibility(View.VISIBLE);
+
+
                 if (!tracking) {
                     tracking = true;
+                    //    Toast.makeText(StepCounterActivity.this, "CLick", Toast.LENGTH_SHORT).show();
 
-                } else if (tracking) {
+
+
+                }else if (tracking) {
+                    tracking = false;
                     goalsBtn.setEnabled(true);
                     userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -214,6 +254,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                             userRef.child("mCaloriesBurned").setValue(caloriesBurned);
                             steps = 0;
                             counterView.setText("0"); //Reset counter.
+
                         }
 
                         @Override
@@ -275,11 +316,9 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     public void updateButton() {
 
         if (tracking) {
-            //  tracking = true;
             trackerBtn.setText("Stop Tracking");
             trackerBtn.setBackgroundResource(R.drawable.buttonstlye_dead);
         } else if (!tracking) {
-            //  tracking = false;
             trackerBtn.setText("Start Tracking");
             trackerBtn.setBackgroundResource(R.drawable.buttonstyle);
         }
@@ -362,6 +401,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+
 
 
         setUpMap();
@@ -550,14 +590,10 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         return dist;
     }
 
-    private void moveCamera(LatLng latLng, float zoom, String title) {
+    private void moveCamera(LatLng latLng, float zoom) {
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
-        MarkerOptions options = new MarkerOptions()
-                .position(latLng)
-                .title(title);
-        mMap.addMarker(options);
     }
 
     private void checkLocationPermission() {
