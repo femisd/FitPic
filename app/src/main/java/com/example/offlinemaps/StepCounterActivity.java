@@ -495,6 +495,17 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         nearbyMarkers.add(new NameCoords("Friary Centre", new LatLng(51.242373, -0.581312)));
         nearbyMarkers.add(new NameCoords("Student Union", new LatLng(51.242007, -0.586198)));
         nearbyMarkers.add(new NameCoords("School Of Arts", new LatLng(51.243012, -0.595327)));
+        nearbyMarkers.add(new NameCoords("Stoke Park", new LatLng(51.245387, -0.564457)));
+        nearbyMarkers.add(new NameCoords("Guildford Cathedral", new LatLng(51.241072,  -0.590174)));
+        nearbyMarkers.add(new NameCoords("AirHop Guildford", new LatLng(51.245076, -0.585014)));
+        nearbyMarkers.add(new NameCoords("Guildford Cricket Club", new LatLng(51.243091, -0.577289)));
+        nearbyMarkers.add(new NameCoords("The Gym Guildford", new LatLng(51.247731, -0.583185)));
+        nearbyMarkers.add(new NameCoords("G Live", new LatLng(51.238716, -0.566239)));
+        nearbyMarkers.add(new NameCoords("Millmead", new LatLng(51.234597, -0.576669)));
+        nearbyMarkers.add(new NameCoords("Undercroft", new LatLng(51.235455, -0.573610)));
+        nearbyMarkers.add(new NameCoords("Alan Turing Statue", new LatLng(51.243959, -0.589444)));
+        nearbyMarkers.add(new NameCoords("Stag Statue", new LatLng(51.242417, -0.595196)));
+        nearbyMarkers.add(new NameCoords("Surrey Sports Park", new LatLng(51.236102, -0.607332)));
     }
 
 
