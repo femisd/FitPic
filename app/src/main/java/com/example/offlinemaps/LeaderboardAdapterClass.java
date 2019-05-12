@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -32,9 +33,26 @@ public class LeaderboardAdapterClass extends ArrayAdapter {
         View listItem = convertView;
         if (listItem == null)
             listItem = LayoutInflater.from(mContext).inflate(R.layout.leaderboard_listview, parent, false);
-
         //Get the user and populate the variables.
         User currentUser = userList.get(position);
+
+        ImageView medal = listItem.findViewById(R.id.iv_medal);
+        if (position == 0) {
+            medal.setImageResource(R.drawable.first);
+        } else if (position == 1) {
+            medal.setImageResource(R.drawable.second);
+        } else if (position == 2) {
+            medal.setImageResource(R.drawable.third);
+        } else {
+            //No medal
+        }
+
+        TextView leaderboardNumber = listItem.findViewById(R.id.tv_medal);
+        for (int i = 3; i < userList.size(); i++) {
+            if (position == i) {
+                leaderboardNumber.setText(i+1 + "");
+            }
+        }
 
         ImageView image = (ImageView) listItem.findViewById(R.id.iv_profile_pic);
         //image.setImageResource((String) currentUser.getmProfilePicture());
@@ -50,7 +68,11 @@ public class LeaderboardAdapterClass extends ArrayAdapter {
         }
 
         TextView name = (TextView) listItem.findViewById(R.id.tv_username);
-        name.setText(currentUser.getmUsername());
+        if (!currentUser.getmUid().equals(FirebaseAuth.getInstance().getUid())) {
+            name.setText(currentUser.getmUsername());
+        } else {
+            name.setText("You");
+        }
 
         TextView location = (TextView) listItem.findViewById(R.id.tv_location);
         location.setText(currentUser.getmLocation());

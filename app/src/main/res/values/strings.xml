@@ -4,7 +4,7 @@
     <string name="title_activity_friends_ui">Friends</string>
     <string name="home">Logout</string>
     <string name="map">Map</string>
-    <string name="friends">Friends</string>
+    <string name="friends">Following</string>
     <string name="title_activity_leaderboard">Leaderboard</string>
     <string name="leaderboard">Leaderboard</string>
     <string name="title_activity_profile_ui">ProfileUI</string>
