@@ -55,6 +55,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -185,22 +190,37 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         mNavView = (NavigationView) findViewById(R.id.nv_nav);
         setupDrawerContent(mNavView);
 
+        final DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(FirebaseAuth.getInstance().getUid());
 
         trackerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                selfieBtn.setVisibility(View.VISIBLE);
-
                 if (!tracking) {
                     tracking = true;
-                    //    Toast.makeText(StepCounterActivity.this, "CLick", Toast.LENGTH_SHORT).show();
-
 
                 } else if (tracking) {
-                    tracking = false;
+                    goalsBtn.setEnabled(true);
+                    userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            User currentUser = dataSnapshot.getValue(User.class); //Get current user object.
+                            int totalSteps = currentUser.getmSteps() + steps; //Calculate total steps.
+                            userRef.child("mSteps").setValue(totalSteps);
 
-                    //   Toast.makeText(StepCounterActivity.this, "clock", Toast.LENGTH_SHORT).show();
+                            double currentCalories = currentUser.getmCaloriesBurned();
+                            //Assume 0.04 calories to 1 step.
+                            double caloriesBurned = (steps * 0.04) + currentCalories;
+                            userRef.child("mCaloriesBurned").setValue(caloriesBurned);
+                            steps = 0;
+                            counterView.setText("0"); //Reset counter.
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
 
                 }
                 updateButton();

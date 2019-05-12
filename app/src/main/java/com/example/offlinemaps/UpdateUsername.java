@@ -2,6 +2,8 @@ package com.example.offlinemaps;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -40,7 +42,7 @@ public class UpdateUsername extends AppCompatActivity {
 
         //Initialise fields.
         final EditText username = (EditText) findViewById(R.id.et_update_username);
-        Button update  = (Button) findViewById(R.id.bt_update);
+        Button update = (Button) findViewById(R.id.bt_update);
 
         //Update username on button click.
         update.setOnClickListener(new View.OnClickListener() {
@@ -102,14 +104,33 @@ public class UpdateUsername extends AppCompatActivity {
         mDrawer.closeDrawers();
     }
 
+    /**
+     * Open the drawer when the nav icon is clicked.
+     * Start search activity.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 mDrawer.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.search:
+                Intent search = new Intent(UpdateUsername.this, FollowersSearch.class);
+                startActivity(search);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Inflate the menu for search icon.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+
+        return true;
+
     }
 
 }

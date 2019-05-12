@@ -27,6 +27,11 @@ public class FriendAdapterClass extends ArrayAdapter {
         userList = list;
     }
 
+    /**
+     * Get the friends list view.
+     * @param position = position in the ListView.
+     * @return listItem.
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -34,9 +39,11 @@ public class FriendAdapterClass extends ArrayAdapter {
         if (listItem == null)
             listItem = LayoutInflater.from(mContext).inflate(R.layout.friends_listview, parent, false);
 
+        //Get user and set variables.
         User currentUser = userList.get(position);
 
         if (currentUser != null) {
+            Log.d("FriendAdapter", currentUser.toString());
             if (currentUser.getmVIP()) {
                 ImageView vip = (ImageView) listItem.findViewById(R.id.iv_vip);
                 vip.setImageResource(R.drawable.vip_ticket);
@@ -44,10 +51,9 @@ public class FriendAdapterClass extends ArrayAdapter {
 
             ImageView image = (ImageView) listItem.findViewById(R.id.iv_profile_pic);
             if (!currentUser.getmProfilePicture().isEmpty()) {
-                Log.d("FriendAdapter", currentUser.getmProfilePicture());
-                Picasso.get().load(currentUser.getmProfilePicture()).placeholder(R.drawable.ic_person_blue).into(image);
+                Picasso.get().load(currentUser.getmProfilePicture()).placeholder(R.drawable.ic_user_placeholder).into(image);
             } else {
-                Picasso.get().load(R.drawable.ic_menu_black_24dp).into(image);
+                Picasso.get().load(R.drawable.ic_user_placeholder).placeholder(R.drawable.ic_user_placeholder).into(image);
             }
 
             TextView name = (TextView) listItem.findViewById(R.id.tv_username);
