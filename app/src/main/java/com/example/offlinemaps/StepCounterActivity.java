@@ -2,10 +2,12 @@ package com.example.offlinemaps;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,12 +16,14 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -47,67 +51,99 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
 public class StepCounterActivity extends AppCompatActivity implements SensorEventListener, OnMapReadyCallback,
         GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerClickListener {
 
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+    private static final String TAG = "MapActivity";
+    private static final float DEFAULT_ZOOM = 15f;
+    private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(-40, -168), new LatLng(71, 136));
+    private static final int CAMERA_REQUEST_CODE = 1;
+    SupportMapFragment mapFrag;
+    LocationRequest mLocationRequest;
+    Location mLastLocation;
+    Marker mCurrLocationMarker;
+    FusedLocationProviderClient mFusedLocationClient;
     private TextView counterView;
     private int steps = 0;
     private Button goalsBtn;
     private SensorManager sensorManager;
     private Sensor stepSensor;
     private Button trackerBtn;
-
     private FirebaseAuth firebaseAuth;
-
     private boolean tracking;
-
     //fields for nav view.
     private DrawerLayout mDrawer;
-    private Toolbar toolbar;
-    private NavigationView mNavView;
-
-    private ImageButton selfieBtn;
-
-
-
-    private GoogleMap mMap;
-    SupportMapFragment mapFrag;
-    LocationRequest mLocationRequest;
-    Location mLastLocation;
-    Marker mCurrLocationMarker;
-    FusedLocationProviderClient mFusedLocationClient;
-    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
     // private LocationCallback;
-
-    private Button locationstart;
+    private Toolbar toolbar;
 
     //widgets
-
-
-    private static final String TAG = "MapActivity";
-
-    private static final float DEFAULT_ZOOM = 15f;
-
+    private NavigationView mNavView;
+    private ImageButton selfieBtn;
+    private GoogleMap mMap;
+    private Button locationstart;
     private PlaceAutocompleteAdapter mPlaceAutocompleteAdapater;
-
     private GoogleApiClient mGoogleApiClient;
 
-    private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(-40, -168), new LatLng(71, 136));
-
-    //Curren Location
-
+    //Current Location
     private Location currentLocation;
     private LatLng currentLatLng;
+    /**
+     * CalcDist between two pars of lat-lon
+     */
 
-    private  TextView locationText;
+
+    LocationCallback mLocationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+
+            List<Location> locationList = locationResult.getLocations();
+            if (locationList.size() > 0) {
+                //The last location in the list is the newest
+                currentLocation = locationList.get(locationList.size() - 1);
+                currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                Log.i("MapsActivity", "Current Location: " + currentLocation.getLatitude() + " " + currentLocation.getLongitude());
+                // Toast.makeText(StepCounterActivity.this, ""+currentLocation.getLatitude()+" " + currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                mLastLocation = currentLocation;
+                if (mCurrLocationMarker != null) {
+                    mCurrLocationMarker.remove();
+                }
+
+                //Place current location marker
+                LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(latLng);
+                markerOptions.title("Current Position");
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+                mCurrLocationMarker = mMap.addMarker(markerOptions);
+
+                //move map camera
+                //  mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 20));
+            }
+        }
+    };
+    private TextView locationText;
+    private StorageReference mStorage;
+    private ProgressDialog mProgress;
+    private Marker myMarker;
+    private Marker myMarker1;
+    private Marker myMarker2;
+    private Marker myMarker3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,21 +170,20 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
         counterView.setText(String.valueOf(steps));
 
-        sensorManager.registerListener(this,stepSensor, SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_FASTEST);
 
-       goalsBtn.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-               Intent intent = new Intent(getApplicationContext(), GoalsActivity.class);
-               intent.putExtra("currentSteps",steps);
-               startActivity(intent);
-           }
-       });
+        goalsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), GoalsActivity.class);
+                intent.putExtra("currentSteps", steps);
+                startActivity(intent);
+            }
+        });
 
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavView = (NavigationView) findViewById(R.id.nv_nav);
         setupDrawerContent(mNavView);
-
 
 
         trackerBtn.setOnClickListener(new View.OnClickListener() {
@@ -157,35 +192,41 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
                 selfieBtn.setVisibility(View.VISIBLE);
 
-                if(!tracking){
+                if (!tracking) {
                     tracking = true;
-                //    Toast.makeText(StepCounterActivity.this, "CLick", Toast.LENGTH_SHORT).show();
+                    //    Toast.makeText(StepCounterActivity.this, "CLick", Toast.LENGTH_SHORT).show();
 
 
-                }
-
-                else if(tracking){
+                } else if (tracking) {
                     tracking = false;
 
-                 //   Toast.makeText(StepCounterActivity.this, "clock", Toast.LENGTH_SHORT).show();
+                    //   Toast.makeText(StepCounterActivity.this, "clock", Toast.LENGTH_SHORT).show();
 
                 }
                 updateButton();
             }
         });
 
+        selfieBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
+                startActivityForResult(intent, CAMERA_REQUEST_CODE);
 
-
-
-
+            }
+        });
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         mapFrag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFrag.getMapAsync(this);
         init();
+
+        mStorage = FirebaseStorage.getInstance().getReference();
+
+        mProgress = new ProgressDialog(this);
 
     }
 
@@ -194,12 +235,11 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
         outState.putBoolean("Tracker", tracking);
         outState.putInt("Steps", steps);
-       // Toast.makeText(this, "OOO" + steps, Toast.LENGTH_SHORT).show();
+        // Toast.makeText(this, "OOO" + steps, Toast.LENGTH_SHORT).show();
         super.onSaveInstanceState(outState);
 
 
     }
-
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -207,28 +247,26 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
         tracking = savedInstanceState.getBoolean("Tracker");
         steps = savedInstanceState.getInt("Steps");
-     //   Toast.makeText(this, "REE" + steps, Toast.LENGTH_SHORT).show();
+        //   Toast.makeText(this, "REE" + steps, Toast.LENGTH_SHORT).show();
         updateButton();
         updateSteps();
     }
 
-    public void updateButton(){
+    public void updateButton() {
 
-        if(tracking){
-          //  tracking = true;
+        if (tracking) {
+            //  tracking = true;
             trackerBtn.setText("Stop Tracking");
             trackerBtn.setBackgroundResource(R.drawable.buttonstlye_dead);
-        }
-
-        else if(!tracking){
-          //  tracking = false;
+        } else if (!tracking) {
+            //  tracking = false;
             trackerBtn.setText("Start Tracking");
             trackerBtn.setBackgroundResource(R.drawable.buttonstyle);
         }
 
     }
 
-    public void updateSteps(){
+    public void updateSteps() {
         counterView.setText(Integer.toString(steps));
 
     }
@@ -236,13 +274,13 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-      if(tracking) {
+        if (tracking) {
 
-          if (event.values[0] == 1.0f) {
-              steps++;
-          }
+            if (event.values[0] == 1.0f) {
+                steps++;
+            }
 
-      }
+        }
         updateSteps();
 
     }
@@ -274,7 +312,6 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 //Go to main activity.
                 firebaseAuth = FirebaseAuth.getInstance();
                 firebaseAuth.signOut();
-                finish();
                 break;
             case R.id.nav_friends:
                 Intent friends = new Intent(StepCounterActivity.this, FriendsUI.class);
@@ -301,16 +338,10 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         return super.onOptionsItemSelected(item);
     }
 
-
-
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-
-
-
 
 
         setUpMap();
@@ -337,20 +368,12 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         }
     }
 
-    private Marker myMarker;
-    private Marker myMarker1;
-    private Marker myMarker2;
-    private Marker myMarker3;
+    private void setUpMap() {
 
+        List<LatLng> location = new ArrayList<>();
+        List<String> locationName = new ArrayList<>();
 
-
-    private void setUpMap()
-    {
-
-        List<LatLng> location=new ArrayList<>();
-        List<String> locationName=new ArrayList<>();
-
-        location.add(new LatLng(51.5074,0.1278));
+        location.add(new LatLng(51.5074, 0.1278));
         location.add(new LatLng(51.243271, -0.591590));
         location.add(new LatLng(51.242373, -0.581312));
         location.add(new LatLng(51.242007, -0.586198));
@@ -365,82 +388,68 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         //locationName.add();
 
 
-
-
-
         myMarker = mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(51.243271, -0.591590))
-                    .title("Pats field")
-                    .snippet("112m")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
+                .position(new LatLng(51.243271, -0.591590))
+                .title("Pats field")
+                .snippet("112m")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.running_icon)));
 
 
         myMarker1 = mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(51.242373, -0.581312))
                 .title("Friary Centre")
                 .snippet("743m")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.running_icon)));
 
         myMarker2 = mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(51.242007, -0.586198))
                 .title("Student Union")
                 .snippet("123m")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.running_icon)));
 
         myMarker3 = mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(51.243012, -0.595327))
                 .title("School Of Arts")
                 .snippet("846m")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
-
-
-
-
-
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.running_icon)));
 
 
     }
-
-
 
     @Override
     public boolean onMarkerClick(Marker marker) {
 
 
-        if (marker.equals(myMarker))
-        {
+        if (marker.equals(myMarker)) {
             //handle click here
 
-          //  Toast.makeText(StepCounterActivity.this, "YOIIIIIIIIIIIIIIIIIIIIIIIIIIINKS", Toast.LENGTH_SHORT).show();
-           // Toast.makeText(StepCounterActivity.this, ""+myMarker.getPosition()+" " , Toast.LENGTH_SHORT).show();
+            //  Toast.makeText(StepCounterActivity.this, "YOIIIIIIIIIIIIIIIIIIIIIIIIIIINKS", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(StepCounterActivity.this, ""+myMarker.getPosition()+" " , Toast.LENGTH_SHORT).show();
 
             locationText.setText("Pats field");
         }
-        if (marker.equals(myMarker1))
-        {
+        if (marker.equals(myMarker1)) {
             //handle click here
 
-           // Toast.makeText(StepCounterActivity.this, "afjaknfask", Toast.LENGTH_SHORT).show();
-           // Toast.makeText(StepCounterActivity.this, ""+myMarker1.getPosition()+" " , Toast.LENGTH_SHORT).show();
+            // Toast.makeText(StepCounterActivity.this, "afjaknfask", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(StepCounterActivity.this, ""+myMarker1.getPosition()+" " , Toast.LENGTH_SHORT).show();
             locationText.setText("Friary Centre");
 
         }
 
-        if (marker.equals(myMarker2))
-        {
+        if (marker.equals(myMarker2)) {
             //handle click here
 
-           // Toast.makeText(StepCounterActivity.this, "afjaknfask", Toast.LENGTH_SHORT).show();
-           // Toast.makeText(StepCounterActivity.this, ""+myMarker2.getPosition()+" " , Toast.LENGTH_SHORT).show();
+            // Toast.makeText(StepCounterActivity.this, "afjaknfask", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(StepCounterActivity.this, ""+myMarker2.getPosition()+" " , Toast.LENGTH_SHORT).show();
             locationText.setText("Student Union");
 
         }
-        if (marker.equals(myMarker3))
-        {
+        if (marker.equals(myMarker3)) {
             //handle click here
 
-          //  Toast.makeText(StepCounterActivity.this, "afjaknfask", Toast.LENGTH_SHORT).show();
-           // Toast.makeText(StepCounterActivity.this, ""+myMarker3.getPosition()+" " , Toast.LENGTH_SHORT).show();
+            //  Toast.makeText(StepCounterActivity.this, "afjaknfask", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(StepCounterActivity.this, ""+myMarker3.getPosition()+" " , Toast.LENGTH_SHORT).show();
             locationText.setText("School Of Arts");
 
         }
@@ -478,31 +487,28 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         }
     }
 
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
 
-    private void init(){
+    private void init() {
         Log.d(TAG, "init: initializing");
 
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
-                .enableAutoManage(this,this)
+                .enableAutoManage(this, this)
                 .build();
 
-        mPlaceAutocompleteAdapater = new PlaceAutocompleteAdapter(this,mGoogleApiClient,LAT_LNG_BOUNDS,null);
-
+        mPlaceAutocompleteAdapater = new PlaceAutocompleteAdapter(this, mGoogleApiClient, LAT_LNG_BOUNDS, null);
 
 
     }
 
-
     public double toRadians(double deg) {
-        return deg*Math.PI/180;
+        return deg * Math.PI / 180;
     }
 
     public double calcDist(LatLng latLng1, LatLng latLng2) {
@@ -517,17 +523,15 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         double lat2R = toRadians(lat2);
         double lon2R = toRadians(lon2);
 
-        double a = Math.pow( Math.sin((lat2R-lat1R)/2),2) + Math.cos(lat1R) * Math.cos(lat2R)*Math.pow(Math.sin((lon2R-lon1R)/2),2);
-        double c = 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+        double a = Math.pow(Math.sin((lat2R - lat1R) / 2), 2) + Math.cos(lat1R) * Math.cos(lat2R) * Math.pow(Math.sin((lon2R - lon1R) / 2), 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double R = 6371.0;
-        dist = R*c;
+        dist = R * c;
         return dist;
     }
 
-
-
-    private void moveCamera(LatLng latLng, float zoom, String title){
-        Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
+    private void moveCamera(LatLng latLng, float zoom, String title) {
+        Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
         MarkerOptions options = new MarkerOptions()
@@ -535,45 +539,6 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 .title(title);
         mMap.addMarker(options);
     }
-
-    /**
-     *
-     * CalcDist between two pars of lat-lon
-     *
-     */
-
-
-
-    LocationCallback mLocationCallback = new LocationCallback() {
-        @Override
-        public void onLocationResult(LocationResult locationResult) {
-
-            List<Location> locationList = locationResult.getLocations();
-            if (locationList.size() > 0) {
-                //The last location in the list is the newest
-                currentLocation = locationList.get(locationList.size() - 1);
-                currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-                Log.i("MapsActivity", "Current Location: " + currentLocation.getLatitude() + " " + currentLocation.getLongitude());
-               // Toast.makeText(StepCounterActivity.this, ""+currentLocation.getLatitude()+" " + currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
-                mLastLocation = currentLocation;
-                if (mCurrLocationMarker != null) {
-                    mCurrLocationMarker.remove();
-                }
-
-                //Place current location marker
-                LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(latLng);
-                markerOptions.title("Current Position");
-                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.running_pointer));
-                mCurrLocationMarker = mMap.addMarker(markerOptions);
-
-                //move map camera
-                //  mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 20));
-            }
-        }
-    };
-
 
     private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -595,7 +560,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                                 //Prompt the user once explanation has been shown
                                 ActivityCompat.requestPermissions(StepCounterActivity.this,
                                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                        MY_PERMISSIONS_REQUEST_LOCATION );
+                                        MY_PERMISSIONS_REQUEST_LOCATION);
                             }
                         })
                         .create()
@@ -606,7 +571,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_LOCATION );
+                        MY_PERMISSIONS_REQUEST_LOCATION);
             }
         }
     }
@@ -644,6 +609,50 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK) {
+            //set the progress dialog
+            mProgress.setMessage("Uploding image...");
+            mProgress.show();
+
+            //get the camera image
+            Bundle extras = data.getExtras();
+            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] databaos = baos.toByteArray();
+
+            //set the image into imageview
+            //mImageView.setImageBitmap(bitmap);
+            //String img = "fire"
+
+            //Firebase storage folder where you want to put the images
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+
+            //name of the image file (add time to have different files to avoid rewrite on the same file)
+            StorageReference imagesRef = storageRef.child("Selfies").child(FirebaseAuth.getInstance().getUid()).child(String.valueOf(new Date().getTime()));
+            //send this name to database
+            //upload image
+            UploadTask uploadTask = imagesRef.putBytes(databaos);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    Toast.makeText(StepCounterActivity.this, "Upload failed", Toast.LENGTH_SHORT).show();
+                }
+            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    //productDownloadUrl = taskSnapshot.getDownloadUrl().toString();
+                    mProgress.dismiss();
+                    Toast.makeText(StepCounterActivity.this, "Image uploaded successfully", Toast.LENGTH_SHORT).show();
+                }
+
+            });
+        }
+    }
 
 
 }
