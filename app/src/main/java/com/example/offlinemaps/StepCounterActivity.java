@@ -112,6 +112,9 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     //Current Location
     private Location currentLocation;
     private LatLng currentLatLng;
+
+
+    private DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(FirebaseAuth.getInstance().getUid());
     /**
      * CalcDist between two pars of lat-lon
      */
@@ -261,7 +264,6 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         mNavView = (NavigationView) findViewById(R.id.nv_nav);
         setupDrawerContent(mNavView);
 
-        final DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(FirebaseAuth.getInstance().getUid());
 
         trackerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -723,8 +725,31 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
             StorageReference storageRef = FirebaseStorage.getInstance().getReference();
 
             //name of the image file (add time to have different files to avoid rewrite on the same file)
-            StorageReference imagesRef = storageRef.child("Selfies").child(FirebaseAuth.getInstance().getUid()).child(String.valueOf(new Date().getTime()));
-            //send this name to database
+            String photoName = String.valueOf(new Date().getTime());
+
+            //send this photo under the specified name to database
+            StorageReference imagesRef = storageRef.child("Selfies").child(FirebaseAuth.getInstance().getUid()).child(photoName);
+
+            Selfie selfie = new Selfie(photoName, currentLatLng.latitude, currentLatLng.longitude);
+
+            // Add photo information to realtime database
+            userRef.child("Selfies").push().setValue(selfie);
+
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User user = dataSnapshot.getValue(User.class);
+                    // Increment user photo count
+                    int photoCount = user.getmPhotos()+1;
+                    userRef.child("mPhotos").setValue(photoCount);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
             //upload image
             UploadTask uploadTask = imagesRef.putBytes(databaos);
             uploadTask.addOnFailureListener(new OnFailureListener() {

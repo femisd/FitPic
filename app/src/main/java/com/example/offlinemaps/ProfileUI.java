@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -226,6 +227,15 @@ public class ProfileUI extends AppCompatActivity {
                                 //Photos
                                 TextView photos = (TextView) findViewById(R.id.tv_profile_photos);
                                 photos.setText(user.getmPhotos() + "");
+
+                                //Photos box/button thingy
+                                LinearLayout photoBox = findViewById(R.id.photosBox);
+                                photoBox.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Toast.makeText(ProfileUI.this, "testing", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
 
                                 //Followers
                                 TextView followers = (TextView) findViewById(R.id.tv_profile_followers);
