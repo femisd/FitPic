@@ -9,11 +9,11 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
@@ -29,7 +29,6 @@ import java.util.ArrayList;
 public class FollowersSearch extends AppCompatActivity {
     //fields for nav view.
     private DrawerLayout mDrawer;
-    private Toolbar toolbar;
     private NavigationView mNavView;
 
     @Override
@@ -43,9 +42,9 @@ public class FollowersSearch extends AppCompatActivity {
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavView = (NavigationView) findViewById(R.id.nav_search_friends);
         setupDrawerContent(mNavView);
-
         Button search = (Button) findViewById(R.id.bt_search);
 
+        //Give button click functionality.
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,6 +53,10 @@ public class FollowersSearch extends AppCompatActivity {
         });
     }
 
+    /**
+     * Populate the listview with results from the firebase based on the
+     * users written query. e.g. Mi -> Mike, ke > Mike
+     */
     public void populateSearchResults() {
         EditText searchField = (EditText) findViewById(R.id.et_search_user);
         final ListView displayResults = (ListView) findViewById(R.id.lv_search_results);
@@ -63,18 +66,19 @@ public class FollowersSearch extends AppCompatActivity {
 
         final String query = searchField.getText().toString();
 
+        /*
+            Loop through FireBase and return users that contain the search query.
+         */
         usersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 friendsAdapter.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     User user = snapshot.getValue(User.class);
-                    if (user.getmUsername().equalsIgnoreCase(query)) {
+                    if (user.getmUsername().toLowerCase().contains(query.toLowerCase()) && !query.equals("")) {
                         Log.d("SEARCHABLE", user.getmUsername());
                         friendsAdapter.add(user);
                         friendsAdapter.notifyDataSetChanged();
-                    } else {
-                        Toast.makeText(FollowersSearch.this, "No users found with that name, try again", Toast.LENGTH_SHORT).show();
                     }
                 }
                 displayResults.setAdapter(friendsAdapter);
@@ -86,6 +90,7 @@ public class FollowersSearch extends AppCompatActivity {
             }
         });
 
+        //Show profile of friend selected in list.
         displayResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -140,6 +145,19 @@ public class FollowersSearch extends AppCompatActivity {
         }
         menuItem.setChecked(true);
         mDrawer.closeDrawers();
+    }
+
+    /**
+     * Open the drawer when nav icon is clicked.
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                mDrawer.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }

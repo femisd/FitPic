@@ -33,12 +33,15 @@ public class LeaderboardAdapterClass extends ArrayAdapter {
         if (listItem == null)
             listItem = LayoutInflater.from(mContext).inflate(R.layout.leaderboard_listview, parent, false);
 
+        //Get the user and populate the variables.
         User currentUser = userList.get(position);
 
         ImageView image = (ImageView) listItem.findViewById(R.id.iv_profile_pic);
         //image.setImageResource((String) currentUser.getmProfilePicture());
         if (!currentUser.getmProfilePicture().isEmpty()) {
-            Picasso.get().load(currentUser.getmProfilePicture()).placeholder(R.drawable.ic_person_blue).into(image);
+            Picasso.get().load(currentUser.getmProfilePicture()).placeholder(R.drawable.ic_user_placeholder).into(image);
+        } else {
+            Picasso.get().load(R.drawable.ic_user_placeholder).placeholder(R.drawable.ic_user_placeholder).into(image);
         }
 
         if (currentUser.getmVIP()) {

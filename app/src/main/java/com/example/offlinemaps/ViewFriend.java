@@ -25,8 +25,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ViewFriend extends AppCompatActivity {
@@ -51,18 +49,21 @@ public class ViewFriend extends AppCompatActivity {
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
+        //Initialisation of fields.
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavView = (NavigationView) findViewById(R.id.nav_view_friend);
+        mProfilePicture = (CircleImageView) findViewById(R.id.cv_view_friends_picture);
         setupDrawerContent(mNavView);
 
+        //Setup references.
         String currentUser = FirebaseAuth.getInstance().getUid();
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUser);
         followersRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUser).child("mFollowedUsers");
 
-        mProfilePicture = (CircleImageView) findViewById(R.id.cv_view_friends_picture);
-
+        //Get user object from previous intent.
         final User user = (User) getIntent().getSerializableExtra("user");
         Log.d("VIEW_FRIEND_REQUEST", user.toString());
+
         String image = user.getmProfilePicture();
         Log.d("IMAGE", image);
         if (!image.isEmpty()) {
@@ -98,15 +99,20 @@ public class ViewFriend extends AppCompatActivity {
 
         final Button follow = (Button) findViewById(R.id.bt_follow);
 
-        final ArrayList<String> userUIDs = new ArrayList<>();
+        /*
+            Query database to check if queried user exists in
+            logged in users followers list and update button text.
+         */
         followersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    userUIDs.add(snapshot.getValue(User.class).getmUid());
+                    if (snapshot.exists()) {
+                        User user = snapshot.getValue(User.class);
 
-                    if (snapshot.getValue(User.class).getmUid().equals(user.getmUid())) {
-                        follow.setText("Unfollow");
+                        if (user.getmUid().equals(user.getmUid())) {
+                            follow.setText("Unfollow");
+                        }
                     }
                 }
             }
@@ -116,6 +122,10 @@ public class ViewFriend extends AppCompatActivity {
 
             }
         });
+
+        /*
+            Update button texts and add users to logged in users followers.
+         */
         follow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -184,6 +194,9 @@ public class ViewFriend extends AppCompatActivity {
         mDrawer.closeDrawers();
     }
 
+    /**
+     * Open the drawer when home icon is clicked.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

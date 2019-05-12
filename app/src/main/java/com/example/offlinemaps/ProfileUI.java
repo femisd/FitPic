@@ -84,6 +84,7 @@ public class ProfileUI extends AppCompatActivity {
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
+        //Enable offline capabilities.
         if (!calledAlready) {
             FirebaseDatabase.getInstance().setPersistenceEnabled(true);
             calledAlready = true;
@@ -112,7 +113,7 @@ public class ProfileUI extends AppCompatActivity {
         });
 
         /*
-        Allows user to select profile picture from an image in their gallery.
+            Allows user to select profile picture from an image in their gallery.
          */
         mProfilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -194,7 +195,7 @@ public class ProfileUI extends AppCompatActivity {
                                 User user = dataSnapshot.getValue(User.class);
                                 String image = user.getmProfilePicture();
                                 if (!image.isEmpty()) {
-                                    Picasso.get().load(image).placeholder(R.drawable.ic_person_white_24dp).into(mProfilePicture);
+                                    Picasso.get().load(image).placeholder(R.drawable.ic_user_placeholder).into(mProfilePicture);
                                 }
                                 //Username
                                 TextView username = (TextView) findViewById(R.id.tv_profile_user);
@@ -278,6 +279,10 @@ public class ProfileUI extends AppCompatActivity {
         firebaseAuth.removeAuthStateListener(authStateListener);
     }
 
+    /**
+     * Open the drawer when the nav icon is clicked.
+     * Start search activity.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -291,6 +296,9 @@ public class ProfileUI extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Inflate the menu for search icon.
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -300,6 +308,9 @@ public class ProfileUI extends AppCompatActivity {
 
     }
 
+    /**
+     * Give user confirmation before closing app.
+     */
     @Override
     public void onBackPressed() {
         if (mDoubleBackToExitPressedOnce) {
@@ -319,6 +330,9 @@ public class ProfileUI extends AppCompatActivity {
         }, 2000);
     }
 
+    /**
+     * Intent results.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == RC_SIGN_IN) {

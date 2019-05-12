@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -58,6 +60,7 @@ public class Leaderboard extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference().child("users");
         currentUser = FirebaseAuth.getInstance().getUid();
 
+        //Initialise ListView.
         final ListView leaderboard = findViewById(R.id.lv_leaderboard_list);
         final ArrayList<User> userList = new ArrayList<>();
         final LeaderboardAdapterClass leaderboardAdapter = new LeaderboardAdapterClass(this, userList);
@@ -65,11 +68,14 @@ public class Leaderboard extends AppCompatActivity {
         //Set adapter.
         leaderboard.setAdapter(leaderboardAdapter);
 
+        //Initialise NavView.
         mDrawer = findViewById(R.id.drawer_layout);
         mNavView = findViewById(R.id.nv_leaderboard);
-
         setupDrawerContent(mNavView);
 
+        /*
+            Populate the leaderboard with all users from Firebase.
+         */
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -98,39 +104,9 @@ public class Leaderboard extends AppCompatActivity {
             }
         });
 
-//        mDatabase.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                leaderboardAdapter.clear();
-//                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-//                    for (DataSnapshot userSnapshot : postSnapshot.getChildren()) {
-//                        User user = userSnapshot.getValue(User.class);
-//                        //Don't include users with no username.
-//                        if (!userSnapshot.child("mUsername").getValue().toString().isEmpty() && !userList.contains(user)) {
-//                            leaderboardAdapter.add(user);
-//                        }
-//                    }
-//                }
-//
-//                //Sort by most points.
-//                Collections.sort(userList, new Comparator<User>() {
-//                    @Override
-//                    public int compare(User o1, User o2) {
-//                        int comparePoints = o1.getmPoints();
-//                        return o2.getmPoints() - comparePoints;
-//                    }
-//                });
-//
-//                //leaderboardAdapter.addAll(userList);
-//                leaderboardAdapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-
+        /*
+            Open view activity for selected user in the list.
+         */
         leaderboard.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -187,14 +163,30 @@ public class Leaderboard extends AppCompatActivity {
         mDrawer.closeDrawers();
     }
 
+    /**
+     * Open the drawers when the nav button is clicked.
+     * Start the search activity.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 mDrawer.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.search:
+                Intent search = new Intent(Leaderboard.this, FollowersSearch.class);
+                startActivity(search);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+
+        return true;
+
     }
 
     /**

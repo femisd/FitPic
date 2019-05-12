@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -47,22 +49,25 @@ public class FriendsUI extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends_ui);
-
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
-        //Firebase initialisation.
+        //FireBase initialisation.
         mCurrentUser = FirebaseAuth.getInstance().getUid();
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser).child("mFollowedUsers");
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
+        //ListView initialisation.
         final ListView friends = (ListView) findViewById(R.id.lv_friends_list);
         final ArrayList<User> userList = new ArrayList<>();
         final FriendAdapterClass friendsAdapter = new FriendAdapterClass(this, userList);
 
+        /*
+            Populate friends list with users from FireBase.
+         */
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -85,6 +90,9 @@ public class FriendsUI extends AppCompatActivity {
         //Set the friends list adapter.
         friends.setAdapter(friendsAdapter);
 
+        /*
+            Open view activity to display selected users statistics.
+         */
         friends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -94,9 +102,9 @@ public class FriendsUI extends AppCompatActivity {
                 startActivity(viewFriend);
             }
         });
+
         //Inflate the navigation drawer.
         mDrawer = findViewById(R.id.drawer_layout);
-
         mNavView = findViewById(R.id.nv_friends_list);
         setupDrawerContent(mNavView);
     }
@@ -155,21 +163,38 @@ public class FriendsUI extends AppCompatActivity {
         super.onPause();
     }
 
+    /**
+     * Open the drawer when nav icon is clicked.
+     * Start search activity.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 mDrawer.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.search:
+                Intent search = new Intent(FriendsUI.this, FollowersSearch.class);
+                startActivity(search);
         }
         return super.onOptionsItemSelected(item);
     }
 
-    /*
+    /**
+     * Inflate menu for search icon.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+        return true;
+
+    }
+
+    /**
      * Method used to invoke the user whether they would
      * like to quit the app with a confirmation before doing so.
      */
-
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
