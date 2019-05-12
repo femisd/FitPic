@@ -235,6 +235,14 @@ public class ProfileUI extends AppCompatActivity {
                                 TextView following = (TextView) findViewById(R.id.tv_profile_following);
                                 following.setText(user.getmFollowing() + "");
 
+                                following.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent following = new Intent(ProfileUI.this, FriendsUI.class);
+                                        startActivity(following);
+                                    }
+                                });
+
                                 //Points
                                 TextView points = (TextView) findViewById(R.id.tv_profile_points);
                                 points.setText(user.getmPoints() + "");

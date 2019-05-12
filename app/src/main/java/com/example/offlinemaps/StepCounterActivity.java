@@ -200,6 +200,9 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                     tracking = true;
 
                 } else if (tracking) {
+                    /*
+                        Update users steps and calories after walking completed.
+                     */
                     goalsBtn.setEnabled(true);
                     userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override

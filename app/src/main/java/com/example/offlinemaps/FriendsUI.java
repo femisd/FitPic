@@ -74,7 +74,10 @@ public class FriendsUI extends AppCompatActivity {
                 friendsAdapter.clear();
                 for (DataSnapshot user : dataSnapshot.getChildren()) {
                     Log.d("USERS", user.toString());
-                    friendsAdapter.add(user.getValue(User.class));
+                    User friends = user.getValue(User.class);
+                    if (!friends.getmUid().equals(mCurrentUser)) {
+                        friendsAdapter.add(user.getValue(User.class));
+                    }
                 }
                 friendsAdapter.notifyDataSetChanged();
             }

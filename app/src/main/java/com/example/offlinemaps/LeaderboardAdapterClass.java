@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -50,7 +51,11 @@ public class LeaderboardAdapterClass extends ArrayAdapter {
         }
 
         TextView name = (TextView) listItem.findViewById(R.id.tv_username);
-        name.setText(currentUser.getmUsername());
+        if (!currentUser.getmUid().equals(FirebaseAuth.getInstance().getUid())) {
+            name.setText(currentUser.getmUsername());
+        } else {
+            name.setText("You");
+        }
 
         TextView location = (TextView) listItem.findViewById(R.id.tv_location);
         location.setText(currentUser.getmLocation());
