@@ -443,6 +443,11 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 startActivity(profile);
                 finish();
                 break;
+            case R.id.nav_feed:
+                Intent feed = new Intent(StepCounterActivity.this, FeedActivity.class);
+                startActivity(feed);
+                finish();
+                break;
             case R.id.nav_shop:
                 Intent shop = new Intent(StepCounterActivity.this, ShopActivity.class);
                 startActivity(shop);

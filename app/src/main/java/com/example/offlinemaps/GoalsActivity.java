@@ -58,7 +58,6 @@ public class GoalsActivity extends AppCompatActivity {
             new AuthUI.IdpConfig.GoogleBuilder().build()
     );
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -157,6 +156,15 @@ public class GoalsActivity extends AppCompatActivity {
                 startActivity(shop);
                 finish();
                 break;
+            case R.id.nav_feed:
+                Intent feed = new Intent(GoalsActivity.this, FeedActivity.class);
+                startActivity(feed);
+                finish();
+                break;
+            case R.id.nav_friends:
+                Intent friends = new Intent(GoalsActivity.this, FriendsUI.class);
+                startActivity(friends);
+                finish();
         }
         menuItem.setChecked(true);
         mDrawer.closeDrawers();

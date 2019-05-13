@@ -264,6 +264,11 @@ public class ViewFriend extends AppCompatActivity {
                 startActivity(shop);
                 finish();
                 break;
+            case R.id.nav_feed:
+                Intent feed = new Intent(ViewFriend.this, FeedActivity.class);
+                startActivity(feed);
+                finish();
+                break;
         }
         menuItem.setChecked(true);
         mDrawer.closeDrawers();

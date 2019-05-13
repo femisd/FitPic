@@ -171,6 +171,11 @@ public class FriendsUI extends AppCompatActivity {
                 startActivity(shop);
                 finish();
                 break;
+            case R.id.nav_feed:
+                Intent feed = new Intent(FriendsUI.this, FeedActivity.class);
+                startActivity(feed);
+                finish();
+                break;
         }
         menuItem.setChecked(true);
         mDrawer.closeDrawers();

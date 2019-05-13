@@ -163,6 +163,15 @@ public class FollowersSearch extends AppCompatActivity {
                 Intent shop = new Intent(FollowersSearch.this, ShopActivity.class);
                 startActivity(shop);
                 finish();
+            case R.id.nav_feed:
+                Intent feed = new Intent(FollowersSearch.this, FeedActivity.class);
+                startActivity(feed);
+                finish();
+                break;
+            case R.id.nav_friends:
+                Intent friends = new Intent(FollowersSearch.this, FriendsUI.class);
+                startActivity(friends);
+                finish();
         }
         menuItem.setChecked(true);
         mDrawer.closeDrawers();

@@ -177,6 +177,11 @@ public class Leaderboard extends AppCompatActivity {
                 Intent shop = new Intent(Leaderboard.this, ShopActivity.class);
                 finish();
                 break;
+            case R.id.nav_feed:
+                Intent feed = new Intent(Leaderboard.this, FeedActivity.class);
+                startActivity(feed);
+                finish();
+                break;
         }
         menuItem.setChecked(true);
         mDrawer.closeDrawers();

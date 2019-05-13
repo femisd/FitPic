@@ -110,13 +110,11 @@ public class ShopActivity extends AppCompatActivity {
                 startActivity(friends);
                 finish();
                 break;
-
-            case R.id.nav_shop:
-                Intent shop = new Intent(ShopActivity.this, ShopActivity.class);
-                startActivity(shop);
+            case R.id.nav_feed:
+                Intent feed = new Intent(ShopActivity.this, FeedActivity.class);
+                startActivity(feed);
                 finish();
                 break;
-
             case R.id.nav_profile:
                 Intent profile = new Intent(ShopActivity.this, ProfileUI.class);
                 startActivity(profile);
