@@ -1,13 +1,9 @@
 package com.example.offlinemaps;
 
-import android.content.Intent;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,15 +20,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Set;
 
 public class FeedActivity extends AppCompatActivity {
 
@@ -42,15 +33,14 @@ public class FeedActivity extends AppCompatActivity {
     private RecyclerView feedRecyclerView;
     private final ArrayList<Feed> feedList = new ArrayList<Feed>();
     private RecyclerView.LayoutManager layoutManager;
-    private RecyclerView.Adapter adapter;
-
+    private FeedAdapter adapter;
 
 
     /**
      * Logical Elements
      */
     ArrayList<Feed> feed;
-    User[] followedUsers;
+    ArrayList<User> followedUsers = new ArrayList<User>();
 
     //Firebase fields
     private DatabaseReference mDatabase;
@@ -64,16 +54,18 @@ public class FeedActivity extends AppCompatActivity {
     //do u love me now
     private static StorageReference imagesRef;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
+        mCurrentUser = FirebaseAuth.getInstance().getUid();
 
         feedRecyclerView = findViewById(R.id.feedRecyclerView);
 
         layoutManager = new LinearLayoutManager(this);
-        adapter = new FeedAdapter(feedList);
+
+        //followedUsers = ;
+
 
         feedRecyclerView.setLayoutManager(layoutManager);
         feedRecyclerView.setAdapter(adapter);
@@ -89,29 +81,32 @@ public class FeedActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     User me = dataSnapshot.getValue(User.class);
-                    String[] keys = (String[]) me.getmFollowedUsers().keySet().toArray();
-                    for(int i = 0; i < keys.length; i++){
+                    String[] keys = (String[]) me.getmFollowedUsers().keySet().toArray(new String[0]);
+                    for (int i = 0; i < keys.length; i++) {
                         String key = keys[i];
-                        followedUsers.add(me.getmFollowedUsers().get(key));
+                        Log.d("Feed data", "key: " + System.identityHashCode(getInstance().feedList));
+                        addUser(me.getmFollowedUsers().get(key));
                     }
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(FeedActivity.this, "卐 ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(FeedActivity.this, "Error", Toast.LENGTH_SHORT).show();
             }
         });
         //userRef.child(FirebaseAuth.getInstance().getUid()).child("Selfies").addListenerForSingleValueEvent(new ValueEventListener() {
 
+        Log.d("kikes",getInstance().followedUsers.size()+"");
+        Log.d("kikes",followedUsers.size() +"");
         firebaseAuth = FirebaseAuth.getInstance();
 
         //User me = new User(userRef.child(FirebaseAuth.getInstance().getUid()));
-        for(int i = 0; i < followedUsers.size(); i++){
-            final String username = followedUsers.get(i).getmUid();
+        for (int i = 0; i < getInstance().followedUsers.size(); i++) {
+            final String username = getInstance().followedUsers.get(i).getmUid();
             userRef.child(username).child("Selfies").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {;
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         Geocoder meeee = new Geocoder(getInstance(), Locale.UK);
                         ///String username = followedUsers.get(i).getmUsername();
@@ -120,12 +115,15 @@ public class FeedActivity extends AppCompatActivity {
                         final String[] image = new String[1];
                         final Selfie selfie = snapshot.getValue(Selfie.class);
                         String location = null;
+
                         try {
                             location = meeee.getFromLocation(selfie.getLatitude(), selfie.getLongitude(), 1).get(0).toString();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        date = (new java.util.Date((long)Integer.parseInt(selfie.getId())*1000)).toString();
+
+
+                        date = (new java.util.Date((long) Integer.parseInt(selfie.getId()) * 1000)).toString();
 
                         Log.d("GalleryActivity", "Selfie object:" + selfie.toString());
                         imagesRef.child(FirebaseAuth.getInstance().getUid()).child(selfie.getId()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -143,6 +141,8 @@ public class FeedActivity extends AppCompatActivity {
                         });
                         Feed feed = new Feed(username, date, location, image[0]);
                         feedList.add(feed);
+                        Log.d("Feed_res", feed.toString());
+                        adapter.notifyDataSetChanged();
                     }
                     //mGalleryAdapter.notifyDataSetChanged();
                 }
@@ -160,15 +160,20 @@ public class FeedActivity extends AppCompatActivity {
     }
 
 
-    public FeedActivity getInstance(){
+    public FeedActivity getInstance() {
         return this;
     }
 
 
-    public void populateFeedList(){
+    public void populateFeedList() {
 
-      ///feedList.add(new Feed("Shaq","13/05/2019","Guildford",R.drawable.test));
+        ///feedList.add(new Feed("Shaq","13/05/2019","Guildford",R.drawable.test));
     }
 
+    public void addUser(User user){
+        this.followedUsers.add(user);
+        Log.d("statics?", System.identityHashCode(followedUsers) + "");
+
+    }
 
 }

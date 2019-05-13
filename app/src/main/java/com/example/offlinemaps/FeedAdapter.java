@@ -9,6 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder> {
@@ -38,6 +40,22 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
     }
 
+
+
+
+    public void addFeedItem(ArrayList<Feed> mFeedList){
+        int previousSize  = mFeedList.size();
+        this.mFeedList.clear();
+        this.mFeedList.addAll(mFeedList);
+        notifyItemRangeChanged(previousSize,mFeedList.size());
+
+    }
+
+    public void abrakadabra(User userToAdd){
+        int previousSize  = mFeedList.size();
+    }
+
+
     @NonNull
     @Override
     public FeedViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -52,7 +70,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
         Feed currentFeed = mFeedList.get(position);
 
-        holder.imageView.setImageResource(currentFeed.getImage());
+        Picasso.get().load(currentFeed.getImage()).into(holder.imageView);
         holder.usernameText.setText(currentFeed.getUsername());
         holder.dateText.setText(currentFeed.getDate());
         holder.locationText.setText(currentFeed.getLocation());
