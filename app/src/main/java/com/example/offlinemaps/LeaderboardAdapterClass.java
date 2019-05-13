@@ -1,6 +1,7 @@
 package com.example.offlinemaps;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,8 +71,10 @@ public class LeaderboardAdapterClass extends ArrayAdapter {
         TextView name = (TextView) listItem.findViewById(R.id.tv_username);
         if (!currentUser.getmUid().equals(FirebaseAuth.getInstance().getUid())) {
             name.setText(currentUser.getmUsername());
+            listItem.setBackgroundColor(Color.WHITE);
         } else {
             name.setText("You");
+            listItem.setBackgroundColor(Color.GREEN);
         }
 
         TextView location = (TextView) listItem.findViewById(R.id.tv_location);

@@ -1,21 +1,49 @@
 package com.example.offlinemaps;
 
-import android.media.Image;
-
-import java.util.Date;
-
 public class Feed {
 
     private String username;
-    private Date date;
+    private String date;
     private String location;
-    private Image image;
+    private int image;
 
 
-    public Feed(String username, Date date, String location, Image image) {
+    public Feed(String username, String date, String location, int image) {
         this.username = username;
         this.date = date;
         this.location = location;
+        this.image = image;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public int getImage() {
+        return image;
+    }
+
+    public void setImage(int image) {
         this.image = image;
     }
 }

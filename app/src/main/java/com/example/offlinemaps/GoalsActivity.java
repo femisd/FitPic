@@ -19,11 +19,14 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class GoalsActivity extends AppCompatActivity {
@@ -52,6 +55,15 @@ public class GoalsActivity extends AppCompatActivity {
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
     private NavigationView mNavView;
+
+    //Final fields
+    private static final int RC_SIGN_IN = 1;
+
+    //List of login methods.
+    private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
+            new AuthUI.IdpConfig.EmailBuilder().build(),
+            new AuthUI.IdpConfig.GoogleBuilder().build()
+    );
 
 
     @Override
@@ -134,10 +146,22 @@ public class GoalsActivity extends AppCompatActivity {
                 FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
                 firebaseAuth.signOut();
                 finish();
+                startActivityForResult(
+                        AuthUI.getInstance()
+                                .createSignInIntentBuilder()
+                                .setIsSmartLockEnabled(false)
+                                .setAvailableProviders(mProviders)
+                                .build(),
+                        RC_SIGN_IN);
                 break;
             case R.id.nav_profile:
                 Intent profile = new Intent(GoalsActivity.this, ProfileUI.class);
                 startActivity(profile);
+                finish();
+                break;
+            case R.id.nav_shop:
+                Intent shop = new Intent(GoalsActivity.this, ShopActivity.class);
+                startActivity(shop);
                 finish();
                 break;
         }
