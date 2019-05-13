@@ -1,14 +1,33 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".slide_show">
+    android:orientation="vertical"
+    tools:context="com.example.offlinemaps">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <!--Viewpager to show slideshow of images-->
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewPagerGallery"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/recyclerViewGalleryStrip" />
+    <!--Image name textview-->
+    <TextView
+        android:id="@+id/textViewImageName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/recyclerViewGalleryStrip"
+        android:background="#aa000000"
+        android:ellipsize="end"
+        android:gravity="center_horizontal"
+        android:padding="16dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
-</FrameLayout>
+    <!--Gallery strip Recyclerview-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewGalleryStrip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>

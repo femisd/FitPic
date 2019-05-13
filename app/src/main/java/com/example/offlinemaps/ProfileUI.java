@@ -205,7 +205,7 @@ public class ProfileUI extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if (dataSnapshot.exists()) {
-                                User user = dataSnapshot.getValue(User.class);
+                                final User user = dataSnapshot.getValue(User.class);
                                 String image = user.getmProfilePicture();
                                 if (!image.isEmpty()) {
                                     Picasso.get().load(image).placeholder(R.drawable.ic_user_placeholder).into(mProfilePicture);
@@ -247,6 +247,7 @@ public class ProfileUI extends AppCompatActivity {
                                     @Override
                                     public void onClick(View v) {
                                         Intent intent = new Intent(ProfileUI.this, GalleryActivity.class);
+                                        intent.putExtra("user", user);
                                         startActivity(intent);
                                     }
                                 });

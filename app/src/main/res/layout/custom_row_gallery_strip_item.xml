@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<com.example.offlinemaps.SquareLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/squareLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
-</LinearLayout>
+    <ImageView
+        android:id="@+id/imageViewThumbnail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:padding="2dp"
+        android:scaleType="fitXY" />
+
+
+</com.example.offlinemaps.SquareLayout>

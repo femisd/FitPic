@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -46,14 +47,18 @@ public class GalleryActivity extends AppCompatActivity implements GalleryAdapter
         //set adapter to RecyclerView
         recyclerViewGallery.setAdapter(mGalleryAdapter);
 
+        final User user = (User) getIntent().getExtras().get("user");
+
+        Log.d("GalleryActivity", "User gallery for: " + user.toString());
+
         //Get images
-        userRef.child(FirebaseAuth.getInstance().getUid()).child("Selfies").addListenerForSingleValueEvent(new ValueEventListener() {
+        userRef.child(user.getmUid()).child("Selfies").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     final Selfie selfie = snapshot.getValue(Selfie.class);
                     Log.d("GalleryActivity", "Selfie object:" + selfie.toString());
-                    imagesRef.child(FirebaseAuth.getInstance().getUid()).child(selfie.getId()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    imagesRef.child(user.getmUid()).child(selfie.getId()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
                             String downloadUri = uri.toString();
@@ -81,11 +86,11 @@ public class GalleryActivity extends AppCompatActivity implements GalleryAdapter
     @Override
     public void onItemSelected(int position) {
         //create fullscreen SlideShowFragment dialog
-        ///SlideShowFragment slideShowFragment = SlideShowFragment.newInstance(position);
+        SlideShowFragment slideShowFragment = SlideShowFragment.newInstance(position);
         //setUp style for slide show fragment
-        ///slideShowFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
+        slideShowFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
         //finally show dialogue
-        ///slideShowFragment.show(getSupportFragmentManager(), null);
+        slideShowFragment.show(getSupportFragmentManager(), null);
     }
 
 }
