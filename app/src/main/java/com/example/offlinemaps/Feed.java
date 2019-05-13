@@ -15,16 +15,6 @@ public class Feed {
         this.image = image;
     }
 
-    @Override
-    public String toString() {
-        return "Feed{" +
-                "username='" + username + '\'' +
-                ", date='" + date + '\'' +
-                ", location='" + location + '\'' +
-                ", image='" + image + '\'' +
-                '}';
-    }
-
     public String getUsername() {
         return username;
     }
@@ -55,5 +45,9 @@ public class Feed {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String toString(){
+        return this.username + " " + this.location + " " + this.date + " " + this.image;
     }
 }

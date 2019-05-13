@@ -23,6 +23,8 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class FeedActivity extends AppCompatActivity {
@@ -31,17 +33,21 @@ public class FeedActivity extends AppCompatActivity {
      * UI elements
      */
     private RecyclerView feedRecyclerView;
-    private final ArrayList<Feed> feedList = new ArrayList<Feed>();
+
     private RecyclerView.LayoutManager layoutManager;
-    private FeedAdapter adapter;
+    private RecyclerView.Adapter adapter;
+
 
 
     /**
      * Logical Elements
      */
     ArrayList<Feed> feed;
-    ArrayList<User> followedUsers = new ArrayList<User>();
+    //User[] followedUsers;
 
+    public static ArrayList<User> followedUsers;
+    public static ArrayList<Feed> feedList;
+    public static HashMap<String, User> followedHashMap;
     //Firebase fields
     private DatabaseReference mDatabase;
     private DatabaseReference userRef;
@@ -54,82 +60,104 @@ public class FeedActivity extends AppCompatActivity {
     //do u love me now
     private static StorageReference imagesRef;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
-        mCurrentUser = FirebaseAuth.getInstance().getUid();
 
         feedRecyclerView = findViewById(R.id.feedRecyclerView);
 
         layoutManager = new LinearLayoutManager(this);
 
-        //followedUsers = ;
-
 
         feedRecyclerView.setLayoutManager(layoutManager);
         feedRecyclerView.setAdapter(adapter);
-
+        mCurrentUser = FirebaseAuth.getInstance().getUid();
         imagesRef = FirebaseStorage.getInstance().getReference().child("Selfies");
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser);
 
-        final ArrayList<User> followedUsers = new ArrayList<User>();
+        followedUsers = new ArrayList<User>();
+        feedList = new ArrayList<Feed>();
 
+        adapter = new FeedAdapter(feedList);
 
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     User me = dataSnapshot.getValue(User.class);
+                    followedHashMap = me.getmFollowedUsers();
                     String[] keys = (String[]) me.getmFollowedUsers().keySet().toArray(new String[0]);
-                    for (int i = 0; i < keys.length; i++) {
+                    for(int i = 0; i < keys.length; i++){
                         String key = keys[i];
-                        Log.d("Feed data", "key: " + System.identityHashCode(getInstance().feedList));
-                        addUser(me.getmFollowedUsers().get(key));
+                        addToList(me.getmFollowedUsers().get(key));
                     }
+                    step2();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(FeedActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                Toast.makeText(FeedActivity.this, "卐 ", Toast.LENGTH_SHORT).show();
             }
         });
         //userRef.child(FirebaseAuth.getInstance().getUid()).child("Selfies").addListenerForSingleValueEvent(new ValueEventListener() {
 
-        Log.d("kikes",getInstance().followedUsers.size()+"");
-        Log.d("kikes",followedUsers.size() +"");
-        firebaseAuth = FirebaseAuth.getInstance();
 
         //User me = new User(userRef.child(FirebaseAuth.getInstance().getUid()));
-        for (int i = 0; i < getInstance().followedUsers.size(); i++) {
-            final String username = getInstance().followedUsers.get(i).getmUid();
-            userRef.child(username).child("Selfies").addListenerForSingleValueEvent(new ValueEventListener() {
+
+
+
+
+    }
+
+    public void step2(){
+        Log.d("first", followedUsers.size() + "");
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        for(int i = 0; i < followedUsers.size(); i++){
+
+
+            final String userName = followedUsers.get(i).getmUid();
+            Log.d("first", userName + "");
+            FirebaseDatabase.getInstance().getReference().child("users").child(userName).child("Selfies").addListenerForSingleValueEvent
+                    (new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Log.d("first", dataSnapshot + "");
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        String username = "bee";
                         Geocoder meeee = new Geocoder(getInstance(), Locale.UK);
                         ///String username = followedUsers.get(i).getmUsername();
-                        String date;
 
-                        final String[] image = new String[1];
+
                         final Selfie selfie = snapshot.getValue(Selfie.class);
-                        String location = null;
 
+                        final String location;
+                        String tempLocation = null;
                         try {
-                            location = meeee.getFromLocation(selfie.getLatitude(), selfie.getLongitude(), 1).get(0).toString();
+                            tempLocation = meeee.getFromLocation(selfie.getLatitude(), selfie.getLongitude(), 1).get(0).toString();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        if(tempLocation != null){
+                            location = tempLocation;
+                        }else{
+                            location = null;
+                        }
 
+                        final String date = new Date(Long.parseLong(selfie.getId())).toString();
 
-                        date = (new java.util.Date((long) Integer.parseInt(selfie.getId()) * 1000)).toString();
-
-                        Log.d("GalleryActivity", "Selfie object:" + selfie.toString());
-                        imagesRef.child(FirebaseAuth.getInstance().getUid()).child(selfie.getId()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        Log.d("first", "Selfie object:" + selfie.toString());
+                        imagesRef.child(userName).child(selfie.getId()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
-                                image[0] = uri.toString();
+                                String image = uri.toString();
+                                Feed feed = new Feed(followedHashMap.get(userName).getmUsername(), date, location, image);
+                                feedList.add(feed);
+                                Log.d("first", feed.toString() + " AM I EVEN HERE");
+
                                 //Log.d("GalleryActivity", "downloadUri: " + downloadUri);
                                 //GalleryItem galleryItem = new GalleryItem(downloadUri, selfie.getId());
                                 //Log.d("GalleryActivity", "GalleryItem: " + galleryItem.toString());
@@ -139,10 +167,9 @@ public class FeedActivity extends AppCompatActivity {
                                 //mGalleryAdapter.addGalleryItems(galleryItems);
                             }
                         });
-                        Feed feed = new Feed(username, date, location, image[0]);
-                        feedList.add(feed);
-                        Log.d("Feed_res", feed.toString());
-                        adapter.notifyDataSetChanged();
+                        //Feed feed = new Feed(followedHashMap.get(userName).getmUsername(), date, location, image[0]);
+                        //Log.d("first", feed.toString() + " AM I EVEN HERE");
+                        //feedList.add(feed);
                     }
                     //mGalleryAdapter.notifyDataSetChanged();
                 }
@@ -155,25 +182,24 @@ public class FeedActivity extends AppCompatActivity {
 
         }
         populateFeedList();
-
-
     }
 
 
-    public FeedActivity getInstance() {
+    public FeedActivity getInstance(){
         return this;
     }
 
 
-    public void populateFeedList() {
-
-        ///feedList.add(new Feed("Shaq","13/05/2019","Guildford",R.drawable.test));
+    public void populateFeedList(){
+        Log.d("first", feedList.size() + "");
+      ///feedList.add(new Feed("Shaq","13/05/2019","Guildford",R.drawable.test));
     }
 
-    public void addUser(User user){
-        this.followedUsers.add(user);
-        Log.d("statics?", System.identityHashCode(followedUsers) + "");
-
+    public static void addToList(User user){
+        Log.d("first", user + "");
+        User copy = new User(user);
+        followedUsers.add(copy);
+        Log.d("first", followedUsers.size()+"");
     }
 
 }
