@@ -47,17 +47,14 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileUI extends AppCompatActivity {
 
+    //Final fields
+    private static final int RC_SIGN_IN = 1;
+    private static boolean calledAlready;
     //Test button for step counter!
     private Button startWalkingBtn;
-
     private boolean mDoubleBackToExitPressedOnce;
     private CircleImageView mProfilePicture;
     private String mCurrentUser;
-    private static boolean calledAlready;
-
-    //Final fields
-    private static final int RC_SIGN_IN = 1;
-
     //Firebase fields
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
@@ -96,10 +93,10 @@ public class ProfileUI extends AppCompatActivity {
         signIn();
 
         //Initialisation of fields.
-        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mNavView = (NavigationView) findViewById(R.id.nv_profile);
+        mDrawer = findViewById(R.id.drawer_layout);
+        mNavView = findViewById(R.id.nv_profile);
         setupDrawerContent(mNavView);
-        mProfilePicture = (CircleImageView) findViewById(R.id.cv_profile_picture);
+        mProfilePicture = findViewById(R.id.cv_profile_picture);
 
         //Firebase initialisation fields.
         userProfilePicturesRef = FirebaseStorage.getInstance().getReference().child("Profile Pictures");
@@ -211,7 +208,7 @@ public class ProfileUI extends AppCompatActivity {
                                     Picasso.get().load(image).placeholder(R.drawable.ic_user_placeholder).into(mProfilePicture);
                                 }
                                 //Username
-                                TextView username = (TextView) findViewById(R.id.tv_profile_user);
+                                TextView username = findViewById(R.id.tv_profile_user);
                                 if (user.getmUsername().isEmpty()) {
                                     Intent intent = new Intent(ProfileUI.this, UpdateUsername.class);
                                     startActivity(intent);
@@ -230,15 +227,15 @@ public class ProfileUI extends AppCompatActivity {
                                 });
 
                                 //Steps
-                                TextView steps = (TextView) findViewById(R.id.tv_profile_steps);
+                                TextView steps = findViewById(R.id.tv_profile_steps);
                                 steps.setText(user.getmSteps() + "");
 
                                 //Calories
-                                TextView calories = (TextView) findViewById(R.id.tv_profile_calories);
+                                TextView calories = findViewById(R.id.tv_profile_calories);
                                 calories.setText(user.getmCaloriesBurned() + "");
 
                                 //Photos
-                                TextView photos = (TextView) findViewById(R.id.tv_profile_photos);
+                                TextView photos = findViewById(R.id.tv_profile_photos);
                                 photos.setText(user.getmPhotos() + "");
 
                                 //Photos box/button thingy
@@ -253,11 +250,11 @@ public class ProfileUI extends AppCompatActivity {
                                 });
 
                                 //Followers
-                                TextView followers = (TextView) findViewById(R.id.tv_profile_followers);
+                                TextView followers = findViewById(R.id.tv_profile_followers);
                                 followers.setText(user.getmFollowers() + "");
 
                                 //Following
-                                TextView following = (TextView) findViewById(R.id.tv_profile_following);
+                                TextView following = findViewById(R.id.tv_profile_following);
                                 following.setText(user.getmFollowing() + "");
 
                                 LinearLayout followingBox = findViewById(R.id.ll_following_box);
@@ -270,7 +267,7 @@ public class ProfileUI extends AppCompatActivity {
                                 });
 
                                 //Points
-                                TextView points = (TextView) findViewById(R.id.tv_profile_points);
+                                TextView points = findViewById(R.id.tv_profile_points);
                                 points.setText(user.getmPoints() + "");
 
                             } else {

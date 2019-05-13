@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -77,20 +76,6 @@ public class GalleryStripAdapter extends RecyclerView.Adapter {
         return galleryItems.size();
     }
 
-    public class GalleryStripItemHolder extends RecyclerView.ViewHolder {
-        ImageView imageViewThumbnail;
-
-        public GalleryStripItemHolder(View itemView) {
-            super(itemView);
-            imageViewThumbnail = itemView.findViewById(R.id.imageViewThumbnail);
-        }
-    }
-
-    //interface for communication on gallery strip interactions
-    public interface GalleryStripCallBacks {
-        void onGalleryStripItemSelected(int position);
-    }
-
     //Method to highlight  selected item on gallery strip
     public void setSelected(int position) {
         //remove current selection
@@ -109,6 +94,20 @@ public class GalleryStripAdapter extends RecyclerView.Adapter {
     //method to remove selection
     public void removeSelection() {
         mCurrentSelected.isSelected = false;
+    }
+
+    //interface for communication on gallery strip interactions
+    public interface GalleryStripCallBacks {
+        void onGalleryStripItemSelected(int position);
+    }
+
+    public class GalleryStripItemHolder extends RecyclerView.ViewHolder {
+        ImageView imageViewThumbnail;
+
+        public GalleryStripItemHolder(View itemView) {
+            super(itemView);
+            imageViewThumbnail = itemView.findViewById(R.id.imageViewThumbnail);
+        }
     }
 
 

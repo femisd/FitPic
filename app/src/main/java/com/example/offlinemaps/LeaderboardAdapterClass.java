@@ -51,11 +51,11 @@ public class LeaderboardAdapterClass extends ArrayAdapter {
         TextView leaderboardNumber = listItem.findViewById(R.id.tv_medal);
         for (int i = 3; i < userList.size(); i++) {
             if (position == i) {
-                leaderboardNumber.setText(i+1 + "");
+                leaderboardNumber.setText(i + 1 + "");
             }
         }
 
-        ImageView image = (ImageView) listItem.findViewById(R.id.iv_profile_pic);
+        ImageView image = listItem.findViewById(R.id.iv_profile_pic);
         //image.setImageResource((String) currentUser.getmProfilePicture());
         if (!currentUser.getmProfilePicture().isEmpty()) {
             Picasso.get().load(currentUser.getmProfilePicture()).placeholder(R.drawable.ic_user_placeholder).into(image);
@@ -64,11 +64,11 @@ public class LeaderboardAdapterClass extends ArrayAdapter {
         }
 
         if (currentUser.getmVIP()) {
-            ImageView vip = (ImageView) listItem.findViewById(R.id.iv_vip);
+            ImageView vip = listItem.findViewById(R.id.iv_vip);
             vip.setImageResource(R.drawable.vip_ticket);
         }
 
-        TextView name = (TextView) listItem.findViewById(R.id.tv_username);
+        TextView name = listItem.findViewById(R.id.tv_username);
         if (!currentUser.getmUid().equals(FirebaseAuth.getInstance().getUid())) {
             name.setText(currentUser.getmUsername());
             listItem.setBackgroundColor(Color.WHITE);
@@ -77,13 +77,13 @@ public class LeaderboardAdapterClass extends ArrayAdapter {
             listItem.setBackgroundColor(Color.GREEN);
         }
 
-        TextView location = (TextView) listItem.findViewById(R.id.tv_location);
+        TextView location = listItem.findViewById(R.id.tv_location);
         location.setText(currentUser.getmLocation());
 
-        TextView points = (TextView) listItem.findViewById(R.id.tv_point_counter);
+        TextView points = listItem.findViewById(R.id.tv_point_counter);
         points.setText("" + currentUser.getmPoints());
 
-        TextView calories = (TextView) listItem.findViewById(R.id.tv_calories_burnt);
+        TextView calories = listItem.findViewById(R.id.tv_calories_burnt);
         calories.setText(currentUser.getmCaloriesBurned() + "");
 
 

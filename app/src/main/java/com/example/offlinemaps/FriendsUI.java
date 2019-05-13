@@ -34,23 +34,19 @@ import java.util.List;
 
 public class FriendsUI extends AppCompatActivity {
 
+    //Final fields
+    private static final int RC_SIGN_IN = 1;
     //Fields.
     private boolean doubleBackToExitPressedOnce = false;
     private String mCurrentUser;
-
     //fields for nav view.
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
     private NavigationView mNavView;
-
     //Firebase fields
     private DatabaseReference mDatabase;
     private DatabaseReference userRef;
     private FirebaseAuth firebaseAuth;
-
-    //Final fields
-    private static final int RC_SIGN_IN = 1;
-
     //List of login methods.
     private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
             new AuthUI.IdpConfig.EmailBuilder().build(),
@@ -73,7 +69,7 @@ public class FriendsUI extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         //ListView initialisation.
-        final ListView friends = (ListView) findViewById(R.id.lv_friends_list);
+        final ListView friends = findViewById(R.id.lv_friends_list);
         final ArrayList<User> userList = new ArrayList<>();
         final FriendAdapterClass friendsAdapter = new FriendAdapterClass(this, userList);
 

@@ -18,24 +18,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
     private ArrayList<Feed> mFeedList;
 
-    public static class FeedViewHolder extends RecyclerView.ViewHolder{
-            public ImageView imageView;
-            public TextView usernameText;
-            public TextView locationText;
-            public TextView dateText;
-        public FeedViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            imageView = itemView.findViewById(R.id.feedImage);
-            usernameText = itemView.findViewById(R.id.usernameFeedText);
-            locationText = itemView.findViewById(R.id.locationFeedText);
-            dateText = itemView.findViewById(R.id.dateFeedText);
-
-
-        }
-    }
-
-    public FeedAdapter(ArrayList<Feed> feedList){
+    public FeedAdapter(ArrayList<Feed> feedList) {
 
         mFeedList = feedList;
         Log.d("FEEDLISTEX", feedList.get(0).toString());
@@ -45,17 +28,16 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
     @NonNull
     @Override
     public FeedViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.feed_element,parent,false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.feed_element, parent, false);
         FeedViewHolder feedViewHolder = new FeedViewHolder(v);
         return feedViewHolder;
     }
-
 
     @Override
     public void onBindViewHolder(@NonNull FeedViewHolder holder, int position) {
 
         Feed currentFeed = mFeedList.get(position);
-        Log.d("picturetest123",currentFeed.toString());
+        Log.d("picturetest123", currentFeed.toString());
         //holder.imageView.setImageResource(currentFeed.getImage());
         Picasso.get().load(currentFeed.getImage()).into(holder.imageView);
         holder.usernameText.setText(currentFeed.getUsername());
@@ -70,6 +52,24 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
     @Override
     public int getItemCount() {
         return mFeedList.size();
+    }
+
+    public static class FeedViewHolder extends RecyclerView.ViewHolder {
+        public ImageView imageView;
+        public TextView usernameText;
+        public TextView locationText;
+        public TextView dateText;
+
+        public FeedViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            imageView = itemView.findViewById(R.id.feedImage);
+            usernameText = itemView.findViewById(R.id.usernameFeedText);
+            locationText = itemView.findViewById(R.id.locationFeedText);
+            dateText = itemView.findViewById(R.id.dateFeedText);
+
+
+        }
     }
 }
 

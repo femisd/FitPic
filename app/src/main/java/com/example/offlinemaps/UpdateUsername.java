@@ -26,16 +26,13 @@ import java.util.List;
 
 public class UpdateUsername extends AppCompatActivity {
 
+    //Final fields
+    private static final int RC_SIGN_IN = 1;
     private DatabaseReference userRef;
-
     //fields for nav view.
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
     private NavigationView mNavView;
-
-    //Final fields
-    private static final int RC_SIGN_IN = 1;
-
     //List of login methods.
     private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
             new AuthUI.IdpConfig.EmailBuilder().build(),
@@ -54,8 +51,8 @@ public class UpdateUsername extends AppCompatActivity {
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUser).child("mUsername");
 
         //Initialise fields.
-        final EditText username = (EditText) findViewById(R.id.et_update_username);
-        Button update = (Button) findViewById(R.id.bt_update);
+        final EditText username = findViewById(R.id.et_update_username);
+        Button update = findViewById(R.id.bt_update);
 
         //Update username on button click.
         update.setOnClickListener(new View.OnClickListener() {

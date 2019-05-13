@@ -9,6 +9,7 @@ public class Feed {
 
     /**
      * Copy constructor <3 Vytenis
+     *
      * @param feed
      */
     public Feed(Feed feed) {
@@ -57,7 +58,7 @@ public class Feed {
         this.image = image;
     }
 
-    public String toString(){
+    public String toString() {
         return this.username + " " + this.location + " " + this.date + " " + this.image;
     }
 }

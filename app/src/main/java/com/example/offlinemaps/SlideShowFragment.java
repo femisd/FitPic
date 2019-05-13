@@ -32,10 +32,9 @@ public class SlideShowFragment extends DialogFragment implements GalleryStripAda
     ViewPager mViewPagerGallery;
     TextView textViewImageName;
     RecyclerView recyclerViewGalleryStrip;
-
-    private int mCurrentPosition;
     //set bottom to visible of first load
     boolean isBottomBarVisible = true;
+    private int mCurrentPosition;
 
 
     public SlideShowFragment() {

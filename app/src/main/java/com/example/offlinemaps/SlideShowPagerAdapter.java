@@ -10,7 +10,6 @@ import androidx.viewpager.widget.PagerAdapter;
 
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -39,13 +38,13 @@ public class SlideShowPagerAdapter extends PagerAdapter {
 
     @Override
     public boolean isViewFromObject(View view, Object object) {
-        return view == ((ImageView) object);
+        return view == object;
     }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         View itemView = mLayoutInflater.inflate(R.layout.pager_item, container, false);
-        ImageView imageView = (ImageView) itemView.findViewById(R.id.imageViewThumbnail);
+        ImageView imageView = itemView.findViewById(R.id.imageViewThumbnail);
         //load current image in viewpager
         Picasso.get().load(galleryItems.get(position).imageUri).fit().into(imageView);
         container.addView(itemView);

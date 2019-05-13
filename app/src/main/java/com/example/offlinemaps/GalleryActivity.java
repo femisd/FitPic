@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,16 +25,12 @@ import java.util.List;
 
 //Remember to implement  GalleryAdapter.GalleryAdapterCallBacks to activity for communication of Activity and Gallery Adapter
 public class GalleryActivity extends AppCompatActivity implements GalleryAdapter.GalleryAdapterCallBacks {
-    //Deceleration of list of  GalleryItems
-    public List<GalleryItem> galleryItems = new ArrayList<>();
-
-    GalleryAdapter mGalleryAdapter;
-
     //Firebase storage folder where you want to put the images
     private static DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users");
-
     private static StorageReference imagesRef = FirebaseStorage.getInstance().getReference().child("Selfies");
-
+    //Deceleration of list of  GalleryItems
+    public List<GalleryItem> galleryItems = new ArrayList<>();
+    GalleryAdapter mGalleryAdapter;
     private ProgressDialog mProgress;
 
     @Override
@@ -43,7 +38,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryAdapter
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
         //setup RecyclerView
-        RecyclerView recyclerViewGallery = (RecyclerView) findViewById(R.id.recyclerViewGallery);
+        RecyclerView recyclerViewGallery = findViewById(R.id.recyclerViewGallery);
         recyclerViewGallery.setLayoutManager(new GridLayoutManager(this, 2));
         //Create RecyclerView Adapter
         mGalleryAdapter = new GalleryAdapter(this);
@@ -62,7 +57,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryAdapter
         //Get images
         userRef.child(user.getmUid()).child("Selfies").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {;
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     final Selfie selfie = snapshot.getValue(Selfie.class);
                     Log.d("GalleryActivity", "Selfie object:" + selfie.toString());

@@ -32,33 +32,26 @@ import java.util.List;
 public class GoalsActivity extends AppCompatActivity {
 
 
+    //Final fields
+    private static final int RC_SIGN_IN = 1;
+    public int currentPoints;
     private int currentStep;
     private RecyclerView goalsRecyclerView;
     private ChallengesAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private Button refreshBtn;
-
     private TextView timerText;
     private CountDownTimer countDownTimer;
     private long timeLeftinMs = 36000000;
-
     //Firebase fields.
     private DatabaseReference userRef;
     private String mCurrentUser = FirebaseAuth.getInstance().getUid();
     private User currentUser;
-
-    public int currentPoints;
-
     private ArrayList<Challenges> challengesList;
-
     //fields for nav view.
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
     private NavigationView mNavView;
-
-    //Final fields
-    private static final int RC_SIGN_IN = 1;
-
     //List of login methods.
     private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
             new AuthUI.IdpConfig.EmailBuilder().build(),

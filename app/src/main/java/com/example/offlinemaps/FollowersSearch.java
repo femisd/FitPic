@@ -30,13 +30,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class FollowersSearch extends AppCompatActivity {
+    //Final fields
+    private static final int RC_SIGN_IN = 1;
     //fields for nav view.
     private DrawerLayout mDrawer;
     private NavigationView mNavView;
-
-    //Final fields
-    private static final int RC_SIGN_IN = 1;
-
     //List of login methods.
     private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
             new AuthUI.IdpConfig.EmailBuilder().build(),
@@ -51,10 +49,10 @@ public class FollowersSearch extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         //Initialisation of fields.
-        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mNavView = (NavigationView) findViewById(R.id.nav_search_friends);
+        mDrawer = findViewById(R.id.drawer_layout);
+        mNavView = findViewById(R.id.nav_search_friends);
         setupDrawerContent(mNavView);
-        Button search = (Button) findViewById(R.id.bt_search);
+        Button search = findViewById(R.id.bt_search);
 
         //Give button click functionality.
         search.setOnClickListener(new View.OnClickListener() {
@@ -70,8 +68,8 @@ public class FollowersSearch extends AppCompatActivity {
      * users written query. e.g. Mi -> Mike, ke > Mike
      */
     public void populateSearchResults() {
-        EditText searchField = (EditText) findViewById(R.id.et_search_user);
-        final ListView displayResults = (ListView) findViewById(R.id.lv_search_results);
+        EditText searchField = findViewById(R.id.et_search_user);
+        final ListView displayResults = findViewById(R.id.lv_search_results);
         final ArrayList<User> userResults = new ArrayList<>();
         final FriendAdapterClass friendsAdapter = new FriendAdapterClass(this, userResults);
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users");

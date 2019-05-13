@@ -10,7 +10,7 @@ import android.widget.RelativeLayout;
  * Class that helps to keep ImageView in a square ratio.
  */
 
-public class SquareLayout extends RelativeLayout  {
+public class SquareLayout extends RelativeLayout {
 
     public SquareLayout(Context context) {
         super(context);

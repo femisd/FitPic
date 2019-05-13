@@ -1,9 +1,6 @@
 package com.example.offlinemaps;
 
 import android.content.Context;
-
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,9 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,6 +81,11 @@ public class GalleryAdapter extends RecyclerView.Adapter {
         return galleryItems.size();
     }
 
+    //Interface for communication of Adapter and MainActivity
+    public interface GalleryAdapterCallBacks {
+        void onItemSelected(int position);
+    }
+
     public class GalleryItemHolder extends RecyclerView.ViewHolder {
         ImageView imageViewThumbnail;
         TextView textViewImageName;
@@ -93,11 +96,6 @@ public class GalleryAdapter extends RecyclerView.Adapter {
             textViewImageName = itemView.findViewById(R.id.textViewImageName);
 
         }
-    }
-
-    //Interface for communication of Adapter and MainActivity
-    public interface GalleryAdapterCallBacks {
-        void onItemSelected(int position);
     }
 
 
