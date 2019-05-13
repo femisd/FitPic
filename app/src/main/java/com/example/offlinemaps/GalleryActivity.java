@@ -1,5 +1,6 @@
 package com.example.offlinemaps;
 
+import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,6 +36,8 @@ public class GalleryActivity extends AppCompatActivity implements GalleryAdapter
 
     private static StorageReference imagesRef = FirebaseStorage.getInstance().getReference().child("Selfies");
 
+    private ProgressDialog mProgress;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +49,11 @@ public class GalleryActivity extends AppCompatActivity implements GalleryAdapter
         mGalleryAdapter = new GalleryAdapter(this);
         //set adapter to RecyclerView
         recyclerViewGallery.setAdapter(mGalleryAdapter);
+
+        // set up the progress dialog
+        mProgress = new ProgressDialog(this);
+        mProgress.setMessage("Fetching images...");
+        mProgress.show();
 
         final User user = (User) getIntent().getExtras().get("user");
 
@@ -69,6 +77,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryAdapter
                             Log.d("GalleryActivity", galleryItems.toString());
                             // add images to gallery recyclerview using adapter
                             mGalleryAdapter.addGalleryItems(galleryItems);
+                            mProgress.dismiss();
                         }
                     });
                 }
