@@ -68,11 +68,7 @@ public class FeedActivity extends AppCompatActivity {
 
         feedRecyclerView = findViewById(R.id.feedRecyclerView);
 
-        layoutManager = new LinearLayoutManager(this);
 
-
-        feedRecyclerView.setLayoutManager(layoutManager);
-        feedRecyclerView.setAdapter(adapter);
         mCurrentUser = FirebaseAuth.getInstance().getUid();
         imagesRef = FirebaseStorage.getInstance().getReference().child("Selfies");
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser);
@@ -80,7 +76,7 @@ public class FeedActivity extends AppCompatActivity {
         followedUsers = new ArrayList<User>();
         feedList = new ArrayList<Feed>();
 
-        adapter = new FeedAdapter(feedList);
+
 
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -94,6 +90,8 @@ public class FeedActivity extends AppCompatActivity {
                         addToList(me.getmFollowedUsers().get(key));
                     }
                     step2();
+                    //populateFeedList();
+                    Log.d("array", feedList.size()+"");
                 }
             }
 
@@ -154,19 +152,14 @@ public class FeedActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(Uri uri) {
                                 String image = uri.toString();
+                                Log.d("FeedActivity", image);
                                 Feed feed = new Feed(followedHashMap.get(userName).getmUsername(), date, location, image);
-                                feedList.add(feed);
-                                Log.d("first", feed.toString() + " AM I EVEN HERE");
-
-                                //Log.d("GalleryActivity", "downloadUri: " + downloadUri);
-                                //GalleryItem galleryItem = new GalleryItem(downloadUri, selfie.getId());
-                                //Log.d("GalleryActivity", "GalleryItem: " + galleryItem.toString());
-                                //galleryItems.add(galleryItem);
-                                //Log.d("GalleryActivity", galleryItems.toString());
-                                // add images to gallery recyclerview using adapter
-                                //mGalleryAdapter.addGalleryItems(galleryItems);
+                                addToList(feed);
+                                step3();
                             }
+
                         });
+
                         //Feed feed = new Feed(followedHashMap.get(userName).getmUsername(), date, location, image[0]);
                         //Log.d("first", feed.toString() + " AM I EVEN HERE");
                         //feedList.add(feed);
@@ -181,9 +174,23 @@ public class FeedActivity extends AppCompatActivity {
             });
 
         }
-        populateFeedList();
+
     }
 
+    public void step3(){
+        Log.d("first", feedList.size() + " AM IGETTING OUT WITH THE MEMBERS");
+
+        /**
+         * Femi lives here
+         */
+        adapter = new FeedAdapter(feedList);
+        layoutManager = new LinearLayoutManager(this);
+
+
+        feedRecyclerView.setLayoutManager(layoutManager);
+        feedRecyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
 
     public FeedActivity getInstance(){
         return this;
@@ -200,6 +207,12 @@ public class FeedActivity extends AppCompatActivity {
         User copy = new User(user);
         followedUsers.add(copy);
         Log.d("first", followedUsers.size()+"");
+    }
+    public static void addToList(Feed feed){
+        Log.d("firstFeed", feed + "");
+        Feed copy = new Feed(feed);
+        feedList.add(copy);
+        Log.d("first", feedList.size()+" feedlistsize");
     }
 
 }
