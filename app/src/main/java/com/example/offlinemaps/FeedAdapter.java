@@ -51,12 +51,12 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
     public void onBindViewHolder(@NonNull FeedViewHolder holder, int position) {
 
         Feed currentFeed = mFeedList.get(position);
-
+/*
         holder.imageView.setImageResource(currentFeed.getImage());
         holder.usernameText.setText(currentFeed.getUsername());
         holder.dateText.setText(currentFeed.getDate());
         holder.locationText.setText(currentFeed.getLocation());
-
+*/
     }
 
     @Override

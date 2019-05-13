@@ -46,4 +46,8 @@ public class Feed {
     public void setImage(String image) {
         this.image = image;
     }
+
+    public String toString(){
+        return this.username + " " + this.location + " " + this.date + " " + this.image;
+    }
 }

@@ -23,6 +23,21 @@ public class User implements Serializable {
     public User() {
     }
 
+    public User(User anotherUser){
+        mProfilePicture = anotherUser.getmProfilePicture();
+        mUsername = anotherUser.getmUsername();
+        mLocation = anotherUser.getmLocation();
+        mSteps = anotherUser.getmSteps();
+        mCaloriesBurned = anotherUser.getmCaloriesBurned();
+        mPhotos = anotherUser.getmPhotos();
+        mFollowers = anotherUser.getmFollowers();
+        mFollowing = anotherUser.getmFollowing();
+        mPoints = anotherUser.getmPoints();
+        mVIP = anotherUser.getmVIP();
+        mUid = anotherUser.getmUid();
+        mFollowedUsers = anotherUser.getmFollowedUsers();
+    }
+
     //Constructor used for creating a User.
     public User(String profilePicture, String uid, String username, String location, int steps, double caloriesBurned,
                 int photos, int followers, int following, int points, boolean vip, HashMap<String, User> followedUsers) {
