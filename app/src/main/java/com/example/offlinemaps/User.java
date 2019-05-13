@@ -148,7 +148,8 @@ public class User implements Serializable {
     @Override
     public String toString() {
         return "User{" +
-                "mUsername='" + mUsername + '\'' +
+                "mUid='" + mUid + '\'' +
+                ", mUsername='" + mUsername + '\'' +
                 ", mProfilePicture='" + mProfilePicture + '\'' +
                 ", mLocation='" + mLocation + '\'' +
                 ", mFollowers=" + mFollowers +

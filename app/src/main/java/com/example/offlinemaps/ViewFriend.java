@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -103,6 +104,17 @@ public class ViewFriend extends AppCompatActivity {
         //Photos
         TextView photos = (TextView) findViewById(R.id.tv_view_friends_photos);
         photos.setText(user.getmPhotos() + "");
+
+        //Photos box/button thingy
+        LinearLayout photoBox = findViewById(R.id.photosBoxFriend);
+        photoBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ViewFriend.this, GalleryActivity.class);
+                intent.putExtra("user", user);
+                startActivity(intent);
+            }
+        });
 
         //Followers
         final TextView followers = (TextView) findViewById(R.id.tv_view_friends_followers);
