@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.example.offlinemaps.SquareLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!--Thumbnail of gallery item-->
+    <ImageView
+        android:id="@+id/imageViewThumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop" />
+    <!--Textview for image name-->
+    <TextView
+        android:id="@+id/textViewImageName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/imageViewThumbnail"
+        android:background="#89000000"
+        android:ellipsize="end"
+        android:lines="1"
+        android:padding="4dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+
+</com.example.offlinemaps.SquareLayout>

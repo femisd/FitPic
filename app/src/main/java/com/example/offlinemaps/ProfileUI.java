@@ -246,7 +246,8 @@ public class ProfileUI extends AppCompatActivity {
                                 photoBox.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        Toast.makeText(ProfileUI.this, "testing", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(ProfileUI.this, GalleryActivity.class);
+                                        startActivity(intent);
                                     }
                                 });
 
