@@ -2,14 +2,11 @@ package com.example.offlinemaps;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ListView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -18,19 +15,15 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class UpdateUsername extends AppCompatActivity {
-
-    private DatabaseReference userRef;
+public class ShopActivity extends AppCompatActivity {
 
     //fields for nav view.
     private DrawerLayout mDrawer;
-    private Toolbar toolbar;
     private NavigationView mNavView;
 
     //Final fields
@@ -45,32 +38,31 @@ public class UpdateUsername extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_update_username);
-        toolbar = findViewById(R.id.toolbar);
+        setContentView(R.layout.content_shop);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
-        //Get reference to database.
-        String currentUser = FirebaseAuth.getInstance().getUid();
-        userRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUser).child("mUsername");
-
-        //Initialise fields.
-        final EditText username = (EditText) findViewById(R.id.et_update_username);
-        Button update = (Button) findViewById(R.id.bt_update);
-
-        //Update username on button click.
-        update.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent profile = new Intent(UpdateUsername.this, ProfileUI.class);
-                startActivity(profile);
-                userRef.setValue(username.getText().toString());
-                finish();
-            }
-        });
-
+        //Initialisation of fields.
         mDrawer = findViewById(R.id.drawer_layout);
-        mNavView = findViewById(R.id.nav_update);
+        mNavView = findViewById(R.id.nav_shop);
         setupDrawerContent(mNavView);
+
+        //Initialise ListView.
+        final ListView shopItems = findViewById(R.id.lv_shop_items);
+        final ArrayList<ShopItem> itemList = new ArrayList<>();
+        final ShopActivtyAdapter shopAdapter = new ShopActivtyAdapter(this, itemList);
+
+        //Shop items.
+        ShopItem VIPMembership = new ShopItem("VIP Membership", 100);
+
+        //Set up adapter.
+        shopAdapter.add(VIPMembership);
+        shopAdapter.notifyDataSetChanged();
+
+        shopItems.setAdapter(shopAdapter);
     }
 
     /**
@@ -97,7 +89,7 @@ public class UpdateUsername extends AppCompatActivity {
         switch (menuItem.getItemId()) {
             case R.id.nav_leaderboard:
                 //Go to leader board activity.
-                Intent leaderboard = new Intent(UpdateUsername.this, Leaderboard.class);
+                Intent leaderboard = new Intent(ShopActivity.this, Leaderboard.class);
                 startActivity(leaderboard);
                 finish();
                 break;
@@ -106,6 +98,7 @@ public class UpdateUsername extends AppCompatActivity {
                 FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
                 firebaseAuth.signOut();
                 finish();
+                //user is signed out.
                 startActivityForResult(
                         AuthUI.getInstance()
                                 .createSignInIntentBuilder()
@@ -114,14 +107,21 @@ public class UpdateUsername extends AppCompatActivity {
                                 .build(),
                         RC_SIGN_IN);
                 break;
-            case R.id.nav_profile:
-                Intent profile = new Intent(UpdateUsername.this, ProfileUI.class);
-                startActivity(profile);
+            case R.id.nav_friends:
+                Intent friends = new Intent(ShopActivity.this, FriendsUI.class);
+                startActivity(friends);
                 finish();
                 break;
+
             case R.id.nav_shop:
-                Intent shop = new Intent(UpdateUsername.this, ShopActivity.class);
+                Intent shop = new Intent(ShopActivity.this, ShopActivity.class);
                 startActivity(shop);
+                finish();
+                break;
+
+            case R.id.nav_profile:
+                Intent profile = new Intent(ShopActivity.this, ProfileUI.class);
+                startActivity(profile);
                 finish();
                 break;
         }
@@ -130,8 +130,8 @@ public class UpdateUsername extends AppCompatActivity {
     }
 
     /**
-     * Open the drawer when the nav icon is clicked.
-     * Start search activity.
+     * Open the drawers when the nav button is clicked.
+     * Start the search activity.
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -139,23 +139,7 @@ public class UpdateUsername extends AppCompatActivity {
             case android.R.id.home:
                 mDrawer.openDrawer(GravityCompat.START);
                 return true;
-            case R.id.search:
-                Intent search = new Intent(UpdateUsername.this, FollowersSearch.class);
-                startActivity(search);
         }
         return super.onOptionsItemSelected(item);
     }
-
-    /**
-     * Inflate the menu for search icon.
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu, menu);
-
-        return true;
-
-    }
-
 }

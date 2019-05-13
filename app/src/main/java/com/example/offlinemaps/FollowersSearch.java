@@ -16,6 +16,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -25,11 +26,22 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class FollowersSearch extends AppCompatActivity {
     //fields for nav view.
     private DrawerLayout mDrawer;
     private NavigationView mNavView;
+
+    //Final fields
+    private static final int RC_SIGN_IN = 1;
+
+    //List of login methods.
+    private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
+            new AuthUI.IdpConfig.EmailBuilder().build(),
+            new AuthUI.IdpConfig.GoogleBuilder().build()
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,12 +148,23 @@ public class FollowersSearch extends AppCompatActivity {
                 FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
                 firebaseAuth.signOut();
                 finish();
+                startActivityForResult(
+                        AuthUI.getInstance()
+                                .createSignInIntentBuilder()
+                                .setIsSmartLockEnabled(false)
+                                .setAvailableProviders(mProviders)
+                                .build(),
+                        RC_SIGN_IN);
                 break;
             case R.id.nav_profile:
                 Intent profile = new Intent(FollowersSearch.this, ProfileUI.class);
                 startActivity(profile);
                 finish();
                 break;
+            case R.id.nav_shop:
+                Intent shop = new Intent(FollowersSearch.this, ShopActivity.class);
+                startActivity(shop);
+                finish();
         }
         menuItem.setChecked(true);
         mDrawer.closeDrawers();

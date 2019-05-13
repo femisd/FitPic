@@ -34,6 +34,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -66,6 +67,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -73,11 +75,20 @@ import java.util.List;
 public class StepCounterActivity extends AppCompatActivity implements SensorEventListener, OnMapReadyCallback,
         GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerClickListener {
 
+    //Final fields
+    private static final int RC_SIGN_IN = 1;
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     private static final String TAG = "MapActivity";
     private static final float DEFAULT_ZOOM = 15f;
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(-40, -168), new LatLng(71, 136));
     private static final int CAMERA_REQUEST_CODE = 1;
+
+    //List of login methods.
+    private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
+            new AuthUI.IdpConfig.EmailBuilder().build(),
+            new AuthUI.IdpConfig.GoogleBuilder().build()
+    );
+
     SupportMapFragment mapFrag;
     LocationRequest mLocationRequest;
     Location mLastLocation;
@@ -411,6 +422,14 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 //Go to main activity.
                 firebaseAuth = FirebaseAuth.getInstance();
                 firebaseAuth.signOut();
+                finish();
+                startActivityForResult(
+                        AuthUI.getInstance()
+                                .createSignInIntentBuilder()
+                                .setIsSmartLockEnabled(false)
+                                .setAvailableProviders(mProviders)
+                                .build(),
+                        RC_SIGN_IN);
                 break;
             case R.id.nav_friends:
                 Intent friends = new Intent(StepCounterActivity.this, FriendsUI.class);
@@ -420,6 +439,11 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
             case R.id.nav_profile:
                 Intent profile = new Intent(StepCounterActivity.this, ProfileUI.class);
                 startActivity(profile);
+                finish();
+                break;
+            case R.id.nav_shop:
+                Intent shop = new Intent(StepCounterActivity.this, ShopActivity.class);
+                startActivity(shop);
                 finish();
                 break;
         }
