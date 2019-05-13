@@ -13,8 +13,10 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -31,6 +33,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -62,10 +65,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -81,7 +87,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     private static final String TAG = "MapActivity";
     private static final float DEFAULT_ZOOM = 15f;
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(-40, -168), new LatLng(71, 136));
-    private static final int CAMERA_REQUEST_CODE = 1;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_TAKE_PHOTO = 1;
 
     //List of login methods.
     private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
@@ -126,6 +133,9 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
 
     private DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(FirebaseAuth.getInstance().getUid());
+
+    private String currentPhotoPath;
+
     /**
      * CalcDist between two pars of lat-lon
      */
@@ -139,13 +149,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         if(!isModified) {
             this.isModified = true;
             moveCamera(ln,15f);
-
-
-
         }
-
-
-
 
     }
 
@@ -204,10 +208,6 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 if (mCurrLocationMarker != null) {
                     mCurrLocationMarker.remove();
                 }
-
-
-
-
 
 
                 //Place current location marker
@@ -320,11 +320,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         selfieBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-                startActivityForResult(intent, CAMERA_REQUEST_CODE);
-
+                dispatchTakePictureIntent();
             }
         });
 
@@ -729,69 +725,106 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK) {
-            //set the progress dialog
-            mProgress.setMessage("Uploding image...");
-            mProgress.show();
-
-            //get the camera image
-            Bundle extras = data.getExtras();
-            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            byte[] databaos = baos.toByteArray();
-
-            //set the image into imageview
-            //mImageView.setImageBitmap(bitmap);
-            //String img = "fire"
-
-            //Firebase storage folder where you want to put the images
-            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-
-            //name of the image file (add time to have different files to avoid rewrite on the same file)
-            String photoName = String.valueOf(new Date().getTime());
-
-            //send this photo under the specified name to database
-            StorageReference imagesRef = storageRef.child("Selfies").child(FirebaseAuth.getInstance().getUid()).child(photoName);
-
-            Selfie selfie = new Selfie(photoName, currentLatLng.latitude, currentLatLng.longitude);
-
-            // Add photo information to realtime database
-            userRef.child("Selfies").push().setValue(selfie);
-
-            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    User user = dataSnapshot.getValue(User.class);
-                    // Increment user photo count
-                    int photoCount = user.getmPhotos()+1;
-                    userRef.child("mPhotos").setValue(photoCount);
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-
-            //upload image
-            UploadTask uploadTask = imagesRef.putBytes(databaos);
-            uploadTask.addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    Toast.makeText(StepCounterActivity.this, "Upload failed", Toast.LENGTH_SHORT).show();
-                }
-            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    //productDownloadUrl = taskSnapshot.getDownloadUrl().toString();
-                    mProgress.dismiss();
-                    Toast.makeText(StepCounterActivity.this, "Image uploaded successfully", Toast.LENGTH_SHORT).show();
-                }
-
-            });
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            galleryAddPic();
         }
     }
 
+    private File createImageFile() throws IOException {
+        // Name of the image file (add time to have different files to avoid rewrite on the same file)
+        String imageFileName = String.valueOf(new Date().getTime());
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName, /* prefix */
+                ".jpg", /* suffix */
+                storageDir /* directory */
+        );
 
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File...
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
+    }
+
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(currentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
+
+        //set the progress dialog
+        mProgress.setMessage("Uploding image...");
+        mProgress.show();
+
+        String photoName = f.getName();
+
+        //Firebase storage folder where you want to put the images
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("Selfies").child(FirebaseAuth.getInstance().getUid()).child(photoName);
+
+        Selfie selfie = new Selfie(photoName, currentLatLng.latitude, currentLatLng.longitude);
+
+        // Add photo information to realtime database
+        userRef.child("Selfies").push().setValue(selfie);
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                // Increment user photo count
+                int photoCount = user.getmPhotos()+1;
+                userRef.child("mPhotos").setValue(photoCount);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        storageRef.putFile(contentUri)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        mProgress.dismiss();
+                        Toast.makeText(StepCounterActivity.this, "Image uploaded", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        mProgress.dismiss();
+                        Toast.makeText(StepCounterActivity.this, "Upload failed", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                        double progress = (100.0*taskSnapshot.getBytesTransferred()/taskSnapshot
+                                .getTotalByteCount());
+                        mProgress.setMessage("Uploaded " + (int)progress + "%");
+                    }
+                });
+
+    }
 }
