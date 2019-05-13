@@ -159,6 +159,11 @@ public class GoalsActivity extends AppCompatActivity {
                 startActivity(profile);
                 finish();
                 break;
+            case R.id.nav_shop:
+                Intent shop = new Intent(GoalsActivity.this, ShopActivity.class);
+                startActivity(shop);
+                finish();
+                break;
         }
         menuItem.setChecked(true);
         mDrawer.closeDrawers();

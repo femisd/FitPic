@@ -418,6 +418,11 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 startActivity(profile);
                 finish();
                 break;
+            case R.id.nav_shop:
+                Intent shop = new Intent(StepCounterActivity.this, ShopActivity.class);
+                startActivity(shop);
+                finish();
+                break;
         }
         menuItem.setChecked(true);
         mDrawer.closeDrawers();

@@ -166,6 +166,11 @@ public class ProfileUI extends AppCompatActivity {
                 startActivity(friends);
                 finish();
                 break;
+            case R.id.nav_shop:
+                Intent shop = new Intent(ProfileUI.this, ShopActivity.class);
+                startActivity(shop);
+                finish();
+                break;
         }
         menuItem.setChecked(true);
         mDrawer.closeDrawers();

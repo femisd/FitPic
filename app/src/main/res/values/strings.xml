@@ -28,5 +28,9 @@
     <string name="search_hint">Type a friends username</string>
     <string name="title_activity_friend_search">FriendSearch</string>
     <string name="search">search</string>
+    <string name="title_activity_shop">ShopActivity</string>
+    <string name="vip_membership">VIP membership</string>
+    <string name="claim">Claim</string>
+    <string name="shop">Shop</string>
 
 </resources>

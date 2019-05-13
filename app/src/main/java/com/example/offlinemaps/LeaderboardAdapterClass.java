@@ -71,6 +71,7 @@ public class LeaderboardAdapterClass extends ArrayAdapter {
         TextView name = (TextView) listItem.findViewById(R.id.tv_username);
         if (!currentUser.getmUid().equals(FirebaseAuth.getInstance().getUid())) {
             name.setText(currentUser.getmUsername());
+            listItem.setBackgroundColor(Color.WHITE);
         } else {
             name.setText("You");
             listItem.setBackgroundColor(Color.GREEN);

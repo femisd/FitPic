@@ -9,6 +9,9 @@
             android:id="@+id/nav_profile"
             android:title="@string/profile" />
         <item
+            android:id="@+id/nav_shop"
+            android:title="@string/shop" />
+        <item
             android:id="@+id/nav_friends"
             android:title="@string/friends" />
         <item
