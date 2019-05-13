@@ -139,23 +139,34 @@ public class FeedActivity extends AppCompatActivity {
                         String username = "bee";
                         Geocoder meeee = new Geocoder(getInstance(), Locale.UK);
                         ///String username = followedUsers.get(i).getmUsername();
-                        String date;
 
-                        final String[] image = new String[1];
+
                         final Selfie selfie = snapshot.getValue(Selfie.class);
-                        String location = null;
+
+                        final String location;
+                        String tempLocation = null;
                         try {
-                            location = meeee.getFromLocation(selfie.getLatitude(), selfie.getLongitude(), 1).get(0).toString();
+                            tempLocation = meeee.getFromLocation(selfie.getLatitude(), selfie.getLongitude(), 1).get(0).toString();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        date = new Date(Long.parseLong(selfie.getId())).toString();
+                        if(tempLocation != null){
+                            location = tempLocation;
+                        }else{
+                            location = null;
+                        }
+
+                        final String date = new Date(Long.parseLong(selfie.getId())).toString();
 
                         Log.d("first", "Selfie object:" + selfie.toString());
-                        imagesRef.child(username).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        imagesRef.child(userName).child(selfie.getId()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
-                                image[0] = uri.toString();
+                                String image = uri.toString();
+                                Feed feed = new Feed(followedHashMap.get(userName).getmUsername(), date, location, image);
+                                feedList.add(feed);
+                                Log.d("first", feed.toString() + " AM I EVEN HERE");
+
                                 //Log.d("GalleryActivity", "downloadUri: " + downloadUri);
                                 //GalleryItem galleryItem = new GalleryItem(downloadUri, selfie.getId());
                                 //Log.d("GalleryActivity", "GalleryItem: " + galleryItem.toString());
@@ -165,9 +176,9 @@ public class FeedActivity extends AppCompatActivity {
                                 //mGalleryAdapter.addGalleryItems(galleryItems);
                             }
                         });
-                        Feed feed = new Feed(followedHashMap.get(userName).getmUsername(), date, location, image[0]);
-                        Log.d("first", feed.toString() + " AM I EVEN HERE");
-                        feedList.add(feed);
+                        //Feed feed = new Feed(followedHashMap.get(userName).getmUsername(), date, location, image[0]);
+                        //Log.d("first", feed.toString() + " AM I EVEN HERE");
+                        //feedList.add(feed);
                     }
                     //mGalleryAdapter.notifyDataSetChanged();
                 }

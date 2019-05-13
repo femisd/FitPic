@@ -15,6 +15,7 @@ public class Feed {
         this.image = image;
     }
 
+
     public String getUsername() {
         return username;
     }
