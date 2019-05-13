@@ -81,6 +81,11 @@ public class GalleryAdapter extends RecyclerView.Adapter {
         return galleryItems.size();
     }
 
+    //Interface for communication of Adapter and MainActivity
+    public interface GalleryAdapterCallBacks {
+        void onItemSelected(int position);
+    }
+
     public class GalleryItemHolder extends RecyclerView.ViewHolder {
         ImageView imageViewThumbnail;
         TextView textViewImageName;
@@ -91,11 +96,6 @@ public class GalleryAdapter extends RecyclerView.Adapter {
             textViewImageName = itemView.findViewById(R.id.textViewImageName);
 
         }
-    }
-
-    //Interface for communication of Adapter and MainActivity
-    public interface GalleryAdapterCallBacks {
-        void onItemSelected(int position);
     }
 
 

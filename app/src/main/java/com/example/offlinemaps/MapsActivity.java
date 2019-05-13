@@ -40,34 +40,61 @@ import java.util.List;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private GoogleMap mMap;
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+    private static final String TAG = "MapActivity";
+    private static final float DEFAULT_ZOOM = 15f;
+    private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(-40, -168), new LatLng(71, 136));
     SupportMapFragment mapFrag;
     LocationRequest mLocationRequest;
     Location mLastLocation;
-    Marker mCurrLocationMarker;
-    FusedLocationProviderClient mFusedLocationClient;
-    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
     // private LocationCallback;
-
-    private Button locationstart;
+    Marker mCurrLocationMarker;
 
     //widgets
-
-    private static final String TAG = "MapActivity";
-
-    private static final float DEFAULT_ZOOM = 15f;
-
+    FusedLocationProviderClient mFusedLocationClient;
+    private GoogleMap mMap;
+    private Button locationstart;
     private PlaceAutocompleteAdapter mPlaceAutocompleteAdapater;
-
     private GoogleApiClient mGoogleApiClient;
 
-    private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(-40, -168), new LatLng(71, 136));
-
     //Curren Location
-
     private Location currentLocation;
     private LatLng currentLatLng;
+    /**
+     * CalcDist between two pars of lat-lon
+     */
+
+
+    LocationCallback mLocationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+
+            List<Location> locationList = locationResult.getLocations();
+            if (locationList.size() > 0) {
+                //The last location in the list is the newest
+                currentLocation = locationList.get(locationList.size() - 1);
+                currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                Log.i("MapsActivity", "Current Location: " + currentLocation.getLatitude() + " " + currentLocation.getLongitude());
+                //Toast.makeText(MapsActivity.this, ""+currentLocation.getLatitude()+" " + currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                mLastLocation = currentLocation;
+                if (mCurrLocationMarker != null) {
+                    mCurrLocationMarker.remove();
+                }
+
+                //Place current location marker
+                LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(latLng);
+                markerOptions.title("Current Position");
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+                mCurrLocationMarker = mMap.addMarker(markerOptions);
+
+                //move map camera
+                //  mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 20));
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +109,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFrag.getMapAsync(this);
         init();
     }
-
 
     /**
      * Manipulates the map once available.
@@ -151,7 +177,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
@@ -169,7 +194,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     }
-
 
     public double toRadians(double deg) {
         return deg * Math.PI / 180;
@@ -194,7 +218,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return dist;
     }
 
-
     private void moveCamera(LatLng latLng, float zoom, String title) {
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
@@ -204,42 +227,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .title(title);
         mMap.addMarker(options);
     }
-
-    /**
-     * CalcDist between two pars of lat-lon
-     */
-
-
-    LocationCallback mLocationCallback = new LocationCallback() {
-        @Override
-        public void onLocationResult(LocationResult locationResult) {
-
-            List<Location> locationList = locationResult.getLocations();
-            if (locationList.size() > 0) {
-                //The last location in the list is the newest
-                currentLocation = locationList.get(locationList.size() - 1);
-                currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-                Log.i("MapsActivity", "Current Location: " + currentLocation.getLatitude() + " " + currentLocation.getLongitude());
-                //Toast.makeText(MapsActivity.this, ""+currentLocation.getLatitude()+" " + currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
-                mLastLocation = currentLocation;
-                if (mCurrLocationMarker != null) {
-                    mCurrLocationMarker.remove();
-                }
-
-                //Place current location marker
-                LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(latLng);
-                markerOptions.title("Current Position");
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-                mCurrLocationMarker = mMap.addMarker(markerOptions);
-
-                //move map camera
-                //  mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 20));
-            }
-        }
-    };
-
 
     private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -279,7 +266,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_LOCATION: {
                 // If request is cancelled, the result arrays are empty.

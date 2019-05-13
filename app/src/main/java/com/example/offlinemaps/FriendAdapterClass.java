@@ -29,6 +29,7 @@ public class FriendAdapterClass extends ArrayAdapter {
 
     /**
      * Get the friends list view.
+     *
      * @param position = position in the ListView.
      * @return listItem.
      */
@@ -45,21 +46,21 @@ public class FriendAdapterClass extends ArrayAdapter {
         if (currentUser != null) {
             Log.d("FriendAdapter", currentUser.toString());
             if (currentUser.getmVIP()) {
-                ImageView vip = (ImageView) listItem.findViewById(R.id.iv_vip);
+                ImageView vip = listItem.findViewById(R.id.iv_vip);
                 vip.setImageResource(R.drawable.vip_ticket);
             }
 
-            ImageView image = (ImageView) listItem.findViewById(R.id.iv_profile_pic);
+            ImageView image = listItem.findViewById(R.id.iv_profile_pic);
             if (!currentUser.getmProfilePicture().isEmpty()) {
                 Picasso.get().load(currentUser.getmProfilePicture()).placeholder(R.drawable.ic_user_placeholder).into(image);
             } else {
                 Picasso.get().load(R.drawable.ic_user_placeholder).placeholder(R.drawable.ic_user_placeholder).into(image);
             }
 
-            TextView name = (TextView) listItem.findViewById(R.id.tv_username);
+            TextView name = listItem.findViewById(R.id.tv_username);
             name.setText(currentUser.getmUsername());
 
-            TextView release = (TextView) listItem.findViewById(R.id.tv_location);
+            TextView release = listItem.findViewById(R.id.tv_location);
             release.setText(currentUser.getmLocation());
         }
         return listItem;

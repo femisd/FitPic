@@ -21,18 +21,18 @@ public class NotificationService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
 
-        generateNotification(remoteMessage.getNotification().getBody(),remoteMessage.getNotification().getTitle());
+        generateNotification(remoteMessage.getNotification().getBody(), remoteMessage.getNotification().getTitle());
 
 
     }
 
 
-    private void generateNotification(String body, String title){
+    private void generateNotification(String body, String title) {
 
         Intent intent = new Intent(this, StepCounterActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,intent,PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
 
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -47,14 +47,13 @@ public class NotificationService extends FirebaseMessagingService {
                 .setSound(soundUri)
                 .setContentIntent(pendingIntent);
 
-        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        if(NOTIFICATION_ID >  1073741824){
-             NOTIFICATION_ID = 0;
+        if (NOTIFICATION_ID > 1073741824) {
+            NOTIFICATION_ID = 0;
         }
 
         notificationManager.notify(NOTIFICATION_ID++, notificationBuilder.build());
-
 
 
     }

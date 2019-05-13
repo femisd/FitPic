@@ -34,6 +34,7 @@ class ShopActivtyAdapter extends ArrayAdapter {
 
     /**
      * Get the friends list view.
+     *
      * @param position = position in the ListView.
      * @return listItem.
      */

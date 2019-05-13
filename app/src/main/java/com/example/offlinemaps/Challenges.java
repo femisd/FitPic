@@ -2,7 +2,7 @@ package com.example.offlinemaps;
 
 public class Challenges {
 
-    private  int progress;
+    private int progress;
     private String challengeName;
     private int challengeLimit;
     private String challengeFormat;

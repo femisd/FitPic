@@ -28,12 +28,4 @@ public class ShopItem {
     public void setItemCost(int itemCost) {
         this.itemCost = itemCost;
     }
-
-    @Override
-    public String toString() {
-        return "ShopItem{" +
-                "itemName='" + itemName + '\'' +
-                ", itemCost=" + itemCost +
-                '}';
-    }
 }

@@ -7,14 +7,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -31,6 +32,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -62,10 +64,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -75,25 +79,30 @@ import java.util.List;
 public class StepCounterActivity extends AppCompatActivity implements SensorEventListener, OnMapReadyCallback,
         GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerClickListener {
 
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     //Final fields
     private static final int RC_SIGN_IN = 1;
-    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     private static final String TAG = "MapActivity";
     private static final float DEFAULT_ZOOM = 15f;
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(-40, -168), new LatLng(71, 136));
-    private static final int CAMERA_REQUEST_CODE = 1;
-
-    //List of login methods.
-    private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
-            new AuthUI.IdpConfig.EmailBuilder().build(),
-            new AuthUI.IdpConfig.GoogleBuilder().build()
-    );
-
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_TAKE_PHOTO = 1;
     SupportMapFragment mapFrag;
     LocationRequest mLocationRequest;
     Location mLastLocation;
     Marker mCurrLocationMarker;
     FusedLocationProviderClient mFusedLocationClient;
+    ArrayList<NameCoords> nearbyMarkers;
+    /**
+     * CalcDist between two pars of lat-lon
+     */
+
+    boolean isModified = false;
+    //List of login methods.
+    private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
+            new AuthUI.IdpConfig.EmailBuilder().build(),
+            new AuthUI.IdpConfig.GoogleBuilder().build()
+    );
     private TextView counterView;
     private int steps = 0;
     private Button goalsBtn;
@@ -106,12 +115,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     private DrawerLayout mDrawer;
     private int poorManGeofence = 50;//meteres pls
     private boolean inAGeofence;
-
-    ArrayList<NameCoords> nearbyMarkers;
-
     // private LocationCallback;
     private Toolbar toolbar;
-
     //widgets
     private NavigationView mNavView;
     private ImageButton selfieBtn;
@@ -119,66 +124,9 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     private Button locationstart;
     private PlaceAutocompleteAdapter mPlaceAutocompleteAdapater;
     private GoogleApiClient mGoogleApiClient;
-
     //Current Location
     private Location currentLocation;
     private LatLng currentLatLng;
-
-
-    private DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(FirebaseAuth.getInstance().getUid());
-    /**
-     * CalcDist between two pars of lat-lon
-     */
-
-    boolean isModified = false;
-
-
-    //method which move camera to our current location when the map is initially loaded or from returning from another activity
-    public void loc(LatLng ln){
-
-        if(!isModified) {
-            this.isModified = true;
-            moveCamera(ln,15f);
-
-
-
-        }
-
-
-
-
-    }
-
-    public void updateMarkers(ArrayList<NameCoords> locations){
-        for(int i = 0; i < locations.size(); i++){
-            NameCoords locationToCheck = locations.get(i);
-            locationToCheck.updateDist(currentLatLng);
-            mMap.addMarker(new MarkerOptions()
-                    .position(locationToCheck.getCoords())
-                    .title(locations.get(i).getName())
-                    .snippet(locationToCheck.getDist()+"m")
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
-
-            if (locationToCheck.amIInIt()){
-                selfieBtn.setVisibility(View.VISIBLE);
-                //Toast.makeText(this, "NI-", Toast.LENGTH_SHORT).show();
-            }else if(!amIInAny(locations)){
-                selfieBtn.setVisibility(View.GONE);
-                //Toast.makeText(this, "Bye.", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    private boolean amIInAny(ArrayList<NameCoords> locations){
-        boolean output = false;
-        for(int i = 0; i < locations.size(); i++){
-            if(locations.get(i).amIInIt()) {
-                output = true;
-            }
-        }
-        return output;
-    }
-
     LocationCallback mLocationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
@@ -191,9 +139,6 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
             loc(currentLatLng);
 
 
-
-
-
             if (locationList.size() > 0) {
                 //The last location in the list is the newest
                 currentLocation = locationList.get(locationList.size() - 1);
@@ -204,10 +149,6 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 if (mCurrLocationMarker != null) {
                     mCurrLocationMarker.remove();
                 }
-
-
-
-
 
 
                 //Place current location marker
@@ -225,6 +166,9 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
             }
         }
     };
+    private DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(FirebaseAuth.getInstance().getUid());
+    private String currentPhotoPath;
+    private String photoName;
     private TextView locationText;
     private StorageReference mStorage;
     private ProgressDialog mProgress;
@@ -232,6 +176,69 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     private Marker myMarker1;
     private Marker myMarker2;
     private Marker myMarker3;
+
+    public static double toRadians(double deg) {
+        return deg * Math.PI / 180;
+    }
+
+    public static double calcDist(LatLng latLng1, LatLng latLng2) {
+
+        double lat1 = latLng1.latitude;
+        double lon1 = latLng1.longitude;
+        double lat2 = latLng2.latitude;
+        double lon2 = latLng2.longitude;
+        double dist = 0;
+        double lat1R = toRadians(lat1);
+        double lon1R = toRadians(lon1);
+        double lat2R = toRadians(lat2);
+        double lon2R = toRadians(lon2);
+
+        double a = Math.pow(Math.sin((lat2R - lat1R) / 2), 2) + Math.cos(lat1R) * Math.cos(lat2R) * Math.pow(Math.sin((lon2R - lon1R) / 2), 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double R = 6371.0;
+        dist = R * c;
+        return dist;
+    }
+
+    //method which move camera to our current location when the map is initially loaded or from returning from another activity
+    public void loc(LatLng ln) {
+
+        if (!isModified) {
+            this.isModified = true;
+            moveCamera(ln, 15f);
+        }
+
+    }
+
+    public void updateMarkers(ArrayList<NameCoords> locations) {
+        for (int i = 0; i < locations.size(); i++) {
+            NameCoords locationToCheck = locations.get(i);
+            locationToCheck.updateDist(currentLatLng);
+            mMap.addMarker(new MarkerOptions()
+                    .position(locationToCheck.getCoords())
+                    .title(locations.get(i).getName())
+                    .snippet(locationToCheck.getDist() + "m")
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
+
+            if (locationToCheck.amIInIt()) {
+                selfieBtn.setVisibility(View.VISIBLE);
+                //Toast.makeText(this, "NI-", Toast.LENGTH_SHORT).show();
+            } else if (!amIInAny(locations)) {
+                selfieBtn.setVisibility(View.GONE);
+                //Toast.makeText(this, "Bye.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private boolean amIInAny(ArrayList<NameCoords> locations) {
+        boolean output = false;
+        for (int i = 0; i < locations.size(); i++) {
+            if (locations.get(i).amIInIt()) {
+                output = true;
+            }
+        }
+        return output;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -271,8 +278,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
             }
         });
 
-        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mNavView = (NavigationView) findViewById(R.id.nv_nav);
+        mDrawer = findViewById(R.id.drawer_layout);
+        mNavView = findViewById(R.id.nv_nav);
         setupDrawerContent(mNavView);
 
 
@@ -286,8 +293,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                     //    Toast.makeText(StepCounterActivity.this, "CLick", Toast.LENGTH_SHORT).show();
 
 
-
-                }else if (tracking) {
+                } else if (tracking) {
                     tracking = false;
                     goalsBtn.setEnabled(true);
                     userRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -320,11 +326,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         selfieBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-                startActivityForResult(intent, CAMERA_REQUEST_CODE);
-
+                dispatchTakePictureIntent();
             }
         });
 
@@ -441,6 +443,11 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
                 startActivity(profile);
                 finish();
                 break;
+            case R.id.nav_feed:
+                Intent feed = new Intent(StepCounterActivity.this, FeedActivity.class);
+                startActivity(feed);
+                finish();
+                break;
             case R.id.nav_shop:
                 Intent shop = new Intent(StepCounterActivity.this, ShopActivity.class);
                 startActivity(shop);
@@ -465,9 +472,6 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-
-
-
 
 
         mLocationRequest = new LocationRequest();
@@ -522,7 +526,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         nearbyMarkers.add(new NameCoords("Student Union", new LatLng(51.242007, -0.586198)));
         nearbyMarkers.add(new NameCoords("School Of Arts", new LatLng(51.243012, -0.595327)));
         nearbyMarkers.add(new NameCoords("Stoke Park", new LatLng(51.245387, -0.564457)));
-        nearbyMarkers.add(new NameCoords("Guildford Cathedral", new LatLng(51.241072,  -0.590174)));
+        nearbyMarkers.add(new NameCoords("Guildford Cathedral", new LatLng(51.241072, -0.590174)));
         nearbyMarkers.add(new NameCoords("AirHop Guildford", new LatLng(51.245076, -0.585014)));
         nearbyMarkers.add(new NameCoords("Guildford Cricket Club", new LatLng(51.243091, -0.577289)));
         nearbyMarkers.add(new NameCoords("The Gym Guildford", new LatLng(51.247731, -0.583185)));
@@ -533,7 +537,6 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         nearbyMarkers.add(new NameCoords("Stag Statue", new LatLng(51.242417, -0.595196)));
         nearbyMarkers.add(new NameCoords("Surrey Sports Park", new LatLng(51.236102, -0.607332)));
     }
-
 
     @Override
     public boolean onMarkerClick(Marker marker) {
@@ -626,29 +629,6 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
     }
 
-    public static double toRadians(double deg) {
-        return deg * Math.PI / 180;
-    }
-
-    public static double calcDist(LatLng latLng1, LatLng latLng2) {
-
-        double lat1 = latLng1.latitude;
-        double lon1 = latLng1.longitude;
-        double lat2 = latLng2.latitude;
-        double lon2 = latLng2.longitude;
-        double dist = 0;
-        double lat1R = toRadians(lat1);
-        double lon1R = toRadians(lon1);
-        double lat2R = toRadians(lat2);
-        double lon2R = toRadians(lon2);
-
-        double a = Math.pow(Math.sin((lat2R - lat1R) / 2), 2) + Math.cos(lat1R) * Math.cos(lat2R) * Math.pow(Math.sin((lon2R - lon1R) / 2), 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double R = 6371.0;
-        dist = R * c;
-        return dist;
-    }
-
     private void moveCamera(LatLng latLng, float zoom) {
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
@@ -694,7 +674,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
@@ -729,69 +709,104 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK) {
-            //set the progress dialog
-            mProgress.setMessage("Uploding image...");
-            mProgress.show();
-
-            //get the camera image
-            Bundle extras = data.getExtras();
-            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            byte[] databaos = baos.toByteArray();
-
-            //set the image into imageview
-            //mImageView.setImageBitmap(bitmap);
-            //String img = "fire"
-
-            //Firebase storage folder where you want to put the images
-            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-
-            //name of the image file (add time to have different files to avoid rewrite on the same file)
-            String photoName = String.valueOf(new Date().getTime());
-
-            //send this photo under the specified name to database
-            StorageReference imagesRef = storageRef.child("Selfies").child(FirebaseAuth.getInstance().getUid()).child(photoName);
-
-            Selfie selfie = new Selfie(photoName, currentLatLng.latitude, currentLatLng.longitude);
-
-            // Add photo information to realtime database
-            userRef.child("Selfies").push().setValue(selfie);
-
-            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    User user = dataSnapshot.getValue(User.class);
-                    // Increment user photo count
-                    int photoCount = user.getmPhotos()+1;
-                    userRef.child("mPhotos").setValue(photoCount);
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-
-            //upload image
-            UploadTask uploadTask = imagesRef.putBytes(databaos);
-            uploadTask.addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    Toast.makeText(StepCounterActivity.this, "Upload failed", Toast.LENGTH_SHORT).show();
-                }
-            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    //productDownloadUrl = taskSnapshot.getDownloadUrl().toString();
-                    mProgress.dismiss();
-                    Toast.makeText(StepCounterActivity.this, "Image uploaded successfully", Toast.LENGTH_SHORT).show();
-                }
-
-            });
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            galleryAddPic();
         }
     }
 
+    private File createImageFile() throws IOException {
+        // Name of the image file (add time to have different files to avoid rewrite on the same file)
+        photoName = String.valueOf(new Date().getTime());
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                photoName, /* prefix */
+                ".jpg", /* suffix */
+                storageDir /* directory */
+        );
 
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File...
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
+    }
+
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(currentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
+
+        //set the progress dialog
+        mProgress.setMessage("Uploding image...");
+        mProgress.show();
+
+        //Firebase storage folder where you want to put the images
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("Selfies").child(FirebaseAuth.getInstance().getUid()).child(photoName);
+
+        Selfie selfie = new Selfie(photoName, currentLatLng.latitude, currentLatLng.longitude);
+
+        // Add photo information to realtime database
+        userRef.child("Selfies").push().setValue(selfie);
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                // Increment user photo count
+                int photoCount = user.getmPhotos() + 1;
+                userRef.child("mPhotos").setValue(photoCount);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        storageRef.putFile(contentUri)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        mProgress.dismiss();
+                        Toast.makeText(StepCounterActivity.this, "Image uploaded", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        mProgress.dismiss();
+                        Toast.makeText(StepCounterActivity.this, "Upload failed", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                        double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot
+                                .getTotalByteCount());
+                        mProgress.setMessage("Uploaded " + (int) progress + "%");
+                    }
+                });
+
+    }
 }

@@ -23,63 +23,20 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 public class ChallengesAdapter extends RecyclerView.Adapter<ChallengesAdapter.ChallengesViewHolder> {
+    public int currentPoints;
+    public int totalPoints;
     private ArrayList<Challenges> mChallangesList;
     private Context context;
-
     private DatabaseReference userRef;
     private String mCurrentUser = FirebaseAuth.getInstance().getUid();
-    private  User currentUser;
-    public int currentPoints;
-
-    public int totalPoints;
+    private User currentUser;
 
 
-
-
-
-    public static class ChallengesViewHolder extends RecyclerView.ViewHolder{
-
-        public TextView challengeNameText;
-        public TextView progressText;
-        public TextView challengeLimitText;
-        public TextView challengeFormatText;
-        public Button claimButton;
-        public LinearLayout challengeLayout;
-        public RelativeLayout completionLayout;
-
-
-
-        public ChallengesViewHolder(@NonNull View itemView) {
-            super(itemView);
-            challengeNameText = itemView.findViewById(R.id.challengeNameText);
-            progressText = itemView.findViewById(R.id.currentStepView);
-            challengeLimitText = itemView.findViewById(R.id.challengeLimitText);
-            challengeFormatText = itemView.findViewById(R.id.challengeFormatText);
-            claimButton = itemView.findViewById(R.id.claimBtn);
-            challengeLayout = itemView.findViewById(R.id.challengeElementLayout);
-            completionLayout = itemView.findViewById(R.id.completion_layout);
-
-            claimButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = getAdapterPosition();
-
-                    if(position != RecyclerView.NO_POSITION){
-
-                    }
-                }
-            });
-
-        }
-    }
-
-
-    public ChallengesAdapter(ArrayList<Challenges> challengesList){
+    public ChallengesAdapter(ArrayList<Challenges> challengesList) {
         //Pass the list from the list from the adapter.
         mChallangesList = challengesList;
 
     }
-
 
     @NonNull
     @Override
@@ -99,17 +56,15 @@ public class ChallengesAdapter extends RecyclerView.Adapter<ChallengesAdapter.Ch
         challengesViewHolder.challengeFormatText.setText(currentItem.getChallengeFormat());
 
 
-
-
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser);
 
-        if( Integer.valueOf(currentItem.getProgress()) >= Integer.valueOf(currentItem.getChallengeLimit()) ){
+        if (Integer.valueOf(currentItem.getProgress()) >= Integer.valueOf(currentItem.getChallengeLimit())) {
             challengesViewHolder.claimButton.setBackgroundResource(R.drawable.buttonstyle);
 
             challengesViewHolder.claimButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(context, " Congratulations!\n"+ currentItem.getPoints() + " added!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, " Congratulations!\n" + currentItem.getPoints() + " added!", Toast.LENGTH_LONG).show();
 
 
                     userRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -130,17 +85,17 @@ public class ChallengesAdapter extends RecyclerView.Adapter<ChallengesAdapter.Ch
                     });
 
 
-                        challengesViewHolder.completionLayout.setVisibility(View.VISIBLE);
-                        challengesViewHolder.claimButton.setBackgroundResource(R.drawable.buttonstlye_dead);
-                        challengesViewHolder.claimButton.setEnabled(false);
+                    challengesViewHolder.completionLayout.setVisibility(View.VISIBLE);
+                    challengesViewHolder.claimButton.setBackgroundResource(R.drawable.buttonstlye_dead);
+                    challengesViewHolder.claimButton.setEnabled(false);
                 }
             });
-        }else{
+        } else {
 
             challengesViewHolder.claimButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-              Toast.makeText(context, "Challenge not yet complete\nKeep it up!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Challenge not yet complete\nKeep it up!", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -152,5 +107,40 @@ public class ChallengesAdapter extends RecyclerView.Adapter<ChallengesAdapter.Ch
     public int getItemCount() {
 
         return mChallangesList.size();
+    }
+
+    public static class ChallengesViewHolder extends RecyclerView.ViewHolder {
+
+        public TextView challengeNameText;
+        public TextView progressText;
+        public TextView challengeLimitText;
+        public TextView challengeFormatText;
+        public Button claimButton;
+        public LinearLayout challengeLayout;
+        public RelativeLayout completionLayout;
+
+
+        public ChallengesViewHolder(@NonNull View itemView) {
+            super(itemView);
+            challengeNameText = itemView.findViewById(R.id.challengeNameText);
+            progressText = itemView.findViewById(R.id.currentStepView);
+            challengeLimitText = itemView.findViewById(R.id.challengeLimitText);
+            challengeFormatText = itemView.findViewById(R.id.challengeFormatText);
+            claimButton = itemView.findViewById(R.id.claimBtn);
+            challengeLayout = itemView.findViewById(R.id.challengeElementLayout);
+            completionLayout = itemView.findViewById(R.id.completion_layout);
+
+            claimButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+
+                    if (position != RecyclerView.NO_POSITION) {
+
+                    }
+                }
+            });
+
+        }
     }
 }

@@ -4,7 +4,9 @@
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
     android:background="#FFFFFF"
-    android:padding="10dp">
+    android:padding="10dp"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp">
 
 
        <TextView
@@ -19,8 +21,8 @@
 
     <ImageView
         android:id="@+id/feedImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
         android:layout_alignParentEnd="true"
         android:layout_gravity="center"
         android:src="@drawable/selfie_icon"

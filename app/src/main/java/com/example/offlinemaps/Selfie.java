@@ -34,7 +34,7 @@ public class Selfie {
     public void setId(String id) {
         this.id = id;
     }
-    
+
     public double getLatitude() {
         return latitude;
     }

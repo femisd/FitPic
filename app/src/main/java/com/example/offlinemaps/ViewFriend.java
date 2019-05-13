@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,22 +34,18 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ViewFriend extends AppCompatActivity {
 
+    //Final fields
+    private static final int RC_SIGN_IN = 1;
     private CircleImageView mProfilePicture;
     private User loggedIn;
-
     //fields for nav view.
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
     private NavigationView mNavView;
-
     //Database references.
     private DatabaseReference userRef;
     private DatabaseReference followersRef;
     private DatabaseReference viewedUserRef;
-
-    //Final fields
-    private static final int RC_SIGN_IN = 1;
-
     //List of login methods.
     private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
             new AuthUI.IdpConfig.EmailBuilder().build(),
@@ -66,9 +63,9 @@ public class ViewFriend extends AppCompatActivity {
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
         //Initialisation of fields.
-        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mNavView = (NavigationView) findViewById(R.id.nav_view_friend);
-        mProfilePicture = (CircleImageView) findViewById(R.id.cv_view_friends_picture);
+        mDrawer = findViewById(R.id.drawer_layout);
+        mNavView = findViewById(R.id.nav_view_friend);
+        mProfilePicture = findViewById(R.id.cv_view_friends_picture);
         setupDrawerContent(mNavView);
 
         //Setup references.
@@ -88,35 +85,46 @@ public class ViewFriend extends AppCompatActivity {
             Picasso.get().load(image).placeholder(R.drawable.ic_person_white_24dp).into(mProfilePicture);
         }
         //Username
-        TextView username = (TextView) findViewById(R.id.tv_view_friends_user);
+        TextView username = findViewById(R.id.tv_view_friends_user);
         username.setText(user.getmUsername());
         setTitle(user.getmUsername());
 
         //Steps
-        TextView steps = (TextView) findViewById(R.id.tv_view_friends_steps);
+        TextView steps = findViewById(R.id.tv_view_friends_steps);
         steps.setText(user.getmSteps() + "");
 
         //Calories
-        TextView calories = (TextView) findViewById(R.id.tv_view_friends_calories);
+        TextView calories = findViewById(R.id.tv_view_friends_calories);
         calories.setText(user.getmCaloriesBurned() + "");
 
         //Photos
-        TextView photos = (TextView) findViewById(R.id.tv_view_friends_photos);
+        TextView photos = findViewById(R.id.tv_view_friends_photos);
         photos.setText(user.getmPhotos() + "");
 
+        //Photos box/button thingy
+        LinearLayout photoBox = findViewById(R.id.photosBoxFriend);
+        photoBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ViewFriend.this, GalleryActivity.class);
+                intent.putExtra("user", user);
+                startActivity(intent);
+            }
+        });
+
         //Followers
-        final TextView followers = (TextView) findViewById(R.id.tv_view_friends_followers);
+        final TextView followers = findViewById(R.id.tv_view_friends_followers);
         followers.setText(user.getmFollowers() + "");
 
         //Following
-        final TextView following = (TextView) findViewById(R.id.tv_view_friends_following);
+        final TextView following = findViewById(R.id.tv_view_friends_following);
         following.setText(user.getmFollowing() + "");
 
         //Points
-        TextView points = (TextView) findViewById(R.id.tv_view_friends_points);
+        TextView points = findViewById(R.id.tv_view_friends_points);
         points.setText(user.getmPoints() + "");
 
-        final Button follow = (Button) findViewById(R.id.bt_follow);
+        final Button follow = findViewById(R.id.bt_follow);
 
         if (user.getmUid().equals(currentUser)) {
             follow.setVisibility(View.GONE);
@@ -126,8 +134,8 @@ public class ViewFriend extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 final User snapshotValue = dataSnapshot.getValue(User.class);
-                    followers.setText(snapshotValue.getmFollowers() + "");
-                    following.setText(snapshotValue.getmFollowing() + "");
+                followers.setText(snapshotValue.getmFollowers() + "");
+                following.setText(snapshotValue.getmFollowing() + "");
 
             }
 
@@ -254,6 +262,11 @@ public class ViewFriend extends AppCompatActivity {
             case R.id.nav_shop:
                 Intent shop = new Intent(ViewFriend.this, ShopActivity.class);
                 startActivity(shop);
+                finish();
+                break;
+            case R.id.nav_feed:
+                Intent feed = new Intent(ViewFriend.this, FeedActivity.class);
+                startActivity(feed);
                 finish();
                 break;
         }
