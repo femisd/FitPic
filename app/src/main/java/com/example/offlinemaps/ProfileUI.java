@@ -64,6 +64,7 @@ public class ProfileUI extends AppCompatActivity {
     private StorageReference userProfilePicturesRef;
     private DatabaseReference userRef;
 
+
     //List of login methods.
     private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
             new AuthUI.IdpConfig.EmailBuilder().build(),
@@ -165,12 +166,17 @@ public class ProfileUI extends AppCompatActivity {
                 startActivity(friends);
                 finish();
                 break;
-
             case R.id.nav_feed:
                 Intent feed = new Intent(ProfileUI.this, FeedActivity.class);
                 startActivity(feed);
                 finish();
                 break;
+            case R.id.nav_shop:
+                Intent shop = new Intent(ProfileUI.this, ShopActivity.class);
+                startActivity(shop);
+                finish();
+                break;
+
         }
         menuItem.setChecked(true);
         mDrawer.closeDrawers();
@@ -213,6 +219,7 @@ public class ProfileUI extends AppCompatActivity {
                                     username.setText(user.getmUsername());
                                 }
 
+                                LinearLayout usernameBox = findViewById(R.id.ll_user_box);
                                 //Launch update username activity.
                                 username.setOnClickListener(new View.OnClickListener() {
                                     @Override
@@ -251,7 +258,8 @@ public class ProfileUI extends AppCompatActivity {
                                 TextView following = (TextView) findViewById(R.id.tv_profile_following);
                                 following.setText(user.getmFollowing() + "");
 
-                                following.setOnClickListener(new View.OnClickListener() {
+                                LinearLayout followingBox = findViewById(R.id.ll_following_box);
+                                followingBox.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
                                         Intent following = new Intent(ProfileUI.this, FriendsUI.class);
