@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">FitPic</string>
     <string name="title_activity_maps">Map</string>
-    <string name="title_activity_friends_ui">Following</string>
+    <string name="title_activity_friends_ui">Friends</string>
     <string name="home">Logout</string>
     <string name="map">Map</string>
     <string name="friends">Following</string>
@@ -16,12 +16,13 @@
     <string name="photos">Photos</string>
     <string name="Steps">steps</string>
     <string name="points">points</string>
-    <string name="title_activity_update_username">Set your username</string>
+    <string name="title_activity_update_username">UpdateUsername</string>
     <string name="start_walking">Start Walking</string>
     <string name="title_activity_goals2">GoalsActivity2</string>
     <string name="update">Update!</string>
     <string name="title_activity_view_friend">ViewFriend</string>
     <string name="goals">Goals</string>
+    <string name="feed">Feed</string>
     <string name="start_tracking">Start Tracking</string>
     <string name="_0">0</string>
     <string name="enter_address_city_or_zip_code">Enter Address, City or Zip Code</string>
@@ -32,5 +33,6 @@
     <string name="vip_membership">VIP membership</string>
     <string name="claim">Claim</string>
     <string name="shop">Shop</string>
+    <string name="Gallery">Gallery</string>
 
 </resources>

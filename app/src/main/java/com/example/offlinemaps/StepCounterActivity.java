@@ -104,6 +104,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     private boolean tracking;
     //fields for nav view.
     private DrawerLayout mDrawer;
+    private int poorManGeofence = 50;//meteres pls
+    private boolean inAGeofence;
 
     ArrayList<NameCoords> nearbyMarkers;
 
@@ -121,6 +123,9 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     //Current Location
     private Location currentLocation;
     private LatLng currentLatLng;
+
+
+    private DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(FirebaseAuth.getInstance().getUid());
     /**
      * CalcDist between two pars of lat-lon
      */
@@ -146,14 +151,32 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
     public void updateMarkers(ArrayList<NameCoords> locations){
         for(int i = 0; i < locations.size(); i++){
-            LatLng coordinates = locations.get(i).getCoords();
-            double dist = calcDist(currentLatLng, coordinates);
+            NameCoords locationToCheck = locations.get(i);
+            locationToCheck.updateDist(currentLatLng);
             mMap.addMarker(new MarkerOptions()
-                    .position(coordinates)
+                    .position(locationToCheck.getCoords())
                     .title(locations.get(i).getName())
-                    .snippet(dist*1000+"m")
+                    .snippet(locationToCheck.getDist()+"m")
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.money_pointer)));
+
+            if (locationToCheck.amIInIt()){
+                selfieBtn.setVisibility(View.VISIBLE);
+                //Toast.makeText(this, "NI-", Toast.LENGTH_SHORT).show();
+            }else if(!amIInAny(locations)){
+                selfieBtn.setVisibility(View.GONE);
+                //Toast.makeText(this, "Bye.", Toast.LENGTH_SHORT).show();
+            }
         }
+    }
+
+    private boolean amIInAny(ArrayList<NameCoords> locations){
+        boolean output = false;
+        for(int i = 0; i < locations.size(); i++){
+            if(locations.get(i).amIInIt()) {
+                output = true;
+            }
+        }
+        return output;
     }
 
     LocationCallback mLocationCallback = new LocationCallback() {
@@ -189,14 +212,15 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
                 //Place current location marker
                 LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+
+                //move map camera
+                // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 20));
+                mMap.clear();
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(latLng);
                 markerOptions.title("Current Position");
                 markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.running_pointer));
                 mCurrLocationMarker = mMap.addMarker(markerOptions);
-
-                //move map camera
-                // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 20));
                 updateMarkers(nearbyMarkers);
             }
         }
@@ -226,6 +250,8 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
         selfieBtn = findViewById(R.id.selfieBtn);
 
+        inAGeofence = false;
+
         updateButton();
         counterView = findViewById(R.id.counterText);
         goalsBtn = findViewById(R.id.goalsBtn);
@@ -249,13 +275,10 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         mNavView = (NavigationView) findViewById(R.id.nv_nav);
         setupDrawerContent(mNavView);
 
-        final DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(FirebaseAuth.getInstance().getUid());
 
         trackerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                selfieBtn.setVisibility(View.VISIBLE);
 
 
                 if (!tracking) {
@@ -498,6 +521,17 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         nearbyMarkers.add(new NameCoords("Friary Centre", new LatLng(51.242373, -0.581312)));
         nearbyMarkers.add(new NameCoords("Student Union", new LatLng(51.242007, -0.586198)));
         nearbyMarkers.add(new NameCoords("School Of Arts", new LatLng(51.243012, -0.595327)));
+        nearbyMarkers.add(new NameCoords("Stoke Park", new LatLng(51.245387, -0.564457)));
+        nearbyMarkers.add(new NameCoords("Guildford Cathedral", new LatLng(51.241072,  -0.590174)));
+        nearbyMarkers.add(new NameCoords("AirHop Guildford", new LatLng(51.245076, -0.585014)));
+        nearbyMarkers.add(new NameCoords("Guildford Cricket Club", new LatLng(51.243091, -0.577289)));
+        nearbyMarkers.add(new NameCoords("The Gym Guildford", new LatLng(51.247731, -0.583185)));
+        nearbyMarkers.add(new NameCoords("G Live", new LatLng(51.238716, -0.566239)));
+        nearbyMarkers.add(new NameCoords("Millmead", new LatLng(51.234597, -0.576669)));
+        nearbyMarkers.add(new NameCoords("Undercroft", new LatLng(51.235455, -0.573610)));
+        nearbyMarkers.add(new NameCoords("Alan Turing Statue", new LatLng(51.243959, -0.589444)));
+        nearbyMarkers.add(new NameCoords("Stag Statue", new LatLng(51.242417, -0.595196)));
+        nearbyMarkers.add(new NameCoords("Surrey Sports Park", new LatLng(51.236102, -0.607332)));
     }
 
 
@@ -592,11 +626,11 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
 
     }
 
-    public double toRadians(double deg) {
+    public static double toRadians(double deg) {
         return deg * Math.PI / 180;
     }
 
-    public double calcDist(LatLng latLng1, LatLng latLng2) {
+    public static double calcDist(LatLng latLng1, LatLng latLng2) {
 
         double lat1 = latLng1.latitude;
         double lon1 = latLng1.longitude;
@@ -715,8 +749,31 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
             StorageReference storageRef = FirebaseStorage.getInstance().getReference();
 
             //name of the image file (add time to have different files to avoid rewrite on the same file)
-            StorageReference imagesRef = storageRef.child("Selfies").child(FirebaseAuth.getInstance().getUid()).child(String.valueOf(new Date().getTime()));
-            //send this name to database
+            String photoName = String.valueOf(new Date().getTime());
+
+            //send this photo under the specified name to database
+            StorageReference imagesRef = storageRef.child("Selfies").child(FirebaseAuth.getInstance().getUid()).child(photoName);
+
+            Selfie selfie = new Selfie(photoName, currentLatLng.latitude, currentLatLng.longitude);
+
+            // Add photo information to realtime database
+            userRef.child("Selfies").push().setValue(selfie);
+
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User user = dataSnapshot.getValue(User.class);
+                    // Increment user photo count
+                    int photoCount = user.getmPhotos()+1;
+                    userRef.child("mPhotos").setValue(photoCount);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
             //upload image
             UploadTask uploadTask = imagesRef.putBytes(databaos);
             uploadTask.addOnFailureListener(new OnFailureListener() {

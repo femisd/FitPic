@@ -55,15 +55,15 @@ public class ProfileUI extends AppCompatActivity {
     private String mCurrentUser;
     private static boolean calledAlready;
 
+    //Final fields
+    private static final int RC_SIGN_IN = 1;
+
     //Firebase fields
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
     private StorageReference userProfilePicturesRef;
     private DatabaseReference userRef;
 
-
-    //Final fields
-    private static final int RC_SIGN_IN = 1;
 
     //List of login methods.
     private List<AuthUI.IdpConfig> mProviders = Arrays.asList(
@@ -166,11 +166,17 @@ public class ProfileUI extends AppCompatActivity {
                 startActivity(friends);
                 finish();
                 break;
+            case R.id.nav_feed:
+                Intent feed = new Intent(ProfileUI.this, FeedActivity.class);
+                startActivity(feed);
+                finish();
+                break;
             case R.id.nav_shop:
                 Intent shop = new Intent(ProfileUI.this, ShopActivity.class);
                 startActivity(shop);
                 finish();
                 break;
+
         }
         menuItem.setChecked(true);
         mDrawer.closeDrawers();
@@ -215,7 +221,7 @@ public class ProfileUI extends AppCompatActivity {
 
                                 LinearLayout usernameBox = findViewById(R.id.ll_user_box);
                                 //Launch update username activity.
-                                usernameBox.setOnClickListener(new View.OnClickListener() {
+                                username.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
                                         Intent update = new Intent(ProfileUI.this, UpdateUsername.class);
@@ -234,6 +240,16 @@ public class ProfileUI extends AppCompatActivity {
                                 //Photos
                                 TextView photos = (TextView) findViewById(R.id.tv_profile_photos);
                                 photos.setText(user.getmPhotos() + "");
+
+                                //Photos box/button thingy
+                                LinearLayout photoBox = findViewById(R.id.photosBox);
+                                photoBox.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent intent = new Intent(ProfileUI.this, GalleryActivity.class);
+                                        startActivity(intent);
+                                    }
+                                });
 
                                 //Followers
                                 TextView followers = (TextView) findViewById(R.id.tv_profile_followers);

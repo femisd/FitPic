@@ -2,8 +2,6 @@ package com.example.offlinemaps;
 
 public class Selfie {
     private String id;
-    private String uid;
-    private String timestamp;
     private double latitude;
     private double longitude;
 
@@ -19,16 +17,12 @@ public class Selfie {
      * Constructor
      *
      * @param id        selfie id
-     * @param uid       user id
-     * @param timestamp time taken
      * @param latitude
      * @param longitude
      */
-    public Selfie(String id, String uid, String timestamp, double latitude, double longitude) {
+    public Selfie(String id, double latitude, double longitude) {
         super();
         this.id = id;
-        this.uid = uid;
-        this.timestamp = timestamp;
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -40,23 +34,7 @@ public class Selfie {
     public void setId(String id) {
         this.id = id;
     }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
-
+    
     public double getLatitude() {
         return latitude;
     }
@@ -72,4 +50,14 @@ public class Selfie {
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
+
+    @Override
+    public String toString() {
+        return "Selfie{" +
+                "id='" + id + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                '}';
+    }
 }
+
