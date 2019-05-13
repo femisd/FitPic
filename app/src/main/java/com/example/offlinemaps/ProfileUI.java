@@ -165,6 +165,12 @@ public class ProfileUI extends AppCompatActivity {
                 startActivity(friends);
                 finish();
                 break;
+
+            case R.id.nav_feed:
+                Intent feed = new Intent(ProfileUI.this, FeedActivity.class);
+                startActivity(feed);
+                finish();
+                break;
         }
         menuItem.setChecked(true);
         mDrawer.closeDrawers();

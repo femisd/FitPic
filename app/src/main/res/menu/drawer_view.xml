@@ -15,5 +15,9 @@
             android:id="@+id/nav_leaderboard"
             android:title="@string/leaderboard" />
 
+        <item
+            android:id="@+id/nav_feed"
+            android:title="@string/feed" />
+
     </group>
 </menu>
