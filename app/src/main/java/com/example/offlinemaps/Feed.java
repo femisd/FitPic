@@ -5,10 +5,10 @@ public class Feed {
     private String username;
     private String date;
     private String location;
-    private int image;
+    private String image;
 
 
-    public Feed(String username, String date, String location, int image) {
+    public Feed(String username, String date, String location, String image) {
         this.username = username;
         this.date = date;
         this.location = location;
@@ -39,11 +39,15 @@ public class Feed {
         this.location = location;
     }
 
-    public int getImage() {
+    public String getImage() {
         return image;
     }
 
-    public void setImage(int image) {
+    public void setImage(String image) {
         this.image = image;
+    }
+
+    public String toString(){
+        return this.username + " " + this.location + " " + this.date + " " + this.image;
     }
 }
