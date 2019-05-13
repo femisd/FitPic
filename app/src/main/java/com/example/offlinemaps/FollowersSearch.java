@@ -161,6 +161,10 @@ public class FollowersSearch extends AppCompatActivity {
                 startActivity(profile);
                 finish();
                 break;
+            case R.id.nav_shop:
+                Intent shop = new Intent(FollowersSearch.this, ShopActivity.class);
+                startActivity(shop);
+                finish();
         }
         menuItem.setChecked(true);
         mDrawer.closeDrawers();

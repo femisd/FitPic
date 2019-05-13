@@ -179,6 +179,7 @@ public class Leaderboard extends AppCompatActivity {
                 break;
             case R.id.nav_shop:
                 Intent shop = new Intent(Leaderboard.this, ShopActivity.class);
+                startActivity(shop);
                 finish();
                 break;
         }

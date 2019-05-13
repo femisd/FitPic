@@ -112,8 +112,8 @@ public class ShopActivity extends AppCompatActivity {
                 startActivity(friends);
                 finish();
                 break;
-            case R.id.nav_shop:
-                Intent shop = new Intent(ShopActivity.this, ShopActivity.class);
+            case R.id.nav_profile:
+                Intent shop = new Intent(ShopActivity.this, ProfileUI.class);
                 startActivity(shop);
                 finish();
                 break;
